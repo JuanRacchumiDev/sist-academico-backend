@@ -17,11 +17,14 @@ return new class extends Migration
             $table->string('nombre', 100)->unique();
             $table->string('nombre_url', 120)->unique();
             $table->string('descripcion', 100)->nullable();
+            $table->string('valor', 20)->nullable();
+            $table->string('abreviatura', 10)->nullable();
             $table->integer('longitud')->nullable();
             $table->boolean('en_persona')->default(false);
             $table->boolean('en_empresa')->default(false);
             $table->boolean('compra')->default(false);
             $table->boolean('venta')->default(false);
+            $table->boolean('visible')->default(false);
             $table->string('user_crea', 10)->nullable();
             $table->string('user_actualiza', 10)->nullable();
             $table->string('user_elimina', 10)->nullable();

@@ -58,6 +58,70 @@ class ParametroSeeder extends Seeder
                 'descripcion' => 'Tipo de certificado',
                 'created_at' => $now,
                 'updated_at' => $now
+            ],
+            [
+                'clase' => 1005,
+                'nombre' => 'Sede',
+                'nombre_url' => 'sede',
+                'descripcion' => 'Sede de instalaciones',
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'clase' => 1006,
+                'nombre' => 'Universidad',
+                'nombre_url' => 'universidad',
+                'descripcion' => 'Universidades públicas y privadas',
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'clase' => 1007,
+                'nombre' => 'Forma de pago',
+                'nombre_url' => 'forma-de-pago',
+                'descripcion' => 'Formas de pago aceptadas',
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'clase' => 1008,
+                'nombre' => 'Moneda',
+                'nombre_url' => 'moneda',
+                'descripcion' => 'Monedas aceptadas',
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'clase' => 1009,
+                'nombre' => 'Segmento',
+                'nombre_url' => 'segmento',
+                'descripcion' => 'Segmentos aceptados',
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'clase' => 1010,
+                'nombre' => 'Grupo',
+                'nombre_url' => 'grupo',
+                'descripcion' => 'Grupos aceptados',
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'clase' => 1011,
+                'nombre' => 'Estado Pago',
+                'nombre_url' => 'estado-pago',
+                'descripcion' => 'Distintos estados de pago',
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'clase' => 1012,
+                'nombre' => 'Estado Matrícula',
+                'nombre_url' => 'estado-matricula',
+                'descripcion' => 'Distintos estados de matricula',
+                'created_at' => $now,
+                'updated_at' => $now
             ]
         ]);
     }

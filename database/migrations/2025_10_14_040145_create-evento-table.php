@@ -24,7 +24,7 @@ return new class extends Migration
             $table->string('fecha_inicio', 10);
             $table->string('fecha_final', 10);
             $table->string('duracion', 20);
-            $table->enum('modalidad', ['Virtual', 'Presencial', 'Mixto'])->default('Virtual');
+            $table->enum('modalidad', ['VIRTUAL', 'PRESENCIAL', 'MIXTO'], 20)->default('VIRTUAL');
             $table->decimal('precio', 10, 2)->nullable();
             $table->integer('capacidad_minima')->nullable();
             $table->integer('capacidad_maxima')->nullable();

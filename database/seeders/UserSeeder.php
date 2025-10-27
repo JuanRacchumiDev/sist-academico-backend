@@ -26,6 +26,8 @@ class UserSeeder extends Seeder
 
         $passwordHashed = Hash::make('admin123');
 
+        $passwordHashedIpede = Hash::make('ipede123'); 
+
         DB::table('users')->truncate();
 
         DB::table('users')->insert([
@@ -33,6 +35,14 @@ class UserSeeder extends Seeder
                 'name' => 'admin',
                 'email' => 'admin@peruinnova.com',
                 'password' => $passwordHashed,
+                'id_perfil' => $perfilAdmnin->codigo,
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'name' => 'ipede',
+                'email' => 'admin@ipede.com',
+                'password' => $passwordHashedIpede,
                 'id_perfil' => $perfilAdmnin->codigo,
                 'created_at' => $now,
                 'updated_at' => $now

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('nombres', 30);
             $table->string('apellido_paterno', 30);
             $table->string('apellido_materno', 30);
+            $table->string('nombre_completo', 100);
             $table->string('departamento', 50)->nullable();
             $table->string('provincia', 50)->nullable();
             $table->string('distrito', 50)->nullable();

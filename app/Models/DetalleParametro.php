@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class DetalleParametro extends Model
 {
@@ -15,6 +17,8 @@ class DetalleParametro extends Model
         'nombre',
         'nombre_url',
         'descripcion',
+        'valor',
+        'abreviatura',
         'longitud',
         'en_persona',
         'en_empresa',
@@ -33,4 +37,28 @@ class DetalleParametro extends Model
         'created_at',
         'updated_at'
     ];
+
+    /**
+     * Obtener el parámetro vinculado a un detalle de parámetro
+     * @return BelongsTo<Parametro, $this>
+     */
+    public function parametro(): BelongsTo
+    {
+        return $this->belongsTo(Parametro::class, 'clase', 'parametro_clase');
+    }
+
+    /**
+     * The roles that belong to the DetalleParametro
+     *
+     * @return BelongsToMany<Persona, $this, Pivot>
+     */
+    public function personas(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Persona::class,
+            'grupo_persona',
+            'detalle_parametro_codigo',
+            'persona_id'
+        )->withTimestamps();
+    }
 }

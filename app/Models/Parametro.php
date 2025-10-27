@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Parametro extends Model
 {
@@ -20,4 +21,12 @@ class Parametro extends Model
         "user_elimina",
         "estado"
     ];
+
+    /**
+     * Obtener el detalle de un parámetro
+     * @return HasMany<DetalleParametro, $this>
+     */
+    public function detalle(): HasMany {
+        return $this->hasMany(DetalleParametro::class, 'parametro_clase', 'clase');
+    }
 }

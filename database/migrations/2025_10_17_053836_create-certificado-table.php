@@ -24,9 +24,9 @@ return new class extends Migration
             $table->string('path_file', 350);
             $table->string('filename', 150);
             $table->string('nombre_impresion', 150);
-            $table->string('user_crea', 12)->nullable();
-            $table->string('user_actualiza', 12)->nullable();
-            $table->string('user_elimina', 12)->nullable();
+            $table->string('user_crea', 10)->nullable();
+            $table->string('user_actualiza', 10)->nullable();
+            $table->string('user_elimina', 10)->nullable();
             $table->boolean('estado')->default(true);
             $table->timestamps();
 
