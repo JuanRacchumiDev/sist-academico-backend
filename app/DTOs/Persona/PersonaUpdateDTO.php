@@ -24,7 +24,7 @@ class PersonaUpdateDTO extends Data
         public ?string $ubigeo_sunat = null,
         public ?string $ubigeo = null,
         public ?string $fecha_nacimiento = null,
-        public ?string $estado_ciivl = null,
+        public ?string $estado_civil = null,
         public ?string $foto = null,
         public ?string $sexo = null,
         public ?string $origen = "WEB",

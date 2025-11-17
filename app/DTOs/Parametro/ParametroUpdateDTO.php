@@ -7,8 +7,9 @@ use Illuminate\Support\Str;
 
 class ParametroUpdateDTO extends Data
 {
+    public ?int $clase;
+
     public function __construct(
-        public int $clase,
         public ?string $nombre = null,
         public ?string $nombre_url = null,
         public ?string $descripcion = null,
@@ -33,25 +34,21 @@ class ParametroUpdateDTO extends Data
 
     public static function rules(): array
     {
-        $parametroId = request()->route('parametro');
+        $data = app(self::class);
+        $clase = $data->clase ?? null;
 
         return [
-            'clase' => [
-                'required',
-                'integer',
-                Rule::unique('parametro', 'clase')
-            ],
             'nombre' => [
                 'sometimes',
                 'string',
                 'max:100',
-                Rule::unique('parametro', 'nombre')->ignore($parametroId)
+                Rule::unique('parametro', 'nombre')->ignore($clase, 'clase')
             ],
             'nombre_url' => [
                 'sometimes',
                 'string',
                 'max:120',
-                Rule::unique('parametro', 'nombre_url')->ignore($parametroId)
+                Rule::unique('parametro', 'nombre_url')->ignore($clase, 'clase')
             ],
             'descripcion' => [
                 'sometimes',

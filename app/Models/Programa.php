@@ -3,21 +3,26 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
 
-class Plantilla extends Model
+class Programa extends Model
 {
-    protected $table = 'plantilla';
+    protected $table = 'programa';
 
     protected $guarded = ['id'];
 
     protected $fillable = [
+        'id_segmento',
+        'codigo_old',
+        'sigla',
         'nombre',
-        'descripcion',
-        'path',
+        'duracion',
+        'modulos',
+        'creditos',
+        'plan',
         'user_crea',
         'user_actualiza',
         'user_elimina',
+        'is_vigente',
         'estado'
     ];
 
@@ -30,11 +35,7 @@ class Plantilla extends Model
     ];
 
     protected $casts = [
+        'is_visible' => 'boolean',
         'estado' => 'boolean'
     ];
-
-    // public function getFileUrlAttribute(): string
-    // {
-    //     return $this->path ? Storage::url($this->path) : '';
-    // }
 }

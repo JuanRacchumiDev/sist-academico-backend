@@ -58,7 +58,9 @@ class PersonaController extends Controller
     public function store(Request $request): JsonResponse
     {
         try {
-            $personaCreateDTO = PersonaCreateDTO::from($request->all());
+            $data = $request->all();
+
+            $personaCreateDTO = PersonaCreateDTO::from($data);
 
             $persona = $this->personaService->createPersona($personaCreateDTO);
 

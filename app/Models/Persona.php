@@ -8,6 +8,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Persona extends Model
 {
+    // AÑADIDO: Declarar explícitamente la llave primaria
+    protected $primaryKey = 'id';
+    public $incrementing = true; // Por defecto es true
+    protected $keyType = 'int'; // Por defecto es int
+
     protected $table = 'persona';
 
     protected $fillable = [
@@ -60,8 +65,8 @@ class Persona extends Model
         return $this->belongsToMany(
             DetalleParametro::class,
             'grupo_persona',
-            'persona_id',
-            'detalle_parametro_codigo'
+            'id_persona', // Clave foránea del modelo actual (Persona) en la tabla pivote
+            'codigo_detalle_parametro' // Clave foránea del modelo DetalleParametro en la tabla pivote
         )->withTimestamps();
     }
 }

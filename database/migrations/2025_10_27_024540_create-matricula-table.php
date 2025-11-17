@@ -15,10 +15,16 @@ return new class extends Migration
             $table->id();
 
             $table->unsignedBigInteger('id_alumno');
-            $table->unsignedBigInteger('id_sede');
-            $table->unsignedBigInteger('id_programa');
-            $table->unsignedBigInteger('id_evento');
-            $table->unsignedBigInteger('id_estadomatricula');
+            $table->unsignedBigInteger('id_sede')->nullable();
+            $table->unsignedBigInteger('id_programa')->nullable();
+            $table->unsignedBigInteger('id_evento')->nullable();
+            $table->unsignedBigInteger('id_estadomatricula')->nullable();
+            
+            $table->string('nombre_alumno', 100)->nullable();
+            $table->string('nombre_sede', 60)->nullable();
+            $table->string('nombre_programa', 100)->nullable();
+            $table->string('nombre_evento', 100)->nullable();
+            $table->string('nombre_estadomatricula', 60)->nullable();
 
             $table->string('fecha_matricula', 10);
             $table->decimal('pago_inicial', 10, 2)->nullable();

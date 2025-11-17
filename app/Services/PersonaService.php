@@ -4,7 +4,10 @@ namespace App\Services;
 use App\DTOs\Persona\PersonaCreateDTO;
 use App\DTOs\Persona\PersonaUpdateDTO;
 use App\Models\Persona;
+use App\Models\DetalleParametro;
+use Illuminate\Support\Facades\DB;
 use App\Repositories\Contracts\IPersonaRepository;
+use App\Repositories\Contracts\IDetalleParametroRepository;
 use App\Services\Contracts\IPersonaService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
@@ -12,10 +15,13 @@ use Illuminate\Validation\ValidationException;
 
 class PersonaService implements IPersonaService {
     protected IPersonaRepository $personaRepository;
+    protected IDetalleParametroRepository $detalleRepository;
 
-    public function __construct(IPersonaRepository $personaRepository)
+    public function __construct(IPersonaRepository $personaRepository, IDetalleParametroRepository $detalleRepository
+        )
     {
         $this->personaRepository = $personaRepository;
+        $this->detalleRepository = $detalleRepository;
     }
 
     /**
@@ -79,13 +85,31 @@ class PersonaService implements IPersonaService {
      */
     public function createPersona(PersonaCreateDTO $personaCreateDTO): Persona
     {
-        $nombreCompleto = $personaCreateDTO->nombres." ".$personaCreateDTO->apellido_paterno." ".$personaCreateDTO->apellido_materno;
+        return DB::transaction(function() use ($personaCreateDTO) {
+            $dataToCreate = $personaCreateDTO->toArray();
 
-        $personaCreateDTO->nombre_completo = $nombreCompleto;
-        
-        $data = array_filter($personaCreateDTO->toArray(), fn($value) => !is_null($value));
-        
-        return $this->personaRepository->create($data);
+            // Obtener el nombre de grupo
+            $nombreGrupo = $personaCreateDTO->nombre_grupo;
+
+            // Filtrar nulos
+            $data = array_filter($dataToCreate, fn($value) => !is_null($value));
+
+            // Crear la persona
+            /** @var Persona $persona */
+            $persona = $this->personaRepository->create($data);
+
+            // Obteniendo grupo
+            $grupo = $this->detalleRepository->findByNombreUrl($nombreGrupo);
+
+            // Adjuntar el grupo (si existe el código)
+            if ($grupo) {
+                $codigoGrupo = $grupo->codigo;
+
+                $persona->grupos()->attach($codigoGrupo);
+            }
+
+            return $persona;
+        });
     }
 
     /**

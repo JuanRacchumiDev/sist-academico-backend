@@ -57,8 +57,8 @@ class DetalleParametro extends Model
         return $this->belongsToMany(
             Persona::class,
             'grupo_persona',
-            'detalle_parametro_codigo',
-            'persona_id'
+            'codigo_detalle_parametro',
+            'id_persona'
         )->withTimestamps();
     }
 }

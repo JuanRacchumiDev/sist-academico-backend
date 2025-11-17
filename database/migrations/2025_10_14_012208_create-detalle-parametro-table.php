@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('detalle_parametro', function(Blueprint $table) {
             $table->id('codigo');
             $table->integer('parametro_clase');
-            $table->string('nombre', 100)->unique();
-            $table->string('nombre_url', 120)->unique();
+            $table->string('nombre', 100);
+            $table->string('nombre_url', 120);
             $table->string('descripcion', 100)->nullable();
             $table->string('valor', 20)->nullable();
             $table->string('abreviatura', 10)->nullable();

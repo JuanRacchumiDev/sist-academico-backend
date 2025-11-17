@@ -12,37 +12,25 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('grupo_persona', function(Blueprint $table) {
-            $table->unsignedBigInteger('detalle_parametro_codigo');
+            $table->unsignedBigInteger('codigo_detalle_parametro');
 
             // Columna que referencia a 'persona'.
             // Siempre 'unsignedBigInteger' si referencia al 'id()' de otra tabla.
-            $table->unsignedBigInteger('persona_id');
+            $table->unsignedBigInteger('id_persona');
 
             $table->timestamps();
 
             // Definición explícita de la clave foránea para 'detalle_parametro'
-            $table->foreign('detalle_parametro_codigo')
+            $table->foreign('codigo_detalle_parametro')
                   ->references('codigo') // La clave primaria de detalle_parametro se llama 'codigo'
                   ->on('detalle_parametro');
                 //   ->onDelete('cascade');
 
             // Definición explícita de la clave foránea para 'persona'
-            $table->foreign('persona_id')
+            $table->foreign('id_persona')
                   ->references('id') // La clave primaria de persona se llama 'id'
                   ->on('persona');
                 //   ->onDelete('cascade');
-
-            $table->primary(['detalle_parametro_codigo', 'persona_id']);
-
-            // $table->id();
-
-            // $table->foreign('id_grupo')
-            //     ->constrained('detalle_parametro');
-
-            // $table->foreign('id_persona')
-            //     ->constrained('persona');
-
-            // $table->timestamps();
         });
     }
 
@@ -51,11 +39,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Schema::table('grupo_persona', function(Blueprint $table) {
-        //     $table->dropConstrainedForeignId('id_grupo');
-        //     $table->dropConstrainedForeignId('id_persona');
-        // });
-
         Schema::dropIfExists('grupo_persona');
     }
 };

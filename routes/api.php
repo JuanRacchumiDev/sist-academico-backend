@@ -3,8 +3,11 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DetalleParametroController;
 use App\Http\Controllers\Api\EventoController;
+use App\Http\Controllers\Api\MatriculaController;
 use App\Http\Controllers\Api\ParametroController;
 use App\Http\Controllers\Api\PersonaController;
+use App\Http\Controllers\Api\PlantillaController;
+use App\Http\Controllers\Api\ProgramaController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function() {
@@ -43,5 +46,24 @@ Route::prefix('v1')->group(function() {
             Route::post('/', [PersonaController::class, 'store']);
             Route::get('grupo/{nombreGrupo}', [PersonaController::class, 'indexByGrupo']);
         });
+
+        // Route::apiResource('plantillas', PlantillaController::class);
+        Route::prefix('plantillas')->group(function () {
+            Route::post('/', [PlantillaController::class, 'store']);
+        });
+
+        Route::prefix('programas')->group(function() {
+            Route::get('/{programa}/descargar-plan', [ProgramaController::class, 'downloadPlan']);
+            Route::get('/', [ProgramaController::class, 'index']);
+            Route::post('/', [ProgramaController::class, 'store']);
+        });
+
+        Route::prefix('matriculas')->group(function() {
+            Route::get('{id}', [MatriculaController::class, 'show']);
+            Route::get('/', [MatriculaController::class, 'index']);
+            Route::post('/', [MatriculaController::class, 'store']);
+        });
+
+        // Route::apiResource('programas', ProgramaController::class);
     });
 });

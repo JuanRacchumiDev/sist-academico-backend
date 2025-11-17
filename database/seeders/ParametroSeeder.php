@@ -77,8 +77,8 @@ class ParametroSeeder extends Seeder
             ],
             [
                 'clase' => 1007,
-                'nombre' => 'Forma de pago',
-                'nombre_url' => 'forma-de-pago',
+                'nombre' => 'Forma pago',
+                'nombre_url' => 'forma-pago',
                 'descripcion' => 'Formas de pago aceptadas',
                 'created_at' => $now,
                 'updated_at' => $now
@@ -120,6 +120,22 @@ class ParametroSeeder extends Seeder
                 'nombre' => 'Estado Matrícula',
                 'nombre_url' => 'estado-matricula',
                 'descripcion' => 'Distintos estados de matricula',
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'clase' => 1013,
+                'nombre' => 'Banco Cuenta',
+                'nombre_url' => 'banco-cuenta',
+                'descripcion' => 'Distintas cuentas de bancos',
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'clase' => 1014,
+                'nombre' => 'Tipo Pago',
+                'nombre_url' => 'tipo-pago',
+                'descripcion' => 'Distintos tipos de pago',
                 'created_at' => $now,
                 'updated_at' => $now
             ]

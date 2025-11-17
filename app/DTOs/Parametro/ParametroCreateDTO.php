@@ -7,11 +7,12 @@ use Illuminate\Support\Str;
 
 class ParametroCreateDTO extends Data
 {
+    public ?int $clase; 
+
     public function __construct(
         public string $nombre,
+        public string $nombre_url,
         public bool $estado = true,
-        public ?int $clase = null,
-        public ?string $nombre_url = null,
         public ?string $descripcion = null,
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
@@ -21,34 +22,16 @@ class ParametroCreateDTO extends Data
     /**
      * Define los valores por defecto para los campos opcionales/booleanos
      */
-    public static function withDefaults(): array
-    {
-        return [
-            'estado' => true
-        ];
-    }
-
-    /**
-     * Manipula los datos de la validación
-     */
-    // public static function prepareForValidation(array $payload): array
+    // public static function withDefaults(): array
     // {
-    //     // Verificamos si el campo nombre está en la petición
-    //     if (isset($payload['nombre'])) {
-    //         $payload['nombre_url'] = Str::slug($payload['nombre']);
-    //     }
-
-    //     return $payload;
+    //     return [
+    //         'estado' => true
+    //     ];
     // }
 
     public static function rules(): array
     {
         return [
-            'clase' => [
-                'required',
-                'integer',
-                Rule::unique('parametro', 'clase')
-            ],
             'nombre' => [
                 'required',
                 'string',
@@ -83,7 +66,7 @@ class ParametroCreateDTO extends Data
                 'nullable'
             ],
             'estado' => [
-                'required',
+                'sometimes',
                 'boolean'
             ]
         ];

@@ -1,8 +1,10 @@
 <?php
 namespace App\DTOs\Persona;
 
+use App\Models\DetalleParametro;
 use Illuminate\Validation\Rule;
 use Spatie\LaravelData\Data;
+use Illuminate\Validation\ValidationException;
 
 class PersonaCreateDTO extends Data
 {
@@ -15,12 +17,13 @@ class PersonaCreateDTO extends Data
         public string $nombre_completo,
         public string $email,
         public string $fecha_nacimiento,
-        public string $estado_ciivl,
+        public string $estado_civil,
         public string $sexo,
         public string $origen = "WEB",
         public bool $estado = true, 
-        public string $nombre_grupo,
-
+        
+        public ?int $codigo_grupo = null,
+        public ?string $nombre_grupo = null,
         public ?string $departamento = null,
         public ?string $provincia = null,
         public ?string $distrito = null,
@@ -112,14 +115,26 @@ class PersonaCreateDTO extends Data
                 'max:60',
                 Rule::unique('persona', 'email')
             ],
-
-            'nombre_grupo' => [
+            'nombre_completo' => [
                 'required',
                 'string',
+                'max:100'
+            ],
+            'codigo_grupo' => [
+                'sometimes',
+                'integer',
+                'nullable',
+                'exists:detalle_parametro,codigo'
+            ],
+
+            'nombre_grupo' => [
+                'required_without:codigo_grupo',
+                'string',
+                'max:120'
                 // Asegura que el nombre_url exista y que pertenezca a la 'clase' Grupo (1010)
-                Rule::exists('detalle_parametro', 'nombre_url')->where(function ($query) {
-                    $query->where('parametro_clase', 1010);
-                }),
+                // Rule::exists('detalle_parametro', 'nombre_url')->where(function ($query) {
+                //     $query->where('parametro_clase', 1010);
+                // }),
             ],
 
             'fecha_nacimiento' => [

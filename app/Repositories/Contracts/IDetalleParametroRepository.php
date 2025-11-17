@@ -29,6 +29,13 @@ interface IDetalleParametroRepository
     public function findByCodigo(int $codigo): ?DetalleParametro;
 
     /**
+     * Obtener un detalle de parámetro por nombre_url
+     * @param string $nombreUrl
+     * @return DetalleParametro|null
+     */
+    public function findByNombreUrl(string $nombreUrl): ?DetalleParametro;
+
+    /**
      * Obtener un detalle de parámetro por codigo y parametro_clase
      * @param int $parametro_clase 
      * @param int $codigo

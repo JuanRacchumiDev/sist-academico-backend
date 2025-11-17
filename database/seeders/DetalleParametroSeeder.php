@@ -627,7 +627,31 @@ class DetalleParametroSeeder extends Seeder
                 'updated_at' => $now
             ],
             [
-                'parametro_clase' => 1010,
+                'parametro_clase' => 1011,
+                'nombre' => 'PAGO PARCIAL',
+                'nombre_url' => 'pago-parcial',
+                'descripcion' => 'Estado pago parcial',
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'parametro_clase' => 1011,
+                'nombre' => 'PAGO TOTAL',
+                'nombre_url' => 'pago-total',
+                'descripcion' => 'Estado pago total',
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'parametro_clase' => 1011,
+                'nombre' => 'PENDIENTE DE VALIDACIÓN',
+                'nombre_url' => 'pendiente-de-validacion',
+                'descripcion' => 'Estado pendiente de validación',
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'parametro_clase' => 1011,
                 'nombre' => 'CONFIRMADO',
                 'nombre_url' => 'confirmado',
                 'descripcion' => 'Estado confirmado de pago',
@@ -635,10 +659,10 @@ class DetalleParametroSeeder extends Seeder
                 'updated_at' => $now
             ],
             [
-                'parametro_clase' => 1010,
-                'nombre' => 'PENDIENTE DE VALIDACIÓN',
-                'nombre_url' => 'pendiente-de-validacion',
-                'descripcion' => 'Estado pendiente de validación',
+                'parametro_clase' => 1011,
+                'nombre' => 'ANULADO',
+                'nombre_url' => 'anulado',
+                'descripcion' => 'Estado pago anulado',
                 'created_at' => $now,
                 'updated_at' => $now
             ]
@@ -647,14 +671,14 @@ class DetalleParametroSeeder extends Seeder
         DB::table('detalle_parametro')->insert([
             [
                 'parametro_clase' => 1012,
-                'nombre' => 'PRE INSCRITO',
-                'nombre_url' => 'pre-inscrito',
+                'nombre' => 'PRE MATRICULADO',
+                'nombre_url' => 'pre-matricula',
                 'descripcion' => 'Estado pre inscripción',
                 'created_at' => $now,
                 'updated_at' => $now
             ],
             [
-                'parametro_clase' => 1010,
+                'parametro_clase' => 1012,
                 'nombre' => 'MATRICULADO',
                 'nombre_url' => 'matriculado',
                 'descripcion' => 'Estado matriculado',
@@ -662,7 +686,15 @@ class DetalleParametroSeeder extends Seeder
                 'updated_at' => $now
             ],
             [
-                'parametro_clase' => 1010,
+                'parametro_clase' => 1012,
+                'nombre' => 'RESERVADA',
+                'nombre_url' => 'reservada',
+                'descripcion' => 'Estado matriculado',
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'parametro_clase' => 1012,
                 'nombre' => 'RETIRADO',
                 'nombre_url' => 'retirado',
                 'descripcion' => 'Estado retirado',
@@ -670,10 +702,34 @@ class DetalleParametroSeeder extends Seeder
                 'updated_at' => $now
             ],
             [
-                'parametro_clase' => 1010,
+                'parametro_clase' => 1012,
                 'nombre' => 'GRADUADO',
                 'nombre_url' => 'graduado',
                 'descripcion' => 'Estado graduado',
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'parametro_clase' => 1014,
+                'nombre' => 'EFECTIVO',
+                'nombre_url' => 'efectivo',
+                'descripcion' => 'Forma de pago efectivo',
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'parametro_clase' => 1014,
+                'nombre' => 'TARJETA',
+                'nombre_url' => 'tarjeta',
+                'descripcion' => 'Forma de pago tarjeta',
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'parametro_clase' => 1014,
+                'nombre' => 'MIXTA',
+                'nombre_url' => 'mixta',
+                'descripcion' => 'Forma de pago mixta',
                 'created_at' => $now,
                 'updated_at' => $now
             ]

@@ -84,7 +84,7 @@ class EventoController extends Controller
             
             return response()->json([
                 'result' => false,
-                'message' => 'Error al crear evento : ' . $e->getMessage()
+                'message' => 'Error al crear evento: ' . $e->getMessage()
             ], 500);
         }
     }

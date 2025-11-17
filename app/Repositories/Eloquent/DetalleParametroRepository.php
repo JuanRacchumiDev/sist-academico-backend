@@ -61,6 +61,16 @@ class DetalleParametroRepository implements IDetalleParametroRepository {
     }
 
     /**
+     * Busca un detalle de parámetro por nombre_url
+     * @param string $nombreUrl
+     * @return DetalleParametro|null
+     */
+    public function findByNombreUrl(string $nombreUrl): ?DetalleParametro
+    {
+        return DetalleParametro::where('nombre_url', $nombreUrl)->first();
+    }
+
+    /**
      * Busca un detalle de parámetro por codigo y parametro_clase
      * @param int $parametro_clase
      * @param int $codigo

@@ -10,7 +10,7 @@ interface IPlantillaRepository
      * Obtener todas las plantilla
      * @return Collection<int, Plantilla>
      */
-    public function getAll(): Collection;
+    public function getAll(?array $searchParams = null): Collection;
 
     /**
      * Obtener una plantilla por ID

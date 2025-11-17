@@ -7,7 +7,9 @@ use App\Repositories\Contracts\IEventoRepository;
 use App\Repositories\Contracts\IParametroRepository;
 use App\Repositories\Contracts\IPersonaRepository;
 use App\Repositories\Contracts\IUserRepository;
-// use App\Repositories\Contracts\IPlantillaRepository;
+use App\Repositories\Contracts\IPlantillaRepository;
+use App\Repositories\Contracts\IProgramaRepository;
+use App\Repositories\Contracts\IMatriculaRepository;
 // use App\Repositories\Contracts\ICertificadoRepository;
 
 use App\Repositories\Eloquent\DetalleParametroRepository;
@@ -15,18 +17,27 @@ use App\Repositories\Eloquent\EventoRepository;
 use App\Repositories\Eloquent\ParametroRepository;
 use App\Repositories\Eloquent\PersonaRepository;
 use App\Repositories\Eloquent\UserRepository;
+use App\Repositories\Eloquent\PlantillaRepository;
+use App\Repositories\Eloquent\ProgramaRepository;
+use App\Repositories\Eloquent\MatriculaRepository;
 
 use App\Services\Contracts\IDetalleParametroService;
 use App\Services\Contracts\IParametroService;
 use App\Services\Contracts\IPersonaService;
 use App\Services\Contracts\IUserService;
 use App\Services\Contracts\IEventoService;
+use App\Services\Contracts\IPlantillaService;
+use App\Services\Contracts\IProgramaService;
+use App\Services\Contracts\IMatriculaService;
 
 use App\Services\DetalleParametroService;
 use App\Services\EventoService;
 use App\Services\ParametroService;
 use App\Services\PersonaService;
 use App\Services\UserService;
+use App\Services\PlantillaService;
+use App\Services\ProgramaService;
+use App\Services\MatriculaService;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -67,6 +78,24 @@ class RepositoryServiceProvider extends ServiceProvider
             EventoRepository::class
         );
 
+        // Enlazando el repositorio de plantilla
+        $this->app->bind(
+            IPlantillaRepository::class,
+            PlantillaRepository::class
+        );
+
+        // Enlazando el repositorio de programa
+        $this->app->bind(
+            IProgramaRepository::class,
+            ProgramaRepository::class
+        );
+
+        // Enlazando el repositorio de matrícula
+        $this->app->bind(
+            IMatriculaRepository::class,
+            MatriculaRepository::class
+        );
+
         /* --------- servicios ----------- */
         // Enlazando el servicio de parámetro
         $this->app->bind(
@@ -96,6 +125,24 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(
             IEventoService::class,
             EventoService::class
+        );
+
+        // Enlazando el servicio de plantilla
+        $this->app->bind(
+            IPlantillaService::class,
+            PlantillaService::class
+        );
+
+        // Enlazando el servicio de programa
+        $this->app->bind(
+            IProgramaService::class,
+            ProgramaService::class
+        );
+
+        // Enlazando el servicio de matrícula
+        $this->app->bind(
+            IMatriculaService::class,
+            MatriculaService::class
         );
     }
 

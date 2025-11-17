@@ -12,11 +12,13 @@ class DetalleParametroCreateDTO extends Data
         public bool $estado = true,
         public ?string $nombre_url,
         public ?string $descripcion = null,
+        public ?string $valor = null,
         public ?int $longitud = null,
         public ?bool $en_persona = false,
         public ?bool $en_empresa = false,
         public ?bool $compra = false,
         public ?bool $venta = false,
+        public ?bool $visible = false,
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null,
@@ -33,7 +35,8 @@ class DetalleParametroCreateDTO extends Data
             'en_empresa' => false,
             'compra' => false,
             'venta' => false,
-            'estado' => true
+            'estado' => true,
+            'visible' => true
         ];
     }
 
@@ -61,6 +64,12 @@ class DetalleParametroCreateDTO extends Data
                 'sometimes',
                 'string',
                 'max: 100',
+                'nullable'
+            ],
+            'valor' => [
+                'sometimes',
+                'string',
+                'max: 20',
                 'nullable'
             ],
             'longitud' => [

@@ -14,12 +14,13 @@ return new class extends Migration
         Schema::create('certificado', function(Blueprint $table) {
             $table->id();
 
-            $table->unsignedBigInteger('id_evento');
             $table->unsignedBigInteger('id_persona');
             $table->unsignedBigInteger('id_tipocertificado');
             $table->unsignedBigInteger('id_plantilla');
+            $table->unsignedBigInteger('id_evento')->nullable();
+            $table->unsignedBigInteger('id_programa')->nullable();
 
-            $table->string('codigo', 12);
+            $table->string('codigoqr_verificacion', 12);
             $table->string('path_codigo_qr', 350);
             $table->string('path_file', 350);
             $table->string('filename', 150);
@@ -29,10 +30,6 @@ return new class extends Migration
             $table->string('user_elimina', 10)->nullable();
             $table->boolean('estado')->default(true);
             $table->timestamps();
-
-            $table->foreign('id_evento')
-                ->references('id')
-                ->on('evento');
 
             $table->foreign('id_persona')
                 ->references('id')
@@ -45,6 +42,14 @@ return new class extends Migration
             $table->foreign('id_plantilla')
                 ->references('id')
                 ->on('plantilla');
+
+            $table->foreign('id_evento')
+                ->references('id')
+                ->on('evento');
+
+            $table->foreign('id_programa')
+                ->references('id')
+                ->on('programa');
         });
     }
 
@@ -54,9 +59,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('certificado', function(Blueprint $table) {
-            $table->dropForeign('id_evento');
-            $table->dropColumn('id_evento');
-
             $table->dropForeign('id_persona');
             $table->dropColumn('id_persona');
 
@@ -65,6 +67,12 @@ return new class extends Migration
 
             $table->dropForeign('id_plantilla');
             $table->dropColumn('id_plantilla');
+
+            $table->dropForeign('id_evento');
+            $table->dropColumn('id_evento');
+
+            $table->dropForeign('id_programa');
+            $table->dropColumn('id_programa');
         });
 
         Schema::dropIfExists('certificado');

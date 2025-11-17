@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('programa', function(Blueprint $table) {
             $table->id();
+        
+            $table->unsignedBigInteger('id_segmento');
+
             $table->string('codigo_old', 10)->nullable();
             $table->string('sigla', 10);
             $table->string('nombre', 100);
@@ -26,6 +29,10 @@ return new class extends Migration
             $table->string('user_elimina', 10)->nullable();
             $table->boolean('estado')->default(true);
             $table->timestamps();
+
+            $table->foreign('id_segmento')
+                ->references('codigo')
+                ->on('detalle_parametro');
         });
     }
 
@@ -34,6 +41,11 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::table('programa', function(Blueprint $table) {
+            $table->dropForeign('id_segmento');
+            $table->dropColumn('id_segmento');
+        });
+
         Schema::dropIfExists('programa');
     }
 };
