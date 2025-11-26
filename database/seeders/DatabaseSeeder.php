@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             ParametroSeeder::class,
             DetalleParametroSeeder::class,
+            EmpresaSeeder::class,
             UserSeeder::class
         ]);
 

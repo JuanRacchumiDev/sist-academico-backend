@@ -23,7 +23,7 @@ class PersonaController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function indexByGrupo(string $nombreGrupo): JsonResponse
+    public function getAll(string $nombreGrupo): JsonResponse
     {
         try {
             $personas = $this->personaService->getAllPersonaByGrupo($nombreGrupo);
@@ -52,6 +52,61 @@ class PersonaController extends Controller
         }
     }
 
+    public function getFilteredPaginate(Request $request, string $nombreGrupo): JsonResponse
+    {
+        try {
+            $filters = [];
+
+            if ($request->has('search')) {
+                $filters['search'] = $request->input('search');
+            }
+
+            $perPage = $request->input('per_page', 10);
+
+            $filters = array_map(function($value) {
+                if ($value === 'true') return true;
+                if ($value === 'false') return false;
+                return $value;
+            }, $filters);
+
+            $personas = $this->personaService->getAllPersonaByGrupoFiltered(
+                $nombreGrupo,
+                $filters,
+                $perPage
+            );
+
+            if ($personas->isEmpty()) {
+                return response()->json([
+                    'result' => false,
+                    'data' => [],
+                    'message' => 'No se encontraron resultados'
+                ], 200);
+            }
+
+            return response()->json([
+                'result' => true,
+                'data' => $personas,
+                'message' => 'Resultados encontrados correctamente',
+                'pagination' => [
+                    'total' => $personas->total(),
+                    'per_page' => $personas->perPage(),
+                    'current_page' => $personas->currentPage(),
+                    'last_page' => $personas->lastPage(),
+                    'from' => $personas->firstItem(),
+                    'to' => $personas->lastItem()
+                ]
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error("Error filtering personas: " . $e->getMessage());
+            
+            return response()->json([
+                'result' => false,
+                'message' => 'Error al obtener personas filtradas.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     /**
      * Store a newly created resource in storage.
      */
@@ -60,6 +115,21 @@ class PersonaController extends Controller
         try {
             $data = $request->all();
 
+            // Validar si existe un alumno registrado
+            $alumnoExiste = $this->personaService->getPersonaByIdTipoDocAndNumDoc(
+                (int)$data['id_tipodocumento'],
+                $data['numero_documento']
+            );
+
+            if ($alumnoExiste) {
+                return response()->json([
+                    'result' => true,
+                    'data' => $alumnoExiste,
+                    'message' => 'El número de documento ingresado se encuentra registrado',
+                    'code' => 'PREVIOUSLY_REGISTERED'
+                ], 200);
+            }
+
             $personaCreateDTO = PersonaCreateDTO::from($data);
 
             $persona = $this->personaService->createPersona($personaCreateDTO);
@@ -67,20 +137,23 @@ class PersonaController extends Controller
             return response()->json([
                 'result' => true,
                 'data' => $persona,
-                'message' => 'Persona registrada correctamente'
+                'message' => 'Persona registrada correctamente',
+                'code' => 'CORRECT_RECORDED'
             ], 201);
         } catch (ValidationException $e) {
             return response()->json([
                 'result' => false,
                 'message' => 'Validation error',
-                'errors' => $e->errors()
+                'errors' => $e->errors(),
+                'code' => 'INVALID_RECORD'
             ], 422);
         } catch (\Exception $e) {
             Log::error("Error al crear el registro de persona: " . $e->getMessage());
 
             return response()->json([
                 'result' => false,
-                'message' => 'Error al crear el registro: ' . $e->getMessage()
+                'message' => 'Error al crear el registro: ' . $e->getMessage(),
+                'code' => 'INVALID_RECORD'
             ], 500);
         }
     }

@@ -75,55 +75,5 @@ class ProgramaService implements IProgramaService {
         $programaData = $programaCreateDTO->toArray();
 
         return $this->programaRepository->create($programaData);
-        
-        // $planPath = null;
-        // $file = $uploadProgramaDTO->plan_file;
-        // $storageDisk = 'public';
-        // $directory = 'planes_estudio'; // Directorio público de destino
-
-        // // 1. Procesamiento y Subida del archivo si existe
-        // if ($file) {
-            
-        //     // Obtener nombre original y extensión
-        //     $originalName = $file->getClientOriginalName();
-        //     $extension = $file->getClientOriginalExtension();
-
-        //     // Preparar un nombre de archivo seguro y slugificado (sin la extensión)
-        //     $nameWithoutExtension = pathinfo($originalName, PATHINFO_FILENAME);
-        //     $slugName = Str::slug($nameWithoutExtension);
-            
-        //     // Reemplazar guiones por guiones bajos (si es la convención deseada)
-        //     $safeSlugName = str_replace('-', '_', $slugName);
-
-        //     // Generar el nombre final: {slug}_{timestamp}.{ext} para evitar colisiones
-        //     $finalFilename = $safeSlugName . '_' . time() . '.' . $extension;
-
-        //     // Guardar el archivo en el disco 'public' y obtener la ruta
-        //     $planPath = Storage::disk($storageDisk)->putFileAs(
-        //         $directory,
-        //         $file,
-        //         $finalFilename
-        //     );
-        // }
-
-        // // 2. Preparar data para insertar en BD
-        // $programaData = [
-        //     'sigla' => $uploadProgramaDTO->sigla,
-        //     'nombre' => $uploadProgramaDTO->nombre,
-        //     'duracion' => $uploadProgramaDTO->duracion,
-        //     'modulos' => $uploadProgramaDTO->modulos,
-        //     'creditos' => $uploadProgramaDTO->creditos,
-        //     'is_vigente' => $uploadProgramaDTO->is_vigente,
-        //     'estado' => $uploadProgramaDTO->estado,
-        //     'plan' => $planPath // $planPath contendrá la ruta relativa si se subió, o null
-        // ];
-
-        // // 3. Añadir campo opcional
-        // if (isset($uploadProgramaDTO->codigo_old)) {
-        //     $programaData['codigo_old'] = $uploadProgramaDTO->codigo_old;
-        // }
-
-        // // 4. Crear el registro
-        // return $this->programaRepository->create($programaData);
     }
 }

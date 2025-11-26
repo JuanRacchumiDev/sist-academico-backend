@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('nombre', 100);
             $table->string('descripcion', 150)->nullable();
+            $table->string('imagen', 150)->nullable();
             $table->string('path', 100);
             $table->string('user_crea', 10)->nullable();
             $table->string('user_actualiza', 10)->nullable();

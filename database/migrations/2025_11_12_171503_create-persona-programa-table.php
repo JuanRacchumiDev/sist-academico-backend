@@ -24,7 +24,7 @@ return new class extends Migration
                 ->references('id')
                 ->on('programa');
 
-            $table->primary(['id_persona', 'id_programa']);
+            // $table->primary(['id_persona', 'id_programa']);
         });
     }
 

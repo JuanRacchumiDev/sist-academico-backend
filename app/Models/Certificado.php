@@ -10,12 +10,13 @@ class Certificado extends Model
     protected $table = 'certificado';
 
     protected $fillable = [
-        'id_evento',
+        // 'id_evento',
         'id_persona',
         'id_tipocertificado',
         'id_plantilla',
-        'codigo',
-        'path_codigo_qr',
+        'id_programa',
+        'codigo_qr_verificacion',
+        'codigo_qr_path',
         'path_file',
         'filename',
         'nombre_impresion',
@@ -37,10 +38,10 @@ class Certificado extends Model
      * Obtener el evento asociado a un certificado
      * @return BelongsTo<Evento, $this>
      */
-    public function evento(): BelongsTo
-    {
-        return $this->belongsTo(Evento::class, 'id_evento', 'id');
-    }
+    // public function evento(): BelongsTo
+    // {
+    //     return $this->belongsTo(Evento::class, 'id_evento', 'id');
+    // }
 
     /**
      * Obtener la persona asociada a un certificado
@@ -67,5 +68,14 @@ class Certificado extends Model
     public function plantilla(): BelongsTo
     {
         return $this->belongsTo(Plantilla::class, 'id_plantilla', 'id');
+    }
+
+    /**
+     * Obtener el programa asociado a un certificado
+     * @return BelongsTo<Programa, $this>
+     */
+    public function programa(): BelongsTo
+    {
+        return $this->belongsTo(Programa::class, 'id_programa', 'id');
     }
 }

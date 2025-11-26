@@ -8,6 +8,7 @@ use App\Models\DetalleParametro;
 use App\Repositories\Contracts\IDetalleParametroRepository;
 use App\Services\Contracts\IDetalleParametroService;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class DetalleParametroService implements IDetalleParametroService {
     protected IDetalleParametroRepository $repository;
@@ -38,6 +39,17 @@ class DetalleParametroService implements IDetalleParametroService {
     }
 
     /**
+     * Obtiene detalle parámetros filtrados
+     * @param array<int, mixed> $filters
+     * @param int $perPage
+     * @return LengthAwarePaginator<DetalleParametro>
+     */
+    public function getAllFilteredPaginate(array $filters, int $perPage): LengthAwarePaginator
+    {
+        return $this->repository->getAllFilteredPaginate($filters, $perPage);
+    }
+
+    /**
      * Obtiene un detalle por código
      * @param int $codigo
      * @return DetalleParametro|null
@@ -59,6 +71,17 @@ class DetalleParametroService implements IDetalleParametroService {
     }
 
     /**
+     * Obtiene un detalle por clase y nombre_url
+     * @param int $clase
+     * @param string $nombreUrl
+     * @return DetalleParametro|null
+     */
+    public function getByClaseAndNombreUrl(int $clase, string $nombreUrl): ?DetalleParametro
+    {
+        return $this->repository->findByClaseAndNombreUrl($clase, $nombreUrl);
+    }
+
+    /**
      * Crea un detalle parámetro
      * @param DetalleParametroCreateDTO $detalleParametroCreateDTO
      * @return DetalleParametro
@@ -66,7 +89,7 @@ class DetalleParametroService implements IDetalleParametroService {
     public function createDetalle(DetalleParametroCreateDTO $detalleParametroCreateDTO): DetalleParametro
     {
         $data = array_filter($detalleParametroCreateDTO->toArray(), fn($value) => !is_null($value));
-        
+
         return $this->repository->create($data);
     }
 

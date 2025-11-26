@@ -133,9 +133,9 @@ class ParametroSeeder extends Seeder
             ],
             [
                 'clase' => 1014,
-                'nombre' => 'Tipo Pago',
-                'nombre_url' => 'tipo-pago',
-                'descripcion' => 'Distintos tipos de pago',
+                'nombre' => 'Método Pago',
+                'nombre_url' => 'metodo-pago',
+                'descripcion' => 'Distintos métodos de pago',
                 'created_at' => $now,
                 'updated_at' => $now
             ]

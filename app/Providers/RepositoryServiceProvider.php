@@ -10,7 +10,8 @@ use App\Repositories\Contracts\IUserRepository;
 use App\Repositories\Contracts\IPlantillaRepository;
 use App\Repositories\Contracts\IProgramaRepository;
 use App\Repositories\Contracts\IMatriculaRepository;
-// use App\Repositories\Contracts\ICertificadoRepository;
+use App\Repositories\Contracts\IPagoRepository;
+use App\Repositories\Contracts\IModuloRepository;
 
 use App\Repositories\Eloquent\DetalleParametroRepository;
 use App\Repositories\Eloquent\EventoRepository;
@@ -20,6 +21,8 @@ use App\Repositories\Eloquent\UserRepository;
 use App\Repositories\Eloquent\PlantillaRepository;
 use App\Repositories\Eloquent\ProgramaRepository;
 use App\Repositories\Eloquent\MatriculaRepository;
+use App\Repositories\Eloquent\PagoRepository;
+use App\Repositories\Eloquent\ModuloRepository;
 
 use App\Services\Contracts\IDetalleParametroService;
 use App\Services\Contracts\IParametroService;
@@ -29,6 +32,8 @@ use App\Services\Contracts\IEventoService;
 use App\Services\Contracts\IPlantillaService;
 use App\Services\Contracts\IProgramaService;
 use App\Services\Contracts\IMatriculaService;
+use App\Services\Contracts\IPagoService;
+use App\Services\Contracts\IModuloService;
 
 use App\Services\DetalleParametroService;
 use App\Services\EventoService;
@@ -38,6 +43,8 @@ use App\Services\UserService;
 use App\Services\PlantillaService;
 use App\Services\ProgramaService;
 use App\Services\MatriculaService;
+use App\Services\PagoService;
+use App\Services\ModuloService;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -96,6 +103,18 @@ class RepositoryServiceProvider extends ServiceProvider
             MatriculaRepository::class
         );
 
+        // Enlazando el repositorio de pago
+        $this->app->bind(
+            IPagoRepository::class,
+            PagoRepository::class
+        );
+
+        // Enlazando el repositorio de módulo
+        $this->app->bind(
+            IModuloRepository::class,
+            ModuloRepository::class
+        );
+
         /* --------- servicios ----------- */
         // Enlazando el servicio de parámetro
         $this->app->bind(
@@ -143,6 +162,18 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(
             IMatriculaService::class,
             MatriculaService::class
+        );
+
+        // Enlazando el servicio de pago
+        $this->app->bind(
+            IPagoService::class,
+            PagoService::class
+        );
+
+        // Enlazando el servicio de módulo
+        $this->app->bind(
+            IModuloService::class,
+            ModuloService::class
         );
     }
 

@@ -3,8 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\DTOs\Programa\ProgramaCreateDTO;
-use App\DTOs\Programa\ProgramaUpdateDTO;
-use App\DTos\Programa\UploadProgramaDTO;
 use App\Http\Controllers\Controller;
 use App\Models\Programa;
 use App\Services\Contracts\IProgramaService;
@@ -13,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ProgramaController extends Controller
 {
@@ -54,59 +53,78 @@ class ProgramaController extends Controller
         }
     }
 
+    public function getFilteredPaginate(Request $request): JsonResponse
+    {
+        try {
+            $filters = [];
+
+            if ($request->has('search')) {
+                $filters['search'] = $request->input('search');
+            }
+
+            $perPage = $request->input('per_page', 10);
+
+            $filters = array_map(function($value) {
+                if ($value === 'true') return true;
+                if ($value === 'false') return false;
+                return $value;
+            }, $filters);
+
+            $programas = $this->programaService->getAllProgramasWithFilters($filters, $perPage);
+
+            if ($programas->isEmpty()) {
+                return response()->json([
+                    'result' => false,
+                    'data' => [],
+                    'message' => 'No se encontraron resultados'
+                ], 200);
+            }
+
+            return response()->json([
+                'result' => true,
+                'data' => $programas,
+                'message' => 'Resultados encontrados correctamente',
+                'pagination' => [
+                    'total' => $programas->total(),
+                    'per_page' => $programas->perPage(),
+                    'current_page' => $programas->currentPage(),
+                    'last_page' => $programas->lastPage(),
+                    'from' => $programas->firstItem(),
+                    'to' => $programas->lastItem()
+                ]
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error("Error filtering programas: " . $e->getMessage());
+            
+            return response()->json([
+                'result' => false,
+                'message' => 'Error al obtener programas.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
         try {
-            $request->validate([
-                'id_segmento' => 'required|integer',
-                'sigla' => 'required|string|max:10',
-                'nombre' => 'required|string|max:100',
-                'duracion' => 'required|string|max:20',
-                'modulos' => 'required|integer',
-                'creditos' => 'required|integer',
-                'plan' => 'required|file|mimes:pdf|max:2048',
-                'is_vigente' => 'boolean',
-                'estado' => 'boolean'
-            ]);
+            $data = $request->all();
 
-            $data = ProgramaCreateDTO::from([
-                ...$request->all(),
-                'plan' => $request->file('plan')
-            ]);
+            if (isset($data['nombre'])) {
+                $data['nombre_url'] = Str::slug($data['nombre']);
+            }
 
-            $programa = $this->programaService->createPrograma($data);
+            $programaCreateDTO = ProgramaCreateDTO::from($data);
+
+            $programa = $this->programaService->createPrograma($programaCreateDTO);
 
             return response()->json([
+                'result' => true,
                 'message' => 'Programa creado exitosamente',
                 'data' => $programa
             ], 201);
-
-            // // Validar el Request antes de DTOs
-            // $validatedData = $request->validate(UploadProgramaDTO::rules());
-
-            // // return response()->json([
-            // //     'result' => false,
-            // //     'validatedData' => $validatedData,
-            // //     'file' => $request->file('plan_file'),
-            // //     'message' => 'Programa no registrado'
-            // // ], 422);
-
-            // // Crear el DTO con el archivo
-            // $uploadDTO = UploadProgramaDTO::fromRequest(
-            //     $validatedData,
-            //     $request->file('plan_file')
-            // );
-
-            // $programa = $this->programaService->createPrograma($uploadDTO);
-
-            // return response()->json([
-            //     'result' => true,
-            //     'data' => $programa,
-            //     'message' => 'Programa registrado exitosamente'
-            // ], 201);
         } catch (ValidationException $e) {
             return response()->json([
                 'result' => false,
@@ -121,23 +139,6 @@ class ProgramaController extends Controller
                 'message' => 'Error al crear programa: ' . $e->getMessage()
             ], 500);
         }
-    }
-
-    public function downloadPlan(Programa $programa) {
-        $planPath = $programa->plan;
-
-        if (!$planPath || !Storage::disk('public')->exists($planPath)) {
-            return response()->json([
-                'result' => false,
-                'message' => 'El archivo del plan de estudios no fue encontrado'
-            ], 404);
-        }
-
-        // El nombre del usuario que se le dará al usuario
-        $fileName = $programa->sigla.'_plan.pdf';
-
-        // Usando Storage::download para enviar el archivo al navegador
-        return Storage::disk('public')->download($planPath, $fileName);
     }
 
     /**
@@ -169,5 +170,22 @@ class ProgramaController extends Controller
                 'message' => 'Error al obtener el programa: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    public function downloadPlan(Programa $programa) {
+        $planPath = $programa->plan;
+
+        if (!$planPath || !Storage::disk('public')->exists($planPath)) {
+            return response()->json([
+                'result' => false,
+                'message' => 'El archivo del plan de estudios no fue encontrado'
+            ], 404);
+        }
+
+        // El nombre del usuario que se le dará al usuario
+        $fileName = $programa->sigla.'_plan.pdf';
+
+        // Usando Storage::download para enviar el archivo al navegador
+        return Storage::disk('public')->download($planPath, $fileName);
     }
 }

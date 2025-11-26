@@ -24,9 +24,21 @@ class UserSeeder extends Seeder
             ->where('nombre_url', 'administrador')
             ->first();
 
-        $passwordHashed = Hash::make('admin123');
+        $perfilAlumno = DetalleParametro::where('parametro_clase', 1001)
+            ->where('nombre_url', 'alumno')
+            ->first();
 
-        $passwordHashedIpede = Hash::make('ipede123'); 
+        $perfilDocente = DetalleParametro::where('parametro_clase', 1001)
+            ->where('nombre_url', 'docente')
+            ->first();
+
+        $passwordAdminHashedPI = Hash::make('admin123');
+
+        $passwordAdminHashedIpede = Hash::make('ipede123'); 
+
+        $passwordAlumnoHashedIpede = Hash::make("alumno123");
+
+        $passwordDocenteHashedIpede = Hash::make("docente123");
 
         DB::table('users')->truncate();
 
@@ -34,7 +46,7 @@ class UserSeeder extends Seeder
             [
                 'name' => 'admin',
                 'email' => 'admin@peruinnova.com',
-                'password' => $passwordHashed,
+                'password' => $passwordAdminHashedPI,
                 'id_perfil' => $perfilAdmnin->codigo,
                 'created_at' => $now,
                 'updated_at' => $now
@@ -42,8 +54,24 @@ class UserSeeder extends Seeder
             [
                 'name' => 'ipede',
                 'email' => 'admin@ipede.com',
-                'password' => $passwordHashedIpede,
+                'password' => $passwordAdminHashedIpede,
                 'id_perfil' => $perfilAdmnin->codigo,
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'name' => 'ualumno',
+                'email' => 'juan.racchumi.dev@gmail.com',
+                'password' => $passwordAlumnoHashedIpede,
+                'id_perfil' => $perfilAlumno->codigo,
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'name' => 'udocente',
+                'email' => 'juan.racchumi.nima@gmail.com',
+                'password' => $passwordDocenteHashedIpede,
+                'id_perfil' => $perfilDocente->codigo,
                 'created_at' => $now,
                 'updated_at' => $now
             ]

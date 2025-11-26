@@ -6,6 +6,7 @@ use App\DTOs\DetalleParametro\DetalleParametroCreateDTO;
 use App\DTOs\DetalleParametro\DetalleParametroUpdateDTO;
 use App\Models\DetalleParametro;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 interface IDetalleParametroService {
 
@@ -24,6 +25,14 @@ interface IDetalleParametroService {
     public function getAllFiltered(array $filters): Collection;
 
     /**
+     * Obtiene DetalleParametros filtrados
+     * @param array<int, mixed> $filters
+     * @param int $perPage
+     * @return LengthAwarePaginator<DetalleParametro>
+     */
+    public function getAllFilteredPaginate(array $filters, int $perPage): LengthAwarePaginator;
+
+    /**
      * Obtiene un detalle por ID
      * @param int $codigo
      * @return DetalleParametro|null
@@ -36,6 +45,13 @@ interface IDetalleParametroService {
      * @param int $codigo
      */
     public function getByClaseAndCodigo(int $clase, int $codigo): ?DetalleParametro;
+
+    /**
+     * Obtiene un detalle por clase y nombre_url
+     * @param int $clase
+     * @param string $nombreUrl
+     */
+    public function getByClaseAndNombreUrl(int $clase, string $nombreUrl): ?DetalleParametro;
 
     /**
      * Crea un nuevo detalle parámetro

@@ -92,6 +92,25 @@ class PersonaRepository implements IPersonaRepository {
         })->get();
     }
 
+    public function getAllByGrupoFiltered(string $nombreGrupo, array $filters, int $perPage): LengthAwarePaginator
+    {
+        $query = Persona::with(['tipoDocumento'])->whereHas('grupos', function($queryGrupo) use ($nombreGrupo) {
+            $queryGrupo->where('nombre_url', $nombreGrupo);
+        });
+
+        if (isset($filters['search'])) {
+            $search = '%'.strtolower($filters['search']).'%';
+
+            $query->whereRaw('numero_documento LIKE ?', [$search])
+                ->orWhereRaw('LOWER(nombre_completo) LIKE ?', [$search])
+                ->orWhereRaw('email LIKE ?', [$search]);
+        }
+
+        $query->orderBy('apellido_paterno', 'ASC');
+
+        return $query->paginate($perPage);
+    }
+
     /**
      * Busca una persona por su ID
      * @param int $id

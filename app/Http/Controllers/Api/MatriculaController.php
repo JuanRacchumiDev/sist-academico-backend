@@ -51,35 +51,53 @@ class MatriculaController extends Controller
         }   
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function getFilteredPaginate(Request $request): JsonResponse
     {
         try {
-            $data = $request->all();
+            $filters = [];
 
-            $matriculaCreateDTO = MatriculaCreateDTO::from($data);
-            
-            $matricula = $this->matriculaService->createMatricula($matriculaCreateDTO);
-            
+            if ($request->has('search')) {
+                $filters['search'] = $request->input('search');
+            }
+
+            $perPage = $request->input('per_page', 10);
+
+            $filters = array_map(function($value) {
+                if ($value === 'true') return true;
+                if ($value === 'false') return false;
+                return $value;
+            }, $filters);
+
+            $matriculas = $this->matriculaService->getAllMatriculasWithFilters($filters, $perPage);
+
+            if ($matriculas->isEmpty()) {
+                return response()->json([
+                    'result' => false,
+                    'data' => [],
+                    'message' => 'No se encontraron resultados'
+                ], 200);
+            }
+
             return response()->json([
                 'result' => true,
-                'data' => $matricula,
-                'message' => 'Matrícula registrada correctamente'
-            ], 201);
-        } catch (ValidationException $e) {
-            return response()->json([
-                'result' => false,
-                'message' => 'Validation error',
-                'errors' => $e->errors()
-            ], 422);
+                'data' => $matriculas,
+                'message' => 'Resultados encontrados correctamente',
+                'pagination' => [
+                    'total' => $matriculas->total(),
+                    'per_page' => $matriculas->perPage(),
+                    'current_page' => $matriculas->currentPage(),
+                    'last_page' => $matriculas->lastPage(),
+                    'from' => $matriculas->firstItem(),
+                    'to' => $matriculas->lastItem()
+                ]
+            ], 200);
         } catch (\Exception $e) {
-            Log::error("Error creating matrícula: " . $e->getMessage());
+            Log::error("Error filtering matrículas: " . $e->getMessage());
             
             return response()->json([
                 'result' => false,
-                'message' => 'Error al crear matrícula: ' . $e->getMessage()
+                'message' => 'Error al obtener matrículas.',
+                'error' => $e->getMessage()
             ], 500);
         }
     }
@@ -111,6 +129,58 @@ class MatriculaController extends Controller
             return response()->json([
                 'result' => false,
                 'message' => 'Error al obtener la matrícula: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function downloadFichaPdf(Request $request): JsonResponse {
+        try {
+            $filters = $request->only(['id_alumno', 'id_programa']);
+
+            $response = $this->matriculaService->getFichaByFilters($filters);
+        
+            if (is_array($response)) {
+                return response()->json($response, 404);
+            }
+
+            return $response;
+        } catch (\Exception $e) {
+            return response()->json([
+                'result' => false,
+                'message' => 'Error al generar el PDF filtrado: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        try {
+            $data = $request->all();
+
+            $matriculaCreateDTO = MatriculaCreateDTO::from($data);
+            
+            $matricula = $this->matriculaService->createMatricula($matriculaCreateDTO);
+            
+            return response()->json([
+                'result' => true,
+                'data' => $matricula,
+                'message' => 'Matrícula registrada correctamente'
+            ], 201);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'result' => false,
+                'message' => 'Validation error',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            Log::error("Error creating matrícula: " . $e->getMessage());
+            
+            return response()->json([
+                'result' => false,
+                'message' => 'Error al crear matrícula: ' . $e->getMessage()
             ], 500);
         }
     }

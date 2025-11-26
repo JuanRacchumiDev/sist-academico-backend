@@ -11,9 +11,11 @@ interface IMatriculaRepository
 
     public function getAllFiltered(array $filters, int $perPage): LengthAwarePaginator;
 
+    public function getUniqueForFilters(array $filters): ?Matricula;
+
     public function findById(int $id): ?Matricula;
 
-    public function create(array $data): Matricula;
+    public function create(array $data): Matricula|null;
 
     public function update(int $id, array $data): ?Matricula;
 

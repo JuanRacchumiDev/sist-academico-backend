@@ -19,6 +19,7 @@ interface IPersonaService {
      * Obtiene todas las personas con filtros aplicados
      * @param array<string, mixed> $filters
      * @param int $perPage
+     * @return LengthAwarePaginator<Persona>
      */
     public function getAllPersonasWithFilters(array $filters, int $perPage): LengthAwarePaginator;
 
@@ -28,6 +29,15 @@ interface IPersonaService {
      * @return Collection<int, Persona>
      */
     public function getAllPersonaByGrupo(string $nombreGrupoUrl): Collection;
+
+    /**
+     * Obtiene todas las personas por grupo
+     * @param string $nombreGrupoUrl
+     * @param array<string, mixed> $filters
+     * @param int $perPage
+     * @return LengthAwarePaginator<Persona>
+     */
+    public function getAllPersonaByGrupoFiltered(string $nombreGrupoUrl, array $filters, int $perPage): LengthAwarePaginator;
 
     /**
      * Obtiene una persona por ID

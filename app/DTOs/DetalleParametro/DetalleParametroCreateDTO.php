@@ -10,9 +10,10 @@ class DetalleParametroCreateDTO extends Data
         public int $parametro_clase,
         public string $nombre,
         public bool $estado = true,
-        public ?string $nombre_url,
+        public ?string $nombre_url = null,
         public ?string $descripcion = null,
         public ?string $valor = null,
+        public ?string $abreviatura = null,
         public ?int $longitud = null,
         public ?bool $en_persona = false,
         public ?bool $en_empresa = false,
@@ -72,6 +73,12 @@ class DetalleParametroCreateDTO extends Data
                 'max: 20',
                 'nullable'
             ],
+            'abreviatura' => [
+                'sometimes',
+                'string',
+                'max:10',
+                'nullable'
+            ],
             'longitud' => [
                 'sometimes',
                 'integer',
@@ -90,6 +97,10 @@ class DetalleParametroCreateDTO extends Data
                 'boolean'
             ],
             'venta' => [
+                'sometimes',
+                'boolean'
+            ],
+            'visible' => [
                 'sometimes',
                 'boolean'
             ],

@@ -30,6 +30,14 @@ interface IPersonaRepository {
     public function getAllByGrupo(string $nombreGrupo): Collection;
 
     /**
+     * Obtiene todas las personas por grupo
+     * @param array<string, mixed> $filters
+     * @param int $perPage
+     * @return LengthAwarePaginator
+     */
+    public function getAllByGrupoFiltered(string $nombreGrupo, array $filters, int $perPage): LengthAwarePaginator;
+
+    /**
      * Obtener una persona por ID
      * @param int $id
      * @return Persona|null

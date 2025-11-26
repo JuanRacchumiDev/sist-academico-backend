@@ -445,8 +445,8 @@ class DetalleParametroSeeder extends Seeder
         DB::table('detalle_parametro')->insert([
             [
                 'parametro_clase' => 1007,
-                'nombre' => 'EFECTIVO',
-                'nombre_url' => 'efectivo',
+                'nombre' => 'PAGO TOTAL',
+                'nombre_url' => 'pago-total',
                 'longitud' => null,
                 'en_persona' => true,
                 'en_empresa' => false,
@@ -457,92 +457,8 @@ class DetalleParametroSeeder extends Seeder
             ],
             [
                 'parametro_clase' => 1007,
-                'nombre' => 'DEPÓSITO',
-                'nombre_url' => 'deposito',
-                'longitud' => null,
-                'en_persona' => true,
-                'en_empresa' => false,
-                'compra' => false,
-                'venta' => false,
-                'created_at' => $now,
-                'updated_at' => $now
-            ],
-            [
-                'parametro_clase' => 1007,
-                'nombre' => 'TRANSFERENCIA',
-                'nombre_url' => 'transferencia',
-                'longitud' => null,
-                'en_persona' => true,
-                'en_empresa' => false,
-                'compra' => false,
-                'venta' => false,
-                'created_at' => $now,
-                'updated_at' => $now
-            ],
-            [
-                'parametro_clase' => 1007,
-                'nombre' => 'CHEQUE',
-                'nombre_url' => 'cheque',
-                'longitud' => null,
-                'en_persona' => true,
-                'en_empresa' => false,
-                'compra' => false,
-                'venta' => false,
-                'created_at' => $now,
-                'updated_at' => $now
-            ],
-            [
-                'parametro_clase' => 1007,
-                'nombre' => 'PLANILLA',
-                'nombre_url' => 'planilla',
-                'longitud' => null,
-                'en_persona' => true,
-                'en_empresa' => false,
-                'compra' => false,
-                'venta' => false,
-                'created_at' => $now,
-                'updated_at' => $now
-            ],
-            [
-                'parametro_clase' => 1007,
-                'nombre' => 'YAPE',
-                'nombre_url' => 'yape',
-                'longitud' => null,
-                'en_persona' => true,
-                'en_empresa' => false,
-                'compra' => false,
-                'venta' => false,
-                'created_at' => $now,
-                'updated_at' => $now
-            ],
-            [
-                'parametro_clase' => 1007,
-                'nombre' => 'REFERIDOS',
-                'nombre_url' => 'referidos',
-                'longitud' => null,
-                'en_persona' => true,
-                'en_empresa' => false,
-                'compra' => false,
-                'venta' => false,
-                'created_at' => $now,
-                'updated_at' => $now
-            ],
-            [
-                'parametro_clase' => 1007,
-                'nombre' => 'PLIN',
-                'nombre_url' => 'plin',
-                'longitud' => null,
-                'en_persona' => true,
-                'en_empresa' => false,
-                'compra' => false,
-                'venta' => false,
-                'created_at' => $now,
-                'updated_at' => $now
-            ],
-            [
-                'parametro_clase' => 1007,
-                'nombre' => 'NIUBIZ',
-                'nombre_url' => 'niubiz',
+                'nombre' => 'PAGO PARCIAL',
+                'nombre_url' => 'pago-parcial',
                 'longitud' => null,
                 'en_persona' => true,
                 'en_empresa' => false,
@@ -708,7 +624,10 @@ class DetalleParametroSeeder extends Seeder
                 'descripcion' => 'Estado graduado',
                 'created_at' => $now,
                 'updated_at' => $now
-            ],
+            ]
+        ]);
+
+        DB::table('detalle_parametro')->insert([
             [
                 'parametro_clase' => 1014,
                 'nombre' => 'EFECTIVO',
@@ -719,17 +638,65 @@ class DetalleParametroSeeder extends Seeder
             ],
             [
                 'parametro_clase' => 1014,
-                'nombre' => 'TARJETA',
-                'nombre_url' => 'tarjeta',
-                'descripcion' => 'Forma de pago tarjeta',
+                'nombre' => 'TARJETA DE DÉBITO',
+                'nombre_url' => 'tarjeta-de-debito',
+                'descripcion' => 'Forma de pago tarjeta de débito',
                 'created_at' => $now,
                 'updated_at' => $now
             ],
             [
                 'parametro_clase' => 1014,
-                'nombre' => 'MIXTA',
-                'nombre_url' => 'mixta',
-                'descripcion' => 'Forma de pago mixta',
+                'nombre' => 'TARJETA DE CRÉDITO',
+                'nombre_url' => 'tarjeta-de-credito',
+                'descripcion' => 'Forma de pago tarjeta de crédito',
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'parametro_clase' => 1014,
+                'nombre' => 'DEPÓSITO BANCARIO',
+                'nombre_url' => 'deposito-bancario',
+                'descripcion' => 'Forma de pago depósito bancario',
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'parametro_clase' => 1014,
+                'nombre' => 'TRANSFERENCIA',
+                'nombre_url' => 'transferencia',
+                'descripcion' => 'Forma de pago transferencia',
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'parametro_clase' => 1014,
+                'nombre' => 'YAPE',
+                'nombre_url' => 'yape',
+                'descripcion' => 'Forma de pago yape',
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'parametro_clase' => 1014,
+                'nombre' => 'PLIN',
+                'nombre_url' => 'plin',
+                'descripcion' => 'Forma de pago plin',
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'parametro_clase' => 1014,
+                'nombre' => 'NIUBIZ',
+                'nombre_url' => 'niubiz',
+                'descripcion' => 'Forma de pago niubiz',
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'parametro_clase' => 1014,
+                'nombre' => 'REFERIDOS',
+                'nombre_url' => 'referidos',
+                'descripcion' => 'Forma de pago referidos',
                 'created_at' => $now,
                 'updated_at' => $now
             ]

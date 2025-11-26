@@ -10,10 +10,12 @@ interface IMatriculaService {
     public function getAllMatriculas(?array $searchParams = null): Collection;
 
     public function getAllMatriculasWithFilters(array $filters, int $perPage): LengthAwarePaginator;
+    
+    public function getFichaByFilters(array $filter);
 
     public function getMatriculaById(int $id): ?Matricula;
 
-    public function createMatricula(MatriculaCreateDTO $matriculaCreateDTO): Matricula;
+    public function createMatricula(MatriculaCreateDTO $matriculaCreateDTO): Matricula|null;
 
     public function deleteMatricula(int $id): bool;
 }

@@ -46,6 +46,11 @@ class PersonaService implements IPersonaService {
         return $this->personaRepository->getAllByGrupo($nombreGrupo);
     }
 
+    public function getAllPersonaByGrupoFiltered(string $nombreGrupoUrl, array $filters, int $perPage): LengthAwarePaginator
+    {
+        return $this->personaRepository->getAllByGrupoFiltered($nombreGrupoUrl, $filters, $perPage);
+    }
+
     /**
      * Obtiene todos las personas con filtros aplicados
      * @param array<string, mixed> $filters

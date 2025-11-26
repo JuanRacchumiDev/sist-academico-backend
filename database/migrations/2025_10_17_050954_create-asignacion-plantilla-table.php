@@ -18,9 +18,9 @@ return new class extends Migration
             $table->foreignId('id_plantilla')
                 ->constrained('plantilla');
 
-            // Clave foránea con la tabla 'evento'
-            $table->foreignId('id_evento')
-                ->constrained('evento');
+            // Clave foránea con la tabla 'programa'
+            $table->foreignId('id_programa')
+                ->constrained('programa');
 
             $table->timestamps();
         });
@@ -33,7 +33,7 @@ return new class extends Migration
     {
         Schema::table('asignacion_plantilla', function(Blueprint $table) {
             $table->dropConstrainedForeignId('id_plantilla');
-            $table->dropConstrainedForeignId('id_evento');
+            $table->dropConstrainedForeignId('id_programa');
         });
 
         Schema::dropIfExists('asignacion_plantilla');

@@ -33,7 +33,7 @@ return new class extends Migration
             $table->string('estado_civil', 20)->nullable();
             $table->string('foto', 100)->nullable();
             $table->enum('sexo', ['M', 'F'])->default('M');
-            $table->enum('origen', ['API', 'WEB', 'APP'])->default('API');
+            $table->enum('origen', ['API', 'WEB', 'APP'])->default('WEB');
             $table->string("user_crea", 10)->nullable();
             $table->string('user_actualiza', 10)->nullable();
             $table->string('user_elimina', 10)->nullable();

@@ -4,6 +4,7 @@ namespace App\Repositories\Contracts;
 
 use App\Models\DetalleParametro;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 interface IDetalleParametroRepository
 {
@@ -20,6 +21,14 @@ interface IDetalleParametroRepository
      * @return Collection<int, DetalleParametro>
      */
     public function getAllFiltered(array $filters): Collection;
+    
+    /**
+     * Obtiene DetalleParametros aplicando filtros dinámicos
+     * @param array<string, mixed> $filters
+     * @param int $perPage
+     * @return LengthAwarePaginator
+     */
+    public function getAllFilteredPaginate(array $filters, int $perPage): LengthAwarePaginator;
 
     /**
      * Obtener un detalle de parámetro por codigo
@@ -42,6 +51,14 @@ interface IDetalleParametroRepository
      * @return DetalleParametro|null
      */
     public function findByClaseAndCodigo(int $parametro_clase, int $codigo): ?DetalleParametro;
+
+    /**
+     * Obtener un detalle de parámetro por clase y nombre_url
+     * @param int $parametro_clase
+     * @param string $nombre_url
+     * @return DetalleParametro|null
+     */
+    public function findByClaseAndNombreUrl(int $parametro_clase, string $nombreUrl): ?DetalleParametro;
 
     /**
      * Crea un detalle parámetro

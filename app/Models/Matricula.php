@@ -15,8 +15,13 @@ class Matricula extends Model
         "id_alumno",
         "id_sede",
         "id_programa",
-        "id_evento",
+        // "id_evento",
         "id_estadomatricula",
+        'nombre_alumno',
+        'nombre_sede',
+        'nombre_programa',
+        // 'nombre_evento',
+        'nombre_estadomatricula',
         "fecha_matricula",
         "pago_inicial",
         "user_crea",
@@ -54,6 +59,6 @@ class Matricula extends Model
 
     public function estadoMatricula(): BelongsTo
     {
-        return $this->belongsTo(DetalleParametro::class, 'id_estadomatricula', 'id');
+        return $this->belongsTo(DetalleParametro::class, 'id_estadomatricula', 'codigo');
     }
 }

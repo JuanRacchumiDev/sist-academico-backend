@@ -15,6 +15,7 @@ return [
         'grupo' => 1010,
         'estado-pago' => 1011,
         'estado-matricula' => 1012,
-        'banco-cuenta' => 1013
+        'banco-cuenta' => 1013,
+        'metodo-pago' => 1014
     ]
 ];

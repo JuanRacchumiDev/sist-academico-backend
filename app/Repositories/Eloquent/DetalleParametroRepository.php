@@ -4,6 +4,7 @@ namespace App\Repositories\Eloquent;
 use App\Models\DetalleParametro;
 use App\Repositories\Contracts\IDetalleParametroRepository;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class DetalleParametroRepository implements IDetalleParametroRepository {
     /**
@@ -51,6 +52,51 @@ class DetalleParametroRepository implements IDetalleParametroRepository {
     }
 
     /**
+     * Obtiene DetalleParametros aplicando filtros dinámicos
+     * @param array<string, mixed> $filters
+     * @param int $perPage
+     * @return LengthAwarePaginator<DetalleParametro>
+     */
+    public function getAllFilteredPaginate(array $filters, int $perPage): LengthAwarePaginator
+    {
+        $query = DetalleParametro::query();
+
+        if (isset($filters['parametro_clase'])) {
+            $clases = is_array($filters['parametro_clase']) ? $filters['parametro_clase'] : [$filters['parametro_clase']];
+            $query->whereIn('parametro_clase', $clases);
+        }
+
+        if (isset($filters['en_persona'])) {
+            $query->where('en_persona', (bool)$filters['en_persona']);
+        }
+
+        if (isset($filters['en_empresa'])) {
+            $query->where('en_empresa', (bool)$filters['en_empresa']);
+        }
+
+        if (isset($filters['visible'])) {
+            $query->where('visible', (bool)$filters['visible']);
+        }
+
+        if (isset($filters['estado'])) {
+            $query->where('estado', (bool)$filters['estado']);
+        }
+
+        if (isset($filters['search'])) {
+            $search = '%'.strtolower($filters['search']).'%';
+
+            $query->where(function($q) use ($search) {
+                $q->whereRaw('LOWER(nombre) LIKE ?', [$search]);
+            });
+        }
+
+        $query->orderBy('parametro_clase', 'asc')->orderBy('nombre', 'asc');
+
+        // return $query->get();
+        return $query->paginate($perPage);
+    }
+
+    /**
      * Busca un detalle de parámetro por código
      * @param int $codigo
      * @return DetalleParametro|null
@@ -80,6 +126,19 @@ class DetalleParametroRepository implements IDetalleParametroRepository {
     {
         return DetalleParametro::where('parametro_clase', $parametro_clase)
             ->where('codigo', $codigo)
+            ->first();
+    }
+
+    /**
+     * Busca un detalle de parámetro por clase y nombre_url
+     * @param int $parametro_clase
+     * @param string $nombrw_url
+     * @return DetalleParametro|null
+     */
+    public function findByClaseAndNombreUrl(int $parametro_clase, string $nombreUrl): ?DetalleParametro
+    {
+        return DetalleParametro::where('parametro_clase', $parametro_clase)
+            ->where('nombre_url', $nombreUrl)
             ->first();
     }
 

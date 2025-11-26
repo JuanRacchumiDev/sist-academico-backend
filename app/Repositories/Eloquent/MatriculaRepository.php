@@ -5,11 +5,17 @@ use App\Models\Matricula;
 use App\Repositories\Contracts\IMatriculaRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Validation\ValidationException;
 
 class MatriculaRepository implements IMatriculaRepository {
     public function getAll(?array $searchParams = null): Collection
     {
-        $query = Matricula::query();
+        $query = Matricula::with([
+            'alumno',
+            'sede',
+            'programa',
+            'estadoMatricula'
+        ]);
 
         if ($searchParams) {
             $query->where(function($q) use ($searchParams) {
@@ -28,7 +34,12 @@ class MatriculaRepository implements IMatriculaRepository {
 
     public function getAllFiltered(array $filters, int $perPage): LengthAwarePaginator
     {
-        $query = Matricula::query();
+        $query = Matricula::with([
+            'alumno',
+            'sede',
+            'programa',
+            'estadoMatricula'
+        ]);
 
         if (isset($filters['estado'])) {
             $query->where('estado', (bool)$filters['estado']);
@@ -50,9 +61,34 @@ class MatriculaRepository implements IMatriculaRepository {
         return $query->paginate($perPage);
     }
 
+    public function getUniqueForFilters(array $filters): ?Matricula
+    {
+        $query = Matricula::with([
+            'alumno',
+            'sede',
+            'programa',
+            'estadoMatricula'
+        ]);
+
+        if (isset($filters['id_alumno'])) {
+            $query->where('id_alumno', (int)$filters['id_alumno']);
+        }
+
+        if (isset($filters['id_programa'])) {
+            $query->where('id_programa', (int)$filters['id_programa']);
+        }
+
+        return $query->first();
+    }
+
     public function findById(int $id): ?Matricula
     {
-        return Matricula::find($id);
+        return Matricula::with([
+            'alumno',
+            'sede',
+            'programa',
+            'estadoMatricula'
+        ])->find($id);
     }
 
     public function create(array $data): Matricula

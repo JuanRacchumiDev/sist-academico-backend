@@ -14,7 +14,12 @@ class ProgramaRepository implements IProgramaRepository {
      */
     public function getAll(?array $searchParams = null): Collection
     {
-        $query = Programa::query();
+        // $query = Programa::query();
+        $query = Programa::with([
+            'segmento',
+            'tipoPrograma',
+            'categoriaPrograma'
+        ]);
 
         if ($searchParams) {
             $query->where(function($q) use ($searchParams) {
@@ -38,7 +43,12 @@ class ProgramaRepository implements IProgramaRepository {
      */
     public function getAllFiltered(array $filters, int $perPage): LengthAwarePaginator
     {
-        $query = Programa::query();
+        // $query = Programa::query();
+        $query = Programa::with([
+            'segmento',
+            'tipoPrograma',
+            'categoriaPrograma'
+        ]);
 
         if (isset($filters['estado'])) {
             $query->where('estado', (bool)$filters['estado']);
@@ -66,7 +76,11 @@ class ProgramaRepository implements IProgramaRepository {
      */
     public function findById(int $id): ?Programa
     {
-        return Programa::find($id);
+        return Programa::with([
+            'segmento',
+            'tipoPrograma',
+            'categoriaPrograma'
+        ])->find($id);
     }
 
     /**
