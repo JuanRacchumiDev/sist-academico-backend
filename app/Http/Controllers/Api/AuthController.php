@@ -9,6 +9,7 @@ use App\Services\Contracts\IUserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -23,6 +24,7 @@ class AuthController extends Controller
 
     public function login(Request $request): JsonResponse
     {
+        Log::info('Login Request Data', $request->all());
         $credenciales = $request->only('email', 'password');
 
         try {
