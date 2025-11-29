@@ -13,13 +13,20 @@ use App\Http\Controllers\Api\PlantillaController;
 use App\Http\Controllers\Api\ProgramaController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('test', function() {
+    return response()->json([
+        'success' => true,
+        'message' => 'Acceso correcto al enrutador de la API'
+    ]);
+});
+
 Route::prefix('v1')->group(function() {
 
-    Route::get('status', function() {
+    Route::get('validate', function() {
         return response()->json([
-            'status' => 'success',
+            'success' => true,
             'message' => 'API V1 está en línea y accesible'
-        ], 200);
+        ]);
     });
 
     Route::get('/generate-ficha-pdf', [PdfController::class, 'fichaTest']);
