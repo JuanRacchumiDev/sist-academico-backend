@@ -57,9 +57,11 @@ Route::prefix('v1')->group(function() {
 
         Route::prefix('personas')->group(function() {
             Route::get('grupo/{nombreGrupo}/paginate', [PersonaController::class, 'getFilteredPaginate']);
+            Route::post('consulta-documento', [PersonaController::class, 'consultarDocumento']);
             Route::get('grupo/{nombreGrupo}', [PersonaController::class, 'getAll']);
             Route::get('/{id}', [PersonaController::class, 'show']);
             Route::post('/', [PersonaController::class, 'store']);
+            Route::patch('/{id}', [PersonaController::class, 'update']);
         });
 
         Route::prefix('plantillas')->group(function () {

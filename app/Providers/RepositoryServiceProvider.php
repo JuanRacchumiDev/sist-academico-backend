@@ -34,6 +34,7 @@ use App\Services\Contracts\IProgramaService;
 use App\Services\Contracts\IMatriculaService;
 use App\Services\Contracts\IPagoService;
 use App\Services\Contracts\IModuloService;
+use App\Services\Contracts\IPersonaAPIService;
 
 use App\Services\DetalleParametroService;
 use App\Services\EventoService;
@@ -45,6 +46,7 @@ use App\Services\ProgramaService;
 use App\Services\MatriculaService;
 use App\Services\PagoService;
 use App\Services\ModuloService;
+use App\Services\PersonaAPIService;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -174,6 +176,12 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(
             IModuloService::class,
             ModuloService::class
+        );
+
+        // Enlazando el servicio de personaApi
+        $this->app->bind(
+            IPersonaAPIService::class,
+            PersonaAPIService::class
         );
     }
 

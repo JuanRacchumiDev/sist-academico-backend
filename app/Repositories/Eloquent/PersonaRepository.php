@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Eloquent;
 
+use App\DTOs\Persona\PersonaAPIDTO;
 use App\Models\DetalleParametro;
 use App\Models\Persona;
 use App\Repositories\Contracts\IPersonaRepository;
@@ -201,6 +202,38 @@ class PersonaRepository implements IPersonaRepository {
         }
         
         return false;
+    }
+
+    public function updateOrCreateFromAPI(PersonaAPIDTO $dto): Persona
+    {
+        $persona = Persona::firstOrNew([
+            'id_tipodocumento' => $dto->id_tipodocumento,
+            'numero_documento' => $dto->numero_documento
+        ]);
+
+        // Mapear el DTO a los datos que serán guardados/actualizados
+        $dataToUpdate = [
+            'nombres'           => $dto->nombres,
+            'apellido_paterno'  => $dto->apellido_paterno,
+            'apellido_materno'  => $dto->apellido_materno,
+            'nombre_completo'   => $dto->nombre_completo,
+            'departamento'      => $dto->departamento,
+            'provincia'         => $dto->provincia,
+            'distrito'          => $dto->distrito,
+            'direccion'         => $dto->direccion,
+            'direccion_completa'=> $dto->direccion_completa,
+            'ubigeo_reniec'     => $dto->ubigeo_reniec,
+            'ubigeo'            => $dto->ubigeo, // El código de ubigeo final
+            'fecha_nacimiento'  => $dto->fecha_nacimiento, // Ya transformado a YYYY-MM-DD
+            'estado_civil'      => $dto->estado_civil,
+            'sexo'              => $dto->sexo,
+            'origen'            => $dto->origen,
+        ];
+
+        $persona->fill($dataToUpdate);
+        $persona->save();
+        
+        return $persona;
     }
 }
 

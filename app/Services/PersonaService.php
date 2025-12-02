@@ -4,21 +4,19 @@ namespace App\Services;
 use App\DTOs\Persona\PersonaCreateDTO;
 use App\DTOs\Persona\PersonaUpdateDTO;
 use App\Models\Persona;
-use App\Models\DetalleParametro;
 use Illuminate\Support\Facades\DB;
 use App\Repositories\Contracts\IPersonaRepository;
 use App\Repositories\Contracts\IDetalleParametroRepository;
 use App\Services\Contracts\IPersonaService;
+use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Validation\ValidationException;
 
 class PersonaService implements IPersonaService {
     protected IPersonaRepository $personaRepository;
     protected IDetalleParametroRepository $detalleRepository;
 
-    public function __construct(IPersonaRepository $personaRepository, IDetalleParametroRepository $detalleRepository
-        )
+    public function __construct(IPersonaRepository $personaRepository, IDetalleParametroRepository $detalleRepository)
     {
         $this->personaRepository = $personaRepository;
         $this->detalleRepository = $detalleRepository;

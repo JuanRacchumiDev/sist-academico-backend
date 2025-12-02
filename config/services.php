@@ -34,5 +34,8 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
-
+    'factiliza' => [
+        'url' => env('FACTILIZA_API_URL', 'https://api.factiliza.com/v1'),
+        'token' => env('FACTILIZA_API_TOKEN')
+    ]
 ];

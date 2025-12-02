@@ -6,6 +6,7 @@ use App\DTOs\Persona\PersonaCreateDTO;
 use App\DTOs\Persona\PersonaUpdateDTO;
 use App\Http\Controllers\Controller;
 use App\Services\Contracts\IPersonaService;
+use App\Services\Contracts\IPersonaAPIService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -14,10 +15,12 @@ use Illuminate\Validation\ValidationException;
 class PersonaController extends Controller
 {
     protected IPersonaService $personaService;
+    protected IPersonaAPIService $personaAPIService;
 
-    public function __construct(IPersonaService $personaService)
+    public function __construct(IPersonaService $personaService, IPersonaAPIService $personaAPIService)
     {
         $this->personaService = $personaService;
+        $this->personaAPIService = $personaAPIService;
     }
 
     /**
@@ -241,5 +244,33 @@ class PersonaController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function consultarDocumento(Request $request) {
+        $request->validate([
+            'tipo_documento' => 'required|string|max:10',
+            'numero_documento' => 'required|string:max:15',
+            'nombre_grupo' => 'required|string:max:50'
+        ]);
+
+        try {
+            $persona = $this->personaAPIService->queryAndRegister(
+                $request->tipo_documento,
+                $request->numero_documento,
+                $request->nombre_grupo
+            );
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Documento consultado y persona registrada/actualizada con éxito',
+                'data' => $persona
+            ], 200);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al consultar o registrar el documento.',
+                'error'   => $e->getMessage()
+            ], 500);
+        }
     }
 }

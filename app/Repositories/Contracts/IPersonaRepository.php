@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Contracts;
 
+use App\DTOs\Persona\PersonaAPIDTO;
 use App\Models\Persona;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -73,4 +74,6 @@ interface IPersonaRepository {
      * @return bool 
      */
     public function delete(int $id): bool;
+
+    public function updateOrCreateFromAPI(PersonaAPIDTO $dto): Persona;
 }
