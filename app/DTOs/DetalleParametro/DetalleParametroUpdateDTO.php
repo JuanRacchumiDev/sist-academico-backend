@@ -1,9 +1,7 @@
 <?php
 namespace App\DTOs\DetalleParametro;
 
-use Illuminate\Validation\Rule;
 use Spatie\LaravelData\Data;
-use Illuminate\Support\Str;
 
 class DetalleParametroUpdateDTO extends Data
 {

@@ -1,10 +1,8 @@
 <?php
 namespace App\DTOs\Persona;
 
-use App\Models\DetalleParametro;
 use Illuminate\Validation\Rule;
 use Spatie\LaravelData\Data;
-use Illuminate\Validation\ValidationException;
 
 class PersonaCreateDTO extends Data
 {

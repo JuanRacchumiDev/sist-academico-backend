@@ -3,7 +3,6 @@ namespace App\DTOs\Programa;
 
 use Illuminate\Validation\Rule;
 use Spatie\LaravelData\Data;
-use Illuminate\Support\Str;
 use Illuminate\Http\UploadedFile;
 
 class ProgramaCreateDTO extends Data {
@@ -34,19 +33,6 @@ class ProgramaCreateDTO extends Data {
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null
     ){}
-
-    /**
-     * Manipula los datos de la validación
-     */
-    // public static function prepareForValidation(array $payload): array
-    // {
-    //     // Verificamos si el campo nombre está en la petición
-    //     if (isset($payload['nombre'])) {
-    //         $payload['nombre_url'] = Str::slug($payload['nombre']);
-    //     }
-
-    //     return $payload;
-    // }
 
     public static function rules(): array
     {

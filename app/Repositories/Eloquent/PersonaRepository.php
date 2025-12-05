@@ -119,7 +119,6 @@ class PersonaRepository implements IPersonaRepository {
      */
     public function findById(int $id): ?Persona
     {
-        // return Persona::with('tipoDocumento')->find($id);
         return Persona::with(['tipoDocumento', 'grupos'])->findOrFail($id);
     }
 
@@ -155,8 +154,6 @@ class PersonaRepository implements IPersonaRepository {
         $persona->grupos()->attach($grupo->codigo);
 
         return $persona;
-
-        // return Persona::create($data);
     }
 
     /**
@@ -181,8 +178,6 @@ class PersonaRepository implements IPersonaRepository {
 
                 return $persona->refresh();
             }
-
-            // return $persona;
         }
         
         return null;

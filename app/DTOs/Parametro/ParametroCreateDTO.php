@@ -3,7 +3,6 @@ namespace App\DTOs\Parametro;
 
 use Illuminate\Validation\Rule;
 use Spatie\LaravelData\Data;
-use Illuminate\Support\Str;
 
 class ParametroCreateDTO extends Data
 {
@@ -18,16 +17,6 @@ class ParametroCreateDTO extends Data
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null,
     ){}
-
-    /**
-     * Define los valores por defecto para los campos opcionales/booleanos
-     */
-    // public static function withDefaults(): array
-    // {
-    //     return [
-    //         'estado' => true
-    //     ];
-    // }
 
     public static function rules(): array
     {

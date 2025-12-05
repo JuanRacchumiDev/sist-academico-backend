@@ -77,16 +77,6 @@ class MatriculaRepository implements IMatriculaRepository {
             'detalles',
             'estadoMatricula'
         ])->find($filters['id_matricula']);
-
-        // if (isset($filters['id_alumno'])) {
-        //     $query->where('id_alumno', (int)$filters['id_alumno']);
-        // }
-
-        // if (isset($filters['id_programa'])) {
-        //     $query->where('id_programa', (int)$filters['id_programa']);
-        // }
-
-        // return $query->first();
     }
 
     public function findById(int $id): ?Matricula
@@ -144,12 +134,6 @@ class MatriculaRepository implements IMatriculaRepository {
             return $matricula;
         });
     }
-
-    // public function create(array $data): Matricula
-    // {
-    //     $matricula = Matricula::create($data);
-    //     return $matricula;
-    // }
 
     public function update(int $id, array $data): ?Matricula
     {

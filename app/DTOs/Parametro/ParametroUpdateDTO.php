@@ -3,7 +3,6 @@ namespace App\DTOs\Parametro;
 
 use Illuminate\Validation\Rule;
 use Spatie\LaravelData\Data;
-use Illuminate\Support\Str;
 
 class ParametroUpdateDTO extends Data
 {
@@ -18,19 +17,6 @@ class ParametroUpdateDTO extends Data
         public ?string $user_elimina = null,
         public ?bool $estado = null
     ){}
-
-    /**
-     * Manipula los datos de la validación
-     */
-    public static function prepareForValidation(array $payload): array
-    {
-        // Verificamos si el campo nombre está en la petición
-        if (isset($payload['nombre'])) {
-            $payload['nombre_url'] = Str::slug($payload['nombre']);
-        }
-
-        return $payload;
-    }
 
     public static function rules(): array
     {

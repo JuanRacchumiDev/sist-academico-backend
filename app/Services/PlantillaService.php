@@ -39,7 +39,6 @@ class PlantillaService implements IPlantillaService {
             $originalName = $plantillaCreateDTO->path->getClientOriginalName();
             
             // Almacenar el archivo PDF
-            // $path = $plantillaCreateDTO->path->store('plantillas', 'public');
             $path = $plantillaCreateDTO->path->storeAs(
                 'plantillas',
                 $originalName,
@@ -48,7 +47,6 @@ class PlantillaService implements IPlantillaService {
             
             // Reemplazar el objeto UploadedFile con la ruta de almacenamiento en el DTO
             $plantillaCreateDTO->path = $path;
-            // $plantillaCreateDTO->path = $fullname;
         } else {
             $plantillaCreateDTO->path = null;
         }

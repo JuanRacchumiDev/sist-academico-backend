@@ -16,7 +16,6 @@ interface IMatriculaRepository
 
     public function findById(int $id): ?Matricula;
 
-    // public function create(array $data): Matricula|null;
     public function create(MatriculaCreateDTO $dto): Matricula;
 
     public function update(int $id, array $data): ?Matricula;

@@ -1,7 +1,6 @@
 <?php
 namespace App\DTOs\Persona;
 
-use Illuminate\Validation\ValidationException;
 use Carbon\Carbon;
 
 class PersonaAPIDTO {
@@ -118,7 +117,6 @@ class PersonaAPIDTO {
             estado_civil: $this->estado_civil,
             sexo: $this->sexo,
             origen: $this->origen,
-            // Sobreescribir el valor de nombre_completo usando el parámetro de override
             nombre_completo_override: $nuevoNombre 
         );
     }

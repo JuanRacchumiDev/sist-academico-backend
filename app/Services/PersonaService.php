@@ -97,14 +97,10 @@ class PersonaService implements IPersonaService {
 
             // Filtrar nulos
             $data = array_filter($dataToCreate, fn($value) => !is_null($value));
-            
-            // throw ValidationException::withMessages(['data' => $data]);
 
             // Crear la persona
             /** @var Persona $persona */
             $persona = $this->personaRepository->create($data);
-
-            // throw ValidationException::withMessages(['persona' => $persona]);
 
             // Obteniendo grupo
             $grupo = $this->detalleRepository->findByNombreUrl($nombreGrupo);

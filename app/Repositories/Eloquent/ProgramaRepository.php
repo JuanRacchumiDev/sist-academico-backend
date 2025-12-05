@@ -14,7 +14,6 @@ class ProgramaRepository implements IProgramaRepository {
      */
     public function getAll(?array $searchParams = null): Collection
     {
-        // $query = Programa::query();
         $query = Programa::with([
             'segmento',
             'tipoPrograma',
@@ -43,7 +42,6 @@ class ProgramaRepository implements IProgramaRepository {
      */
     public function getAllFiltered(array $filters, int $perPage): LengthAwarePaginator
     {
-        // $query = Programa::query();
         $query = Programa::with([
             'segmento',
             'tipoPrograma',

@@ -8,7 +8,6 @@ use App\Services\Contracts\IProgramaService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 
 class ProgramaService implements IProgramaService {
     protected IProgramaRepository $programaRepository;
@@ -57,6 +56,7 @@ class ProgramaService implements IProgramaService {
     public function createPrograma(ProgramaCreateDTO $programaCreateDTO): Programa
     {
         if ($programaCreateDTO->plan instanceof UploadedFile) {
+            
             // Obtener el nombre original del archivo
             $originalName = $programaCreateDTO->plan->getClientOriginalName();
 

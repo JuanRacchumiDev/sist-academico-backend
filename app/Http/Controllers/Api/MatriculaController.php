@@ -161,22 +161,7 @@ class MatriculaController extends Controller
 
             $dto = MatriculaCreateDTO::from($data);
 
-            // return response()->json([
-            //     'result' => false,
-            //     'data' => $data,
-            //     'dto' => $dto,
-            //     'message' => 'Error al registrar matrícula'
-            // ], 422);
-
             $matricula = $this->matriculaService->createMatricula($dto);
-
-            // return response()->json([
-            //     'result' => false,
-            //     'data' => $data,
-            //     'dto' => $dto,
-            //     'matricula' => $matricula,
-            //     'message' => 'Error al registrar matrícula'
-            // ], 422);
 
             return response()->json([
                 'message' => 'Matrícula registrada exitosamente',
@@ -201,37 +186,6 @@ class MatriculaController extends Controller
             ], 500);
         }
     }
-    /*
-    public function store(Request $request)
-    {
-        try {
-            $data = $request->all();
-
-            $matriculaCreateDTO = MatriculaCreateDTO::from($data);
-            
-            $matricula = $this->matriculaService->createMatricula($matriculaCreateDTO);
-            
-            return response()->json([
-                'result' => true,
-                'data' => $matricula,
-                'message' => 'Matrícula registrada correctamente'
-            ], 201);
-        } catch (ValidationException $e) {
-            return response()->json([
-                'result' => false,
-                'message' => 'Validation error',
-                'errors' => $e->errors()
-            ], 422);
-        } catch (\Exception $e) {
-            Log::error("Error creating matrícula: " . $e->getMessage());
-            
-            return response()->json([
-                'result' => false,
-                'message' => 'Error al crear matrícula: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-    */
 
     /**
      * Update the specified resource in storage.

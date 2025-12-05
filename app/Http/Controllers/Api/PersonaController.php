@@ -135,13 +135,6 @@ class PersonaController extends Controller
 
             $personaCreateDTO = PersonaCreateDTO::from($data);
 
-            // return response()->json([
-            //     'result' => false,
-            //     'alumnoExiste' => $alumnoExiste,
-            //     'personaCreateDTO' => $personaCreateDTO,
-            //     'message' => 'Error crear persona'
-            // ], 422);
-
             $persona = $this->personaService->createPersona($personaCreateDTO);
 
             return response()->json([

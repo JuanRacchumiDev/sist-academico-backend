@@ -6,7 +6,6 @@ use App\DTOs\Persona\PersonaAPIDTO;
 use App\Models\Persona;
 use App\Repositories\Contracts\IDetalleParametroRepository;
 use App\Services\Contracts\IPersonaAPIService;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Http;
 use Exception;
 
@@ -57,7 +56,6 @@ class PersonaAPIService implements IPersonaAPIService{
             throw new Exception("Error al procesar la respuesta de la API externa: " . $e->getMessage());
         }
 
-        // return $this->personaRepository->updateOrCreateFromAPI($dto);
         $persona = $this->personaRepository->updateOrCreateFromAPI($dto);
 
         // Obtener el nombre del grupo

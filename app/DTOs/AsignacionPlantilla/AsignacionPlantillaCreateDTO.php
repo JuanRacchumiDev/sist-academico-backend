@@ -1,9 +1,7 @@
 <?php
 namespace App\DTOs\AsignacionPlantilla;
 
-use Illuminate\Validation\Rule;
 use Spatie\LaravelData\Data;
-use Illuminate\Support\Str;
 
 class AsignacionPlantillaCreateDTO extends Data
 {

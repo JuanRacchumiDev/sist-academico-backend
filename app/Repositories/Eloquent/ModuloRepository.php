@@ -14,7 +14,6 @@ class ModuloRepository implements IModuloRepository {
      */
     public function getAll(?array $searchParams = null): Collection
     {
-        // $query = Modulo::query();
         $query = Modulo::with([
             'programa'
         ]);
@@ -40,7 +39,6 @@ class ModuloRepository implements IModuloRepository {
      */
     public function getAllFiltered(array $filters, int $perPage): LengthAwarePaginator
     {
-        // $query = Modulo::query();
         $query = Modulo::with([
             'programa'
         ]);
@@ -84,7 +82,6 @@ class ModuloRepository implements IModuloRepository {
      */
     public function findById(int $id): ?Modulo
     {
-        // return Modulo::find($id);
         return Modulo::with([
             'programa'
         ])->find($id);

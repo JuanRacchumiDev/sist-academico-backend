@@ -3,14 +3,12 @@ namespace App\Repositories\Eloquent;
 
 use App\Models\Plantilla;
 use App\Repositories\Contracts\IPlantillaRepository;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 
 class PlantillaRepository implements IPlantillaRepository {
 
     public function getAll(?array $searchParams = null): Collection
     {
-        // return Plantilla::get();
         $query = Plantilla::query();
 
         if ($searchParams) {

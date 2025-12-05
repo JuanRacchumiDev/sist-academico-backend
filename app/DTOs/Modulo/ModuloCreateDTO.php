@@ -3,7 +3,6 @@ namespace App\DTOs\Modulo;
 
 use Illuminate\Validation\Rule;
 use Spatie\LaravelData\Data;
-use Illuminate\Support\Str;
 
 class ModuloCreateDTO extends Data {
     public function __construct(
@@ -19,19 +18,6 @@ class ModuloCreateDTO extends Data {
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null
     ){}
-
-    /**
-     * Manipula los datos de la validación
-     */
-    // public static function prepareForValidation(array $payload): array
-    // {
-    //     // Verificamos si el campo título está en la petición
-    //     if (isset($payload['titulo'])) {
-    //         $payload['titulo_url'] = Str::slug($payload['titulo']);
-    //     }
-
-    //     return $payload;
-    // }
 
     public static function rules(): array
     {

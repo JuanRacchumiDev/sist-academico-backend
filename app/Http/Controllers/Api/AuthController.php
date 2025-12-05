@@ -28,7 +28,6 @@ class AuthController extends Controller
         $credenciales = $request->only('email', 'password');
 
         try {
-            // $usuario = User::where('email', $request->email)->first();
             $usuario = $this->userService->getUserByEmail($request->email);
 
             if (!$usuario) {
