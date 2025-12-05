@@ -4,6 +4,7 @@ namespace App\Repositories\Contracts;
 use App\Models\Matricula;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use App\DTOs\Matricula\MatriculaCreateDTO;
 
 interface IMatriculaRepository
 {
@@ -15,7 +16,8 @@ interface IMatriculaRepository
 
     public function findById(int $id): ?Matricula;
 
-    public function create(array $data): Matricula|null;
+    // public function create(array $data): Matricula|null;
+    public function create(MatriculaCreateDTO $dto): Matricula;
 
     public function update(int $id, array $data): ?Matricula;
 

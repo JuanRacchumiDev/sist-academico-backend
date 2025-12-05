@@ -17,7 +17,6 @@ return new class extends Migration
             $table->unsignedBigInteger('id_persona');
             $table->unsignedBigInteger('id_tipocertificado');
             $table->unsignedBigInteger('id_plantilla');
-            // $table->unsignedBigInteger('id_evento')->nullable();
             $table->unsignedBigInteger('id_programa')->nullable();
 
             $table->string('codigo_qr_verificacion', 12);
@@ -43,10 +42,6 @@ return new class extends Migration
                 ->references('id')
                 ->on('plantilla');
 
-            // $table->foreign('id_evento')
-            //     ->references('id')
-            //     ->on('evento');
-
             $table->foreign('id_programa')
                 ->references('id')
                 ->on('programa');
@@ -67,9 +62,6 @@ return new class extends Migration
 
             $table->dropForeign('id_plantilla');
             $table->dropColumn('id_plantilla');
-
-            // $table->dropForeign('id_evento');
-            // $table->dropColumn('id_evento');
 
             $table->dropForeign('id_programa');
             $table->dropColumn('id_programa');

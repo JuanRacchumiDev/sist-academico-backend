@@ -19,10 +19,11 @@ return new class extends Migration
             $table->unsignedBigInteger('id_formapago');
             $table->unsignedBigInteger('id_metodopago');
             $table->unsignedBigInteger('id_estadopago');
-            
             $table->string('concepto', 100);
             $table->string('fecha_pago', 10);
             $table->string('nro_operacion', 30)->nullable();
+            $table->string('fecha_proximo_pago')->nullable();
+            $table->string('fecha_compromiso_pago')->nullable();
             $table->integer('nro_cuota')->nullable();
             $table->decimal('monto_efectivo', 10, 2)->default(0);
             $table->decimal('monto_tarjeta', 10, 2)->default(0);

@@ -23,6 +23,17 @@ class PersonaAPIService implements IPersonaAPIService{
         $this->detalleRepository = $detalleRepository;
     }
 
+    public function query(string $tipoDocumento, string $numeroDocumento): array
+    {
+        if ($tipoDocumento !== 'DNI') {
+             throw new Exception("La API de Factiliza solo soporta consultas DNI.");
+        }
+
+        $response = $this->callAPI($numeroDocumento);
+
+        return $response;
+    }
+
     public function queryAndRegister(string $tipoDocumento, string $numeroDocumento, ?string $nombreGrupo = null): Persona
     {
         if ($tipoDocumento !== 'DNI') {
@@ -94,7 +105,7 @@ class PersonaAPIService implements IPersonaAPIService{
                 throw new Exception("La API de Factiliza devolvió un error: {$message}");
             }
 
-            return $responseData;
+            return $responseData['data'];
         } catch (\Throwable $e) {
             throw new Exception("Fallo en la conexión o la API: " . $e->getMessage());
         }

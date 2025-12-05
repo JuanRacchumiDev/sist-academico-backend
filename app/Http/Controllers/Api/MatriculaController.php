@@ -133,9 +133,9 @@ class MatriculaController extends Controller
         }
     }
 
-    public function downloadFichaPdf(Request $request): JsonResponse {
+    public function getFicha(Request $request) {
         try {
-            $filters = $request->only(['id_alumno', 'id_programa']);
+            $filters = $request->only(['id_matricula']);
 
             $response = $this->matriculaService->getFichaByFilters($filters);
         
@@ -155,6 +155,53 @@ class MatriculaController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+    public function store(Request $request): JsonResponse {
+        try {
+            $data = $request->all();
+
+            $dto = MatriculaCreateDTO::from($data);
+
+            // return response()->json([
+            //     'result' => false,
+            //     'data' => $data,
+            //     'dto' => $dto,
+            //     'message' => 'Error al registrar matrícula'
+            // ], 422);
+
+            $matricula = $this->matriculaService->createMatricula($dto);
+
+            // return response()->json([
+            //     'result' => false,
+            //     'data' => $data,
+            //     'dto' => $dto,
+            //     'matricula' => $matricula,
+            //     'message' => 'Error al registrar matrícula'
+            // ], 422);
+
+            return response()->json([
+                'message' => 'Matrícula registrada exitosamente',
+                'data' => [
+                    'id' => $matricula->id,
+                    'id_alumno' => $matricula->id_alumno,
+                    'fecha_matricula' => $matricula->fecha_matricula
+                ]
+            ], 201);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'result' => false,
+                'message' => 'Validation error',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            Log::error("Error creating matrícula: " . $e->getMessage());
+            
+            return response()->json([
+                'result' => false,
+                'message' => 'Error al crear matrícula: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    /*
     public function store(Request $request)
     {
         try {
@@ -184,6 +231,7 @@ class MatriculaController extends Controller
             ], 500);
         }
     }
+    */
 
     /**
      * Update the specified resource in storage.

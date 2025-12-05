@@ -19,6 +19,7 @@ use Illuminate\Validation\ValidationException;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Response;
 
+
 class MatriculaService implements IMatriculaService {
     protected IMatriculaRepository $matriculaRepository;
     protected IPersonaRepository $personaRepository;
@@ -51,38 +52,37 @@ class MatriculaService implements IMatriculaService {
         return $this->matriculaRepository->getAllFiltered($filters, $perPage);
     }
 
-    public function getFichaByFilters(array $filters): Response|array
+    public function getFichaByFilters(array $filters)
     {
         // Obtener datos de la matrícula
         $matricula = $this->matriculaRepository->getUniqueForFilters($filters);
 
-        // Validar si la matrícula no fue encontrada
-        if (is_null($matricula)) {
-            return [
-                'result' => false,
-                'message' => 'Matrícula no encontrada'
-            ];
-        }
-
-        // Cargar la vista y pasar los datos
-        // $pdf = Pdf::loadView('pdf.matricula.generarFicha', [
-        //     'matricula' => $matricula
-        // ]);
-
-        $pdf = Pdf::loadView('pdf.test');
-
-        // Devolver el PDF para descarga o visualización
-        // $filename = 'matricula_'.$matricula->id.'_'.$matricula->alumno->nombre_completo ?? 'N_A'.'pdf';
-        $nombreAlumno = $matricula->alumno->nombre_completo ?? "N_A";
-        $filename = 'matricula_'.$matricula->id.'_'.$nombreAlumno.'.pdf';
-
-        return [
-            'result' => false,
-            'filename' => $filename,
-            'message' => 'Matrícula no encontrada'
+        $empresa = [
+            'razon_social' => 'COOPERATIVA DE SERVICIOS EDUCACIONALES CAPACITA',
+            'ruc' => '20603337337'
         ];
 
-        // return $pdf->stream($filename);
+        $pago = [
+            'matricula' => '120.00',
+            'cuotas' => '12',
+            'monto_cuota' => '120.00',
+            'total' => '1560.00'
+        ];
+
+        $dataPDF = [
+            'title' => 'FICHA DE MATRÍCULA',
+            'content' => [
+                'matricula' => $matricula,
+                'empresa' => $empresa,
+                'pago' => $pago
+            ]
+        ];
+
+        $pdf = Pdf::loadView('pdf.ficha', $dataPDF);
+
+        $filename = 'matricula_0001.pdf';
+
+        return $pdf->download($filename);
     }
 
     public function getMatriculaById(int $id): ?Matricula
@@ -90,6 +90,14 @@ class MatriculaService implements IMatriculaService {
         return $this->matriculaRepository->findById($id);
     }
 
+    public function createMatricula(MatriculaCreateDTO $matriculaCreateDTO): Matricula|null
+    {
+        // throw ValidationException::withMessages(['matriculaCreateDTO' => $matriculaCreateDTO]);
+
+        return $this->matriculaRepository->create($matriculaCreateDTO);
+    }
+
+    /*
     public function createMatricula(MatriculaCreateDTO $matriculaCreateDTO): Matricula|null
     {
         $valorCuota = 0;
@@ -216,6 +224,7 @@ class MatriculaService implements IMatriculaService {
 
         return null;
     }
+    */
 
     public function deleteMatricula(int $id): bool
     {

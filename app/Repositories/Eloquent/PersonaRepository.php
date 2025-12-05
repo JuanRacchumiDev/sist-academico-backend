@@ -149,7 +149,7 @@ class PersonaRepository implements IPersonaRepository {
 
         // Obtener el código del grupo
         $grupo = DetalleParametro::where('nombre_url', $data['nombre_grupo'])
-            ->where('parametro_clase', 1010)
+            ->where('parametro_clase', 1009)
             ->firstOrFail();
 
         $persona->grupos()->attach($grupo->codigo);

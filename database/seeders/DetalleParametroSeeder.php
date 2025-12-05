@@ -136,6 +136,7 @@ class DetalleParametroSeeder extends Seeder
                 'nombre' => 'CERTIFICACIÓN',
                 'nombre_url' => 'certificacion',
                 'descripcion' => 'CERTIFICACIÓN',
+                'abreviatura' => 'C',
                 'longitud' => null,
                 'en_persona' => true,
                 'en_empresa' => false,
@@ -149,6 +150,7 @@ class DetalleParametroSeeder extends Seeder
                 'nombre' => 'ESPECIALIZACIÓN',
                 'nombre_url' => 'especializacion',
                 'descripcion' => 'ESPECIALIZACIÓN',
+                'abreviatura' => 'E',
                 'longitud' => null,
                 'en_persona' => true,
                 'en_empresa' => false,
@@ -159,35 +161,10 @@ class DetalleParametroSeeder extends Seeder
             ],
             [
                 'parametro_clase' => 1002,
-                'nombre' => 'CURSO',
-                'nombre_url' => 'curso',
-                'descripcion' => 'CURSO',
-                'longitud' => null,
-                'en_persona' => true,
-                'en_empresa' => false,
-                'compra' => false,
-                'venta' => false,
-                'created_at' => $now,
-                'updated_at' => $now
-            ],
-            [
-                'parametro_clase' => 1002,
-                'nombre' => 'TALLER',
-                'nombre_url' => 'taller',
-                'descripcion' => 'TALLER',
-                'longitud' => null,
-                'en_persona' => true,
-                'en_empresa' => false,
-                'compra' => false,
-                'venta' => false,
-                'created_at' => $now,
-                'updated_at' => $now
-            ],
-            [
-                'parametro_clase' => 1002,
-                'nombre' => 'CONFERENCIA',
-                'nombre_url' => 'conferencia',
-                'descripcion' => 'CONFERENCIA',
+                'nombre' => 'DIPLOMADO',
+                'nombre_url' => 'diplomado',
+                'descripcion' => 'DIPLOMADO',
+                'abreviatura' => 'D',
                 'longitud' => null,
                 'en_persona' => true,
                 'en_empresa' => false,
@@ -201,81 +178,6 @@ class DetalleParametroSeeder extends Seeder
         DB::table('detalle_parametro')->insert([
             [
                 'parametro_clase' => 1003,
-                'nombre' => 'TECNOLOGÍA',
-                'nombre_url' => 'tecnologia',
-                'longitud' => null,
-                'en_persona' => true,
-                'en_empresa' => false,
-                'compra' => false,
-                'venta' => false,
-                'created_at' => $now,
-                'updated_at' => $now
-            ],
-            [
-                'parametro_clase' => 1003,
-                'nombre' => 'NEGOCIOS',
-                'nombre_url' => 'negocios',
-                'longitud' => null,
-                'en_persona' => true,
-                'en_empresa' => false,
-                'compra' => false,
-                'venta' => false,
-                'created_at' => $now,
-                'updated_at' => $now
-            ],
-            [
-                'parametro_clase' => 1003,
-                'nombre' => 'SALUD',
-                'nombre_url' => 'salud',
-                'longitud' => null,
-                'en_persona' => true,
-                'en_empresa' => false,
-                'compra' => false,
-                'venta' => false,
-                'created_at' => $now,
-                'updated_at' => $now
-            ],
-            [
-                'parametro_clase' => 1003,
-                'nombre' => 'EDUCACIÓN',
-                'nombre_url' => 'educacion',
-                'longitud' => null,
-                'en_persona' => true,
-                'en_empresa' => false,
-                'compra' => false,
-                'venta' => false,
-                'created_at' => $now,
-                'updated_at' => $now
-            ],
-            [
-                'parametro_clase' => 1003,
-                'nombre' => 'INGENIERÍA',
-                'nombre_url' => 'ingenieria',
-                'longitud' => null,
-                'en_persona' => true,
-                'en_empresa' => false,
-                'compra' => false,
-                'venta' => false,
-                'created_at' => $now,
-                'updated_at' => $now
-            ],
-            [
-                'parametro_clase' => 1003,
-                'nombre' => 'CIENCIAS',
-                'nombre_url' => 'ciencias',
-                'longitud' => null,
-                'en_persona' => true,
-                'en_empresa' => false,
-                'compra' => false,
-                'venta' => false,
-                'created_at' => $now,
-                'updated_at' => $now
-            ]
-        ]);
-
-        DB::table('detalle_parametro')->insert([
-            [
-                'parametro_clase' => 1004,
                 'nombre' => 'CERTIFICADO DE PARTICIPACIÓN',
                 'nombre_url' => 'certificado-de-participacion',
                 'longitud' => null,
@@ -287,7 +189,7 @@ class DetalleParametroSeeder extends Seeder
                 'updated_at' => $now
             ],
             [
-                'parametro_clase' => 1004,
+                'parametro_clase' => 1003,
                 'nombre' => 'CERTIFICADO DE APROBACIÓN',
                 'nombre_url' => 'certificado-de-aprobacion',
                 'longitud' => null,
@@ -299,19 +201,7 @@ class DetalleParametroSeeder extends Seeder
                 'updated_at' => $now
             ],
             [
-                'parametro_clase' => 1004,
-                'nombre' => 'DIPLOMA DE ESPECIALIZACIÓN',
-                'nombre_url' => 'diploma-de-especializacion',
-                'longitud' => null,
-                'en_persona' => true,
-                'en_empresa' => false,
-                'compra' => false,
-                'venta' => false,
-                'created_at' => $now,
-                'updated_at' => $now
-            ],
-            [
-                'parametro_clase' => 1004,
+                'parametro_clase' => 1003,
                 'nombre' => 'CERTIFICADO DE AGRADECIMIENTO',
                 'nombre_url' => 'certificado-de-agradecimiento',
                 'longitud' => null,
@@ -326,57 +216,9 @@ class DetalleParametroSeeder extends Seeder
 
         DB::table('detalle_parametro')->insert([
             [
-                'parametro_clase' => 1005,
+                'parametro_clase' => 1004,
                 'nombre' => 'MOYOBAMBA',
                 'nombre_url' => 'moyobamba',
-                'longitud' => null,
-                'en_persona' => true,
-                'en_empresa' => false,
-                'compra' => false,
-                'venta' => false,
-                'created_at' => $now,
-                'updated_at' => $now
-            ],
-            [
-                'parametro_clase' => 1005,
-                'nombre' => 'CHICLAYO',
-                'nombre_url' => 'chiclayo',
-                'longitud' => null,
-                'en_persona' => true,
-                'en_empresa' => false,
-                'compra' => false,
-                'venta' => false,
-                'created_at' => $now,
-                'updated_at' => $now
-            ],
-            [
-                'parametro_clase' => 1005,
-                'nombre' => 'LAMBAYEQUE',
-                'nombre_url' => 'lambayeque',
-                'longitud' => null,
-                'en_persona' => true,
-                'en_empresa' => false,
-                'compra' => false,
-                'venta' => false,
-                'created_at' => $now,
-                'updated_at' => $now
-            ],
-            [
-                'parametro_clase' => 1005,
-                'nombre' => 'RIOJA',
-                'nombre_url' => 'rioja',
-                'longitud' => null,
-                'en_persona' => true,
-                'en_empresa' => false,
-                'compra' => false,
-                'venta' => false,
-                'created_at' => $now,
-                'updated_at' => $now
-            ],
-            [
-                'parametro_clase' => 1005,
-                'nombre' => 'LIMA',
-                'nombre_url' => 'lima',
                 'longitud' => null,
                 'en_persona' => true,
                 'en_empresa' => false,
@@ -389,20 +231,7 @@ class DetalleParametroSeeder extends Seeder
 
         DB::table('detalle_parametro')->insert([
             [
-                'parametro_clase' => 1006,
-                'nombre' => 'UNIVERSIDAD NACIONAL PEDRO RUIZ GALLO',
-                'nombre_url' => 'universidad-nacional-pedro-ruiz-gallo',
-                'abreviatura' => 'UNPRG',
-                'longitud' => null,
-                'en_persona' => true,
-                'en_empresa' => false,
-                'compra' => false,
-                'venta' => false,
-                'created_at' => $now,
-                'updated_at' => $now
-            ],
-            [
-                'parametro_clase' => 1006,
+                'parametro_clase' => 1005,
                 'nombre' => 'UNIVERSIDAD NACIONAL DE TRUJILLO',
                 'nombre_url' => 'universidad-nacional-de-trujillo',
                 'abreviatura' => 'UNT',
@@ -413,38 +242,12 @@ class DetalleParametroSeeder extends Seeder
                 'venta' => false,
                 'created_at' => $now,
                 'updated_at' => $now
-            ],
-            [
-                'parametro_clase' => 1006,
-                'nombre' => 'UNIVERSIDAD NACIONAL DE CAJAMARCA',
-                'nombre_url' => 'universidad-nacional-de-cajamarca',
-                'abreviatura' => 'UNC',
-                'longitud' => null,
-                'en_persona' => true,
-                'en_empresa' => false,
-                'compra' => false,
-                'venta' => false,
-                'created_at' => $now,
-                'updated_at' => $now
-            ],
-            [
-                'parametro_clase' => 1006,
-                'nombre' => 'UNIVERSIDAD NACIONAL MAYOR DE SAN MARCOS',
-                'nombre_url' => 'universidad-nacional-mayor-de-san-marcos',
-                'abreviatura' => 'UNMSM',
-                'longitud' => null,
-                'en_persona' => true,
-                'en_empresa' => false,
-                'compra' => false,
-                'venta' => false,
-                'created_at' => $now,
-                'updated_at' => $now
             ]
         ]);
 
         DB::table('detalle_parametro')->insert([
             [
-                'parametro_clase' => 1007,
+                'parametro_clase' => 1006,
                 'nombre' => 'PAGO TOTAL',
                 'nombre_url' => 'pago-total',
                 'longitud' => null,
@@ -456,7 +259,7 @@ class DetalleParametroSeeder extends Seeder
                 'updated_at' => $now
             ],
             [
-                'parametro_clase' => 1007,
+                'parametro_clase' => 1006,
                 'nombre' => 'PAGO PARCIAL',
                 'nombre_url' => 'pago-parcial',
                 'longitud' => null,
@@ -471,7 +274,7 @@ class DetalleParametroSeeder extends Seeder
 
         DB::table('detalle_parametro')->insert([
             [
-                'parametro_clase' => 1008,
+                'parametro_clase' => 1007,
                 'nombre' => 'SOLES',
                 'nombre_url' => 'soles',
                 'abreviatura' => 'S/.',
@@ -482,14 +285,95 @@ class DetalleParametroSeeder extends Seeder
                 'venta' => false,
                 'created_at' => $now,
                 'updated_at' => $now
+            ]
+        ]);
+
+        DB::table('detalle_parametro')->insert([
+            [
+                'parametro_clase' => 1008,
+                'nombre' => 'EDUCACIÓN',
+                'nombre_url' => 'educacion',
+                'abreviatura' => null,
+                'longitud' => null,
+                'en_persona' => false,
+                'en_empresa' => false,
+                'compra' => false,
+                'venta' => false,
+                'created_at' => $now,
+                'updated_at' => $now
             ],
             [
                 'parametro_clase' => 1008,
-                'nombre' => 'DÓLARES',
-                'nombre_url' => 'dolares',
-                'abreviatura' => '$/.',
+                'nombre' => 'SALUD',
+                'nombre_url' => 'salud',
+                'abreviatura' => null,
                 'longitud' => null,
-                'en_persona' => true,
+                'en_persona' => false,
+                'en_empresa' => false,
+                'compra' => false,
+                'venta' => false,
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'parametro_clase' => 1008,
+                'nombre' => 'PSICOLOGÍA',
+                'nombre_url' => 'psicologia',
+                'abreviatura' => null,
+                'longitud' => null,
+                'en_persona' => false,
+                'en_empresa' => false,
+                'compra' => false,
+                'venta' => false,
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'parametro_clase' => 1008,
+                'nombre' => 'DERECHO',
+                'nombre_url' => 'derecho',
+                'abreviatura' => null,
+                'longitud' => null,
+                'en_persona' => false,
+                'en_empresa' => false,
+                'compra' => false,
+                'venta' => false,
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'parametro_clase' => 1008,
+                'nombre' => 'AGROPECUARIA',
+                'nombre_url' => 'agropecuaria',
+                'abreviatura' => null,
+                'longitud' => null,
+                'en_persona' => false,
+                'en_empresa' => false,
+                'compra' => false,
+                'venta' => false,
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'parametro_clase' => 1008,
+                'nombre' => 'INGENIERÍA',
+                'nombre_url' => 'ingenieria',
+                'abreviatura' => null,
+                'longitud' => null,
+                'en_persona' => false,
+                'en_empresa' => false,
+                'compra' => false,
+                'venta' => false,
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'parametro_clase' => 1008,
+                'nombre' => 'EMPRESARIALES',
+                'nombre_url' => 'empresariales',
+                'abreviatura' => null,
+                'longitud' => null,
+                'en_persona' => false,
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
@@ -500,7 +384,7 @@ class DetalleParametroSeeder extends Seeder
 
         DB::table('detalle_parametro')->insert([
             [
-                'parametro_clase' => 1010,
+                'parametro_clase' => 1009,
                 'nombre' => 'GRUPO ALUMNO',
                 'nombre_url' => 'grupo-alumno',
                 'descripcion' => 'Grupo que almacenará a todos los alumnos',
@@ -508,7 +392,7 @@ class DetalleParametroSeeder extends Seeder
                 'updated_at' => $now
             ],
             [
-                'parametro_clase' => 1010,
+                'parametro_clase' => 1009,
                 'nombre' => 'GRUPO PROMOTOR',
                 'nombre_url' => 'grupo-promotor',
                 'descripcion' => 'Grupo que almacenará a todos los promotores',
@@ -516,7 +400,7 @@ class DetalleParametroSeeder extends Seeder
                 'updated_at' => $now
             ],
             [
-                'parametro_clase' => 1010,
+                'parametro_clase' => 1009,
                 'nombre' => 'GRUPO DOCENTE',
                 'nombre_url' => 'grupo-docente',
                 'descripcion' => 'Grupo que almacenará a todos los docentes',
@@ -524,7 +408,7 @@ class DetalleParametroSeeder extends Seeder
                 'updated_at' => $now
             ],
             [
-                'parametro_clase' => 1010,
+                'parametro_clase' => 1009,
                 'nombre' => 'GRUPO COBRADOR',
                 'nombre_url' => 'grupo-cobrador',
                 'descripcion' => 'Grupo que almacenará a todos los cobradores',
@@ -535,7 +419,7 @@ class DetalleParametroSeeder extends Seeder
 
         DB::table('detalle_parametro')->insert([
             [
-                'parametro_clase' => 1011,
+                'parametro_clase' => 1010,
                 'nombre' => 'PENDIENTE DE PAGO',
                 'nombre_url' => 'pendiente-de-pago',
                 'descripcion' => 'Estado pendiente de pago',
@@ -543,7 +427,7 @@ class DetalleParametroSeeder extends Seeder
                 'updated_at' => $now
             ],
             [
-                'parametro_clase' => 1011,
+                'parametro_clase' => 1010,
                 'nombre' => 'PAGO PARCIAL',
                 'nombre_url' => 'pago-parcial',
                 'descripcion' => 'Estado pago parcial',
@@ -551,7 +435,7 @@ class DetalleParametroSeeder extends Seeder
                 'updated_at' => $now
             ],
             [
-                'parametro_clase' => 1011,
+                'parametro_clase' => 1010,
                 'nombre' => 'PAGO TOTAL',
                 'nombre_url' => 'pago-total',
                 'descripcion' => 'Estado pago total',
@@ -559,7 +443,7 @@ class DetalleParametroSeeder extends Seeder
                 'updated_at' => $now
             ],
             [
-                'parametro_clase' => 1011,
+                'parametro_clase' => 1010,
                 'nombre' => 'PENDIENTE DE VALIDACIÓN',
                 'nombre_url' => 'pendiente-de-validacion',
                 'descripcion' => 'Estado pendiente de validación',
@@ -567,7 +451,7 @@ class DetalleParametroSeeder extends Seeder
                 'updated_at' => $now
             ],
             [
-                'parametro_clase' => 1011,
+                'parametro_clase' => 1010,
                 'nombre' => 'CONFIRMADO',
                 'nombre_url' => 'confirmado',
                 'descripcion' => 'Estado confirmado de pago',
@@ -575,7 +459,7 @@ class DetalleParametroSeeder extends Seeder
                 'updated_at' => $now
             ],
             [
-                'parametro_clase' => 1011,
+                'parametro_clase' => 1010,
                 'nombre' => 'ANULADO',
                 'nombre_url' => 'anulado',
                 'descripcion' => 'Estado pago anulado',
@@ -586,7 +470,7 @@ class DetalleParametroSeeder extends Seeder
 
         DB::table('detalle_parametro')->insert([
             [
-                'parametro_clase' => 1012,
+                'parametro_clase' => 1011,
                 'nombre' => 'PRE MATRICULADO',
                 'nombre_url' => 'pre-matricula',
                 'descripcion' => 'Estado pre inscripción',
@@ -594,7 +478,7 @@ class DetalleParametroSeeder extends Seeder
                 'updated_at' => $now
             ],
             [
-                'parametro_clase' => 1012,
+                'parametro_clase' => 1011,
                 'nombre' => 'MATRICULADO',
                 'nombre_url' => 'matriculado',
                 'descripcion' => 'Estado matriculado',
@@ -602,7 +486,7 @@ class DetalleParametroSeeder extends Seeder
                 'updated_at' => $now
             ],
             [
-                'parametro_clase' => 1012,
+                'parametro_clase' => 1011,
                 'nombre' => 'RESERVADA',
                 'nombre_url' => 'reservada',
                 'descripcion' => 'Estado matriculado',
@@ -610,7 +494,7 @@ class DetalleParametroSeeder extends Seeder
                 'updated_at' => $now
             ],
             [
-                'parametro_clase' => 1012,
+                'parametro_clase' => 1011,
                 'nombre' => 'RETIRADO',
                 'nombre_url' => 'retirado',
                 'descripcion' => 'Estado retirado',
@@ -618,7 +502,7 @@ class DetalleParametroSeeder extends Seeder
                 'updated_at' => $now
             ],
             [
-                'parametro_clase' => 1012,
+                'parametro_clase' => 1011,
                 'nombre' => 'GRADUADO',
                 'nombre_url' => 'graduado',
                 'descripcion' => 'Estado graduado',
@@ -629,7 +513,26 @@ class DetalleParametroSeeder extends Seeder
 
         DB::table('detalle_parametro')->insert([
             [
-                'parametro_clase' => 1014,
+                'parametro_clase' => 1012,
+                'nombre' => 'BN-CAPACITA',
+                'nombre_url' => 'bn-capacita',
+                'valor' => '1111-2222-3333',
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'parametro_clase' => 1012,
+                'nombre' => 'BCP-CAPACITA',
+                'nombre_url' => 'bcp-capacita',
+                'valor' => '4444-5555-6666',
+                'created_at' => $now,
+                'updated_at' => $now
+            ]
+        ]);
+
+        DB::table('detalle_parametro')->insert([
+            [
+                'parametro_clase' => 1013,
                 'nombre' => 'EFECTIVO',
                 'nombre_url' => 'efectivo',
                 'descripcion' => 'Forma de pago efectivo',
@@ -637,7 +540,7 @@ class DetalleParametroSeeder extends Seeder
                 'updated_at' => $now
             ],
             [
-                'parametro_clase' => 1014,
+                'parametro_clase' => 1013,
                 'nombre' => 'TARJETA DE DÉBITO',
                 'nombre_url' => 'tarjeta-de-debito',
                 'descripcion' => 'Forma de pago tarjeta de débito',
@@ -645,7 +548,7 @@ class DetalleParametroSeeder extends Seeder
                 'updated_at' => $now
             ],
             [
-                'parametro_clase' => 1014,
+                'parametro_clase' => 1013,
                 'nombre' => 'TARJETA DE CRÉDITO',
                 'nombre_url' => 'tarjeta-de-credito',
                 'descripcion' => 'Forma de pago tarjeta de crédito',
@@ -653,7 +556,7 @@ class DetalleParametroSeeder extends Seeder
                 'updated_at' => $now
             ],
             [
-                'parametro_clase' => 1014,
+                'parametro_clase' => 1013,
                 'nombre' => 'DEPÓSITO BANCARIO',
                 'nombre_url' => 'deposito-bancario',
                 'descripcion' => 'Forma de pago depósito bancario',
@@ -661,7 +564,7 @@ class DetalleParametroSeeder extends Seeder
                 'updated_at' => $now
             ],
             [
-                'parametro_clase' => 1014,
+                'parametro_clase' => 1013,
                 'nombre' => 'TRANSFERENCIA',
                 'nombre_url' => 'transferencia',
                 'descripcion' => 'Forma de pago transferencia',
@@ -669,7 +572,7 @@ class DetalleParametroSeeder extends Seeder
                 'updated_at' => $now
             ],
             [
-                'parametro_clase' => 1014,
+                'parametro_clase' => 1013,
                 'nombre' => 'YAPE',
                 'nombre_url' => 'yape',
                 'descripcion' => 'Forma de pago yape',
@@ -677,7 +580,7 @@ class DetalleParametroSeeder extends Seeder
                 'updated_at' => $now
             ],
             [
-                'parametro_clase' => 1014,
+                'parametro_clase' => 1013,
                 'nombre' => 'PLIN',
                 'nombre_url' => 'plin',
                 'descripcion' => 'Forma de pago plin',
@@ -685,7 +588,7 @@ class DetalleParametroSeeder extends Seeder
                 'updated_at' => $now
             ],
             [
-                'parametro_clase' => 1014,
+                'parametro_clase' => 1013,
                 'nombre' => 'NIUBIZ',
                 'nombre_url' => 'niubiz',
                 'descripcion' => 'Forma de pago niubiz',
@@ -693,7 +596,7 @@ class DetalleParametroSeeder extends Seeder
                 'updated_at' => $now
             ],
             [
-                'parametro_clase' => 1014,
+                'parametro_clase' => 1013,
                 'nombre' => 'REFERIDOS',
                 'nombre_url' => 'referidos',
                 'descripcion' => 'Forma de pago referidos',

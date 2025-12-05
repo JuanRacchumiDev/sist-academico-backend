@@ -14,8 +14,6 @@ return new class extends Migration
         Schema::create('grupo_persona', function(Blueprint $table) {
             $table->unsignedBigInteger('codigo_detalle_parametro');
 
-            // Columna que referencia a 'persona'.
-            // Siempre 'unsignedBigInteger' si referencia al 'id()' de otra tabla.
             $table->unsignedBigInteger('id_persona');
 
             $table->timestamps();

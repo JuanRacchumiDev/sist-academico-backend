@@ -11,7 +11,7 @@ interface IMatriculaService {
 
     public function getAllMatriculasWithFilters(array $filters, int $perPage): LengthAwarePaginator;
     
-    public function getFichaByFilters(array $filter);
+    public function getFichaByFilters(array $filters);
 
     public function getMatriculaById(int $id): ?Matricula;
 

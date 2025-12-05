@@ -10,7 +10,6 @@ class Certificado extends Model
     protected $table = 'certificado';
 
     protected $fillable = [
-        // 'id_evento',
         'id_persona',
         'id_tipocertificado',
         'id_plantilla',
@@ -33,15 +32,6 @@ class Certificado extends Model
         'created_at',
         'updated_at'
     ];
-
-    /**
-     * Obtener el evento asociado a un certificado
-     * @return BelongsTo<Evento, $this>
-     */
-    // public function evento(): BelongsTo
-    // {
-    //     return $this->belongsTo(Evento::class, 'id_evento', 'id');
-    // }
 
     /**
      * Obtener la persona asociada a un certificado

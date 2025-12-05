@@ -12,7 +12,6 @@ class ProgramaCreateDTO extends Data {
         public string $modalidad,
         public bool $is_vigente = true,
         public bool $estado = true,
-        public int $valor_cuota,
         public ?int $id_segmento = null,
         public ?int $id_tipoprograma = null,
         public ?int $id_categoriaprograma = null,
@@ -30,6 +29,7 @@ class ProgramaCreateDTO extends Data {
         public ?int $capacidad_minima = null,
         public ?int $capacidad_maxima = null,
         public ?int $cantidad_inscritos = null,
+        public ?int $valor_cuota = null,
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null
@@ -159,9 +159,9 @@ class ProgramaCreateDTO extends Data {
                 'nullable'
             ],
             'valor_cuota' => [
-                'required',
+                'sometimes',
                 'integer',
-                'integer'
+                'nullable',
             ],
             'is_vigente' => [
                 'required',

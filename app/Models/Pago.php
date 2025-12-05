@@ -20,6 +20,8 @@ class Pago extends Model
         'concepto',
         'fecha_pago',
         'nro_operacion',
+        'fecha_proximo_pago',
+        'fecha_compromiso_pago',
         'nro_cuota',
         'monto_efectivo',
         'monto_tarjeta',

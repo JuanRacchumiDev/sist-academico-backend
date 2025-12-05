@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Programa extends Model
 {
@@ -77,5 +78,10 @@ class Programa extends Model
     public function categoriaPrograma(): BelongsTo
     {
         return $this->belongsTo(DetalleParametro::class, 'id_categoriaprograma', 'codigo');
+    }
+
+    public function detalleMatricula()
+    {
+        return $this->hasMany(DetalleMatricula::class, 'id_programa', 'id');
     }
 }

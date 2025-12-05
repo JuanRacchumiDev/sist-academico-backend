@@ -16,14 +16,10 @@ return new class extends Migration
 
             $table->unsignedBigInteger('id_alumno');
             $table->unsignedBigInteger('id_sede')->nullable();
-            $table->unsignedBigInteger('id_programa')->nullable();
-            // $table->unsignedBigInteger('id_evento')->nullable();
             $table->unsignedBigInteger('id_estadomatricula')->nullable();
             
             $table->string('nombre_alumno', 100)->nullable();
             $table->string('nombre_sede', 60)->nullable();
-            $table->string('nombre_programa', 100)->nullable();
-            // $table->string('nombre_evento', 100)->nullable();
             $table->string('nombre_estadomatricula', 60)->nullable();
 
             $table->string('fecha_matricula', 10);
@@ -42,14 +38,6 @@ return new class extends Migration
                 ->references('codigo')
                 ->on('detalle_parametro');
 
-            $table->foreign('id_programa')
-                ->references('id')
-                ->on('programa');
-
-            // $table->foreign('id_evento')
-            //     ->references('id')
-            //     ->on('evento');
-
             $table->foreign('id_estadomatricula')
                 ->references('codigo')
                 ->on('detalle_parametro');
@@ -67,13 +55,7 @@ return new class extends Migration
 
             $table->dropForeign('id_sede');
             $table->dropColumn('id_sede');
-
-            $table->dropForeign('id_programa');
-            $table->dropColumn('id_programa');
-
-            // $table->dropForeign('id_evento');
-            // $table->dropColumn('id_evento');
-
+            
             $table->dropForeign('id_estadomatricula');
             $table->dropColumn('id_estadomatricula');
         });

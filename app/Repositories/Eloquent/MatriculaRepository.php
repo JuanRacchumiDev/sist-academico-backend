@@ -1,11 +1,17 @@
 <?php
 namespace App\Repositories\Eloquent;
 
+use App\DTOs\Matricula\MatriculaCreateDTO;
 use App\Models\Matricula;
+use App\Models\DetalleMatricula;
+use App\Models\PersonaPrograma;
+use App\Models\Programa;
+use Illuminate\Support\Facades\DB;
 use App\Repositories\Contracts\IMatriculaRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Validation\ValidationException;
+use Throwable;
 
 class MatriculaRepository implements IMatriculaRepository {
     public function getAll(?array $searchParams = null): Collection
@@ -13,7 +19,7 @@ class MatriculaRepository implements IMatriculaRepository {
         $query = Matricula::with([
             'alumno',
             'sede',
-            'programa',
+            'detalles',
             'estadoMatricula'
         ]);
 
@@ -37,7 +43,7 @@ class MatriculaRepository implements IMatriculaRepository {
         $query = Matricula::with([
             'alumno',
             'sede',
-            'programa',
+            'detalles',
             'estadoMatricula'
         ]);
 
@@ -63,22 +69,24 @@ class MatriculaRepository implements IMatriculaRepository {
 
     public function getUniqueForFilters(array $filters): ?Matricula
     {
-        $query = Matricula::with([
+        // throw ValidationException::withMessages(['filters' => $filters]);
+
+        return Matricula::with([
             'alumno',
             'sede',
-            'programa',
+            'detalles',
             'estadoMatricula'
-        ]);
+        ])->find($filters['id_matricula']);
 
-        if (isset($filters['id_alumno'])) {
-            $query->where('id_alumno', (int)$filters['id_alumno']);
-        }
+        // if (isset($filters['id_alumno'])) {
+        //     $query->where('id_alumno', (int)$filters['id_alumno']);
+        // }
 
-        if (isset($filters['id_programa'])) {
-            $query->where('id_programa', (int)$filters['id_programa']);
-        }
+        // if (isset($filters['id_programa'])) {
+        //     $query->where('id_programa', (int)$filters['id_programa']);
+        // }
 
-        return $query->first();
+        // return $query->first();
     }
 
     public function findById(int $id): ?Matricula
@@ -86,16 +94,62 @@ class MatriculaRepository implements IMatriculaRepository {
         return Matricula::with([
             'alumno',
             'sede',
-            'programa',
+            'detalles',
             'estadoMatricula'
         ])->find($id);
     }
 
-    public function create(array $data): Matricula
+    /**
+     * @throws Throwable
+     */
+    public function create(MatriculaCreateDTO $dto): Matricula
     {
-        $matricula = Matricula::create($data);
-        return $matricula;
+        return DB::transaction(function () use ($dto){
+            $matriculaData = $dto->except('programas')->toArray();
+            
+            $matriculaData = array_filter($matriculaData, fn($value) => !is_null($value));
+            
+            $matricula = Matricula::create($matriculaData);
+            
+            $detalleMatriculaData = [];
+            $personaProgramaData = [];
+
+            $programas = Programa::whereIn('id', $dto->programas)
+                ->pluck('nombre', 'id');
+
+            foreach ($dto->programas as $programaId) {
+                $nombrePrograma = $programas->get($programaId) ?? "Nombre no encontrado";
+
+                $detalleMatriculaData[] = [
+                    'id_matricula' => $matricula->id,
+                    'id_programa' => $programaId,
+                    'nombre_programa' => $nombrePrograma,
+                    'estado' => $dto->estado
+                ];
+
+                $personaProgramaData[] = [
+                    'id_persona' => $dto->id_alumno,
+                    'id_programa' => $programaId
+                ];
+            }
+
+            if (!empty($detalleMatriculaData)) {
+                DetalleMatricula::insert($detalleMatriculaData);
+            }
+
+            if (!empty($personaProgramaData)) {
+                PersonaPrograma::insert($personaProgramaData);
+            }
+
+            return $matricula;
+        });
     }
+
+    // public function create(array $data): Matricula
+    // {
+    //     $matricula = Matricula::create($data);
+    //     return $matricula;
+    // }
 
     public function update(int $id, array $data): ?Matricula
     {

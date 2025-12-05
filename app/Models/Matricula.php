@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Matricula extends Model
 {
@@ -14,13 +15,9 @@ class Matricula extends Model
     protected $fillable = [
         "id_alumno",
         "id_sede",
-        "id_programa",
-        // "id_evento",
         "id_estadomatricula",
         'nombre_alumno',
         'nombre_sede',
-        'nombre_programa',
-        // 'nombre_evento',
         'nombre_estadomatricula',
         "fecha_matricula",
         "pago_inicial",
@@ -52,13 +49,13 @@ class Matricula extends Model
         return $this->belongsTo(DetalleParametro::class, 'id_sede', 'codigo');
     }
 
-    public function programa(): BelongsTo
-    {
-        return $this->belongsTo(Programa::class, 'id_programa', 'id');
-    }
-
     public function estadoMatricula(): BelongsTo
     {
         return $this->belongsTo(DetalleParametro::class, 'id_estadomatricula', 'codigo');
+    }
+
+    public function detalles()
+    {
+        return $this->hasMany(DetalleMatricula::class, 'id_matricula', 'id');
     }
 }

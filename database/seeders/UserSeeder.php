@@ -61,7 +61,7 @@ class UserSeeder extends Seeder
             ],
             [
                 'name' => 'ualumno',
-                'email' => 'juan.racchumi.dev@gmail.com',
+                'email' => 'alumno.test@gmail.com',
                 'password' => $passwordAlumnoHashedIpede,
                 'id_perfil' => $perfilAlumno->codigo,
                 'created_at' => $now,
