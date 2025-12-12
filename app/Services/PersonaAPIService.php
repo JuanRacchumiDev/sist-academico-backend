@@ -8,6 +8,8 @@ use App\Repositories\Contracts\IDetalleParametroRepository;
 use App\Services\Contracts\IPersonaAPIService;
 use Illuminate\Support\Facades\Http;
 use Exception;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Log;
 
 class PersonaAPIService implements IPersonaAPIService{
     protected IPersonaRepository $personaRepository;
@@ -33,7 +35,11 @@ class PersonaAPIService implements IPersonaAPIService{
         return $response;
     }
 
-    public function queryAndRegister(string $tipoDocumento, string $numeroDocumento, ?string $nombreGrupo = null): Persona
+    public function queryAndRegister(
+        string $tipoDocumento,
+        string $numeroDocumento,
+        string $nombreGrupo
+        ): Persona
     {
         if ($tipoDocumento !== 'DNI') {
              throw new Exception("La API de Factiliza solo soporta consultas DNI.");
@@ -41,10 +47,14 @@ class PersonaAPIService implements IPersonaAPIService{
 
         $response = $this->callAPI($numeroDocumento);
 
+        Log::debug('PersonaAPIService: Respuesta de callAPI recibida.', ['api_response_data' => $response]);
+
         // Crear DTO a partir de la respuesta
         try {
             // Aquí usamos el DTO para mapear y validar los datos de la respuesta
             $dto = PersonaAPIDTO::fromAPIResponse($response, $tipoDocumento);
+
+            Log::info('PersonaAPIService: DTO creado con éxito.', ['dto_data' => (array) $dto]);
 
             // Establecer el valor de 'nombre_grupo' en el DTO
             if ($nombreGrupo) {
@@ -52,6 +62,11 @@ class PersonaAPIService implements IPersonaAPIService{
             }
             
         } catch (Exception $e) {
+            Log::error('PersonaAPIService: Error al procesar DTO desde la API.', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
             // Manejo de errores de mapeo/validación del DTO
             throw new Exception("Error al procesar la respuesta de la API externa: " . $e->getMessage());
         }

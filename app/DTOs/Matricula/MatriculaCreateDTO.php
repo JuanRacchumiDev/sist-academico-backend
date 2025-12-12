@@ -11,8 +11,10 @@ class MatriculaCreateDTO extends Data
         public string $fecha_matricula,
         public bool $estado = true,
         public ?int $id_sede = null,
+        public ?int $id_formapago = null,
         public ?int $id_estadomatricula = null,
         public ?int $id_metodopago = null,
+        public ?int $id_estadopago = null,
         public ?int $monto = null,
         public ?string $nombre_alumno = null,
         public ?string $nombre_sede = null,
@@ -47,6 +49,18 @@ class MatriculaCreateDTO extends Data
                 'exists:detalle_parametro,codigo',
                 'nullable'
             ],
+            'id_formapago' => [
+                'sometimes',
+                'integer',
+                'exists:detalle_parametro,codigo',
+                'nullable'
+            ],
+            'id_estadopago' => [
+                'sometimes',
+                'integer',
+                'exists:detalle_parametro,codigo',
+                'nullable'
+            ],
             'id_estadomatricula' => [
                 'sometimes',
                 'integer',
@@ -60,6 +74,12 @@ class MatriculaCreateDTO extends Data
                 'nullable'
             ],
             'nombre_sede' => [
+                'sometimes',
+                'string',
+                'max:60',
+                'nullable'
+            ],
+            'nombre_formapago' => [
                 'sometimes',
                 'string',
                 'max:60',

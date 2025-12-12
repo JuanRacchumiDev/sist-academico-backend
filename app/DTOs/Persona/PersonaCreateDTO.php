@@ -144,12 +144,12 @@ class PersonaCreateDTO extends Data
                 'required',
                 'string',
                 'max:20',
-                'exists:detalle_parametro,codigo'
+                // 'exists:detalle_parametro,codigo'
             ],
             'sexo' => [
                 'required',
                 'string',
-                'exists:detalle_parametro,codigo'
+                // 'exists:detalle_parametro,codigo'
             ],
             'origen' => [
                 'required',

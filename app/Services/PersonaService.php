@@ -123,11 +123,7 @@ class PersonaService implements IPersonaService {
      * @return Persona|null
      */
     public function updatePersona(int $id, PersonaUpdateDTO $personaUpdateDTO): ?Persona
-    {
-        $nombreCompleto = $personaUpdateDTO->nombres." ".$personaUpdateDTO->apellido_paterno." ".$personaUpdateDTO->apellido_materno;
-
-        $personaUpdateDTO->nombre_completo = $nombreCompleto;
-
+    {   
         $data = array_filter($personaUpdateDTO->toArray(), fn($value) => !is_null($value));
 
         return $this->personaRepository->update($id, $data);

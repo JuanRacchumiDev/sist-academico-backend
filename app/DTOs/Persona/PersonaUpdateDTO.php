@@ -7,6 +7,8 @@ use Spatie\LaravelData\Data;
 class PersonaUpdateDTO extends Data
 {
     public function __construct(
+        public ?int $id_tipodocumento = null,
+        public ?string $numero_documento = null,
         public ?string $nombres = null,
         public ?string $apellido_paterno = null,
         public ?string $apellido_materno = null,
@@ -21,13 +23,26 @@ class PersonaUpdateDTO extends Data
         public ?string $fecha_nacimiento = null,
         public ?string $estado_civil = null,
         public ?string $sexo = null,
+        public ?string $ubigeo_reniec = null,
+        public ?string $ubigeo_sunat = null,
+        public ?string $ubigeo = null,
+        public ?string $foto = null
     ){}
 
-    public static function rules(): array
+    public static function rules(int $id): array
     {
-        $personaId = request()->route('persona');
-
         return [
+            'id_tipodocumento' => [
+                'sometimes',
+                'integer',
+                'exists:detalle_parametro,codigo'
+            ],
+            'numero_documento' => [
+                'sometimes',
+                'string',
+                'max:30',
+                Rule::unique('persona', 'numero_documento')->ignore($id)
+            ],
             'nombres' => [
                 'sometimes',
                 'string',
@@ -78,12 +93,12 @@ class PersonaUpdateDTO extends Data
                 'string',
                 'email',
                 'max:60',
-                Rule::unique('persona', 'email')->ignore($personaId)
+                Rule::unique('persona', 'email')->ignore($id)
             ],
-            'telefono' => [
+            'nombre_completo' => [
                 'sometimes',
                 'string',
-                'max:13'
+                'max:100'
             ],
             'fecha_nacimiento' => [
                 'sometimes',
@@ -93,13 +108,23 @@ class PersonaUpdateDTO extends Data
             'estado_civil' => [
                 'sometimes',
                 'string',
-                'max:20',
-                'exists:detalle_parametro,codigo'
+                'max:20'
             ],
             'sexo' => [
                 'sometimes',
+                'string'
+            ],
+            'telefono' => [
+                'sometimes',
                 'string',
-                'exists:detalle_parametro,codigo'
+                'max:13',
+                'nullable'
+            ],
+            'ubigeo_reniec' => [
+                'sometimes',
+                'string',
+                'max:12',
+                'nullable'
             ],
         ];
     }

@@ -168,22 +168,24 @@ class PersonaController extends Controller
             'nombre_grupo' => 'required|string:max:50'
         ]);
 
+        $data = $request->all();
+
         try {
             $persona = $this->personaAPIService->queryAndRegister(
-                $request->tipo_documento,
-                $request->numero_documento,
-                $request->nombre_grupo
+                $data['tipo_documento'],
+                $data['numero_documento'],
+                $data['nombre_grupo']
             );
 
             return response()->json([
                 'success' => true,
-                'message' => 'Documento consultado y persona registrada/actualizada con éxito',
+                'message' => 'Consulta de documento realizado con éxito',
                 'data' => $persona
             ], 200);
         } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error al consultar o registrar el documento.',
+                'message' => 'Error al consultar documento',
                 'error'   => $e->getMessage()
             ], 500);
         }
@@ -240,9 +242,11 @@ class PersonaController extends Controller
         try {
             $data = $request->all();
 
-            $personaUpdateDTO = PersonaUpdateDTO::validateAndCreate($data, [
-                'rules' => PersonaUpdateDTO::rules($id)
-            ]);
+            $validationRules = PersonaUpdateDTO::rules($id);
+
+            $validatedData = $request->validate($validationRules);
+
+            $personaUpdateDTO = PersonaUpdateDTO::from($validatedData);
 
             $persona = $this->personaService->updatePersona($id, $personaUpdateDTO);
 

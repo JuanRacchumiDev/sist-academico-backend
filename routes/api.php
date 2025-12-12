@@ -51,7 +51,7 @@ Route::prefix('v1')->group(function() {
             Route::get('grupo/{nombreGrupo}/paginate', [PersonaController::class, 'getFilteredPaginate'])->name('personas.paginate');
             Route::get('grupo/{nombreGrupo}', [PersonaController::class, 'getAll'])->name('personas');
             Route::get('/{id}', [PersonaController::class, 'show'])->name('personas.show');
-            Route::post('store-api', [PersonaController::class, 'storeApi'])->name('personas.storeApi');
+            Route::post('/store-api', [PersonaController::class, 'storeApi'])->name('personas.storeApi');
             Route::post('/', [PersonaController::class, 'store'])->name('personas.store');
             Route::patch('/{id}', [PersonaController::class, 'update'])->name('personas.update');
         });

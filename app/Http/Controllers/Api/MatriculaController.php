@@ -164,6 +164,7 @@ class MatriculaController extends Controller
             $matricula = $this->matriculaService->createMatricula($dto);
 
             return response()->json([
+                'success' => true,
                 'message' => 'Matrícula registrada exitosamente',
                 'data' => [
                     'id' => $matricula->id,
@@ -173,16 +174,17 @@ class MatriculaController extends Controller
             ], 201);
         } catch (ValidationException $e) {
             return response()->json([
-                'result' => false,
+                'success' => false,
                 'message' => 'Validation error',
-                'errors' => $e->errors()
+                'error' => $e->errors()
             ], 422);
         } catch (\Exception $e) {
             Log::error("Error creating matrícula: " . $e->getMessage());
             
             return response()->json([
-                'result' => false,
-                'message' => 'Error al crear matrícula: ' . $e->getMessage()
+                'success' => false,
+                'message' => 'Error al crear matrícula',
+                'error' => $e->getMessage()
             ], 500);
         }
     }

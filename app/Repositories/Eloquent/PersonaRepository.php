@@ -166,21 +166,13 @@ class PersonaRepository implements IPersonaRepository {
     {
         $persona = $this->findById($id);
 
-        if ($persona) {
-            $persona->update($data);
-
-            if ($data['nombre_grupo']) {
-                $nuevoGrupo = DetalleParametro::where('nombre_url', $data['nombre_grupo'])
-                    ->where('parametro_clase', 1010)
-                    ->firstOrFail();
-
-                $persona->grupos()->sync([$nuevoGrupo->codigo]);
-
-                return $persona->refresh();
-            }
+        if (!$persona) {
+            return null;
         }
-        
-        return null;
+
+        $persona->update($data);
+
+        return $persona;
     }
 
     /**

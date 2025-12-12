@@ -12,6 +12,7 @@ class PersonaAPIDTO {
         public readonly string $nombres,
         public readonly string $apellido_paterno,
         public readonly string $apellido_materno,
+        public readonly string $sexo,
         public readonly ?string $nombre_grupo = null,
         public readonly ?string $departamento = null,
         public readonly ?string $provincia = null,
@@ -22,7 +23,6 @@ class PersonaAPIDTO {
         public readonly ?string $ubigeo = null,
         public readonly ?string $fecha_nacimiento = null,
         public readonly ?string $estado_civil = null,
-        public readonly ?string $sexo = null,
         public readonly string $origen = 'API',
         ?string $nombre_completo_override = null
     ){
@@ -30,45 +30,44 @@ class PersonaAPIDTO {
             ?? $this->nombres.' '.$this->apellido_paterno.' '.$this->apellido_materno;
     }
 
-    public static function fromAPIResponse(array $response, string $tipoDocumento): self
+    public static function fromAPIResponse(array $response): self
     {
         // Validar y extraer la data de la respuesta
-        if (!isset($response['data']) || $response['status'] !== 200 || $response['success'] !== true) {
-            throw new \Exception("La consulta de la API falló o no devolvió datos válidos.");
+        
+        if (empty($response) || !isset($response['numero'], $response['nombres'])) {
+             throw new \Exception("No se recibieron datos de persona válidos para el mapeo.");
         }
-
-        $data = $response['data'];
 
         // Mapear y transformar los datos
         $fechaNacimientoBD = null;
 
-        if (!empty($data['fecha_nacimiento'])) {
+        if (!empty($response['fecha_nacimiento'])) {
             try {
-                $fechaNacimientoBD = Carbon::createFromFormat('d/m/Y', $data['fecha_nacimiento'])->format('Y-m-d');
+                $fechaNacimientoBD = Carbon::createFromFormat('d/m/Y', $response['fecha_nacimiento'])->format('Y-m-d');
             } catch (\Exception $e) {
                 // Manejar error de formato de fecha si es necesario
             }
         }
 
         // Convertir el array de ubigeo a string
-        $ubigeoString = is_array($data['ubigeo']) ? end($data['ubigeo']) : null;
+        $ubigeoString = is_array($response['ubigeo']) ? end($response['ubigeo']) : null;
 
         return new self(
             id_tipodocumento: 1,
-            numero_documento: $data['numero'],
-            nombres: $data['nombres'],
-            apellido_paterno: $data['apellido_paterno'],
-            apellido_materno: $data['apellido_materno'],
-            departamento: $data['departamento'] ?? null,
-            provincia: $data['provincia'] ?? null,
-            distrito: $data['distrito'] ?? null,
-            direccion: $data['direccion'] ?? null,
-            direccion_completa: $data['direccion_completa'] ?? null,
-            ubigeo_reniec: $data['ubigeo_reniec'] ?? null,
+            numero_documento: $response['numero'],
+            nombres: $response['nombres'],
+            apellido_paterno: $response['apellido_paterno'],
+            apellido_materno: $response['apellido_materno'],
+            departamento: $response['departamento'] ?? null,
+            provincia: $response['provincia'] ?? null,
+            distrito: $response['distrito'] ?? null,
+            direccion: $response['direccion'] ?? null,
+            direccion_completa: $response['direccion_completa'] ?? null,
+            ubigeo_reniec: $response['ubigeo_reniec'] ?? null,
             ubigeo: $ubigeoString,
             fecha_nacimiento: $fechaNacimientoBD,
-            estado_civil: $data['estado_civil'] ?? null,
-            sexo: $data['sexo'] ?? null,
+            estado_civil: $response['estado_civil'] ?? null,
+            sexo: $response['sexo'],
             origen: 'API',
         );
     }
