@@ -26,9 +26,9 @@ return new class extends Migration
 
             $table->string('fecha_matricula', 10);
             $table->decimal('pago_inicial', 10, 2)->nullable();
-            $table->string('user_crea', 10)->nullable();
-            $table->string('user_actualiza', 10)->nullable();
-            $table->string('user_elimina', 10)->nullable();
+            $table->string('user_crea', 12)->nullable();
+            $table->string('user_actualiza', 12)->nullable();
+            $table->string('user_elimina', 12)->nullable();
             $table->boolean('estado')->default(true);
             $table->timestamps();
 
@@ -62,8 +62,8 @@ return new class extends Migration
             $table->dropForeign('id_sede');
             $table->dropColumn('id_sede');
 
-            $table->dropForeign('id_formapago');
-            $table->dropColumn('id_formapago');
+            $table->dropForeign('id_metodopago');
+            $table->dropColumn('id_metodopago');
             
             $table->dropForeign('id_estadomatricula');
             $table->dropColumn('id_estadomatricula');

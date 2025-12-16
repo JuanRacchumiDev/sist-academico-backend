@@ -16,7 +16,7 @@ return new class extends Migration
             $table->integer('parametro_clase');
             $table->string('nombre', 100);
             $table->string('nombre_url', 120);
-            $table->string('descripcion', 100)->nullable();
+            $table->string('descripcion', 150)->nullable();
             $table->string('valor', 20)->nullable();
             $table->string('abreviatura', 10)->nullable();
             $table->integer('longitud')->nullable();
@@ -25,9 +25,9 @@ return new class extends Migration
             $table->boolean('compra')->default(false);
             $table->boolean('venta')->default(false);
             $table->boolean('visible')->default(false);
-            $table->string('user_crea', 10)->nullable();
-            $table->string('user_actualiza', 10)->nullable();
-            $table->string('user_elimina', 10)->nullable();
+            $table->string('user_crea', 12)->nullable();
+            $table->string('user_actualiza', 12)->nullable();
+            $table->string('user_elimina', 12)->nullable();
             $table->boolean('estado')->default(true);
             $table->timestamps();
 

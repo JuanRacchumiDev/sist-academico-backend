@@ -15,15 +15,16 @@ return new class extends Migration
             $table->id();
 
             $table->unsignedBigInteger('id_alumno');
-            $table->unsignedBigInteger('id_programa');
-            $table->unsignedBigInteger('id_docente');
+            $table->unsignedBigInteger('id_modulo');
+            // $table->unsignedBigInteger('id_docente');
 
-            $table->decimal('calificacion', 10, 2);
-            $table->string('descripcion', 100);
+            $table->decimal('calificacion_numerica', 10, 2);
+            $table->string('calificacion_letras', 50);
+            $table->string('descripcion', 100)->nullable();
             $table->string('fecha_registro', 10);
-            $table->string('user_crea', 10)->nullable();
-            $table->string('user_actualiza', 10)->nullable();
-            $table->string('user_elimina', 10)->nullable();
+            $table->string('user_crea', 12)->nullable();
+            $table->string('user_actualiza', 12)->nullable();
+            $table->string('user_elimina', 12)->nullable();
             $table->boolean('estado')->default(true);
             $table->timestamps();
 
@@ -31,13 +32,13 @@ return new class extends Migration
                 ->references('id')
                 ->on('persona');
 
-            $table->foreign('id_programa')
+            $table->foreign('id_modulo')
                 ->references('id')
-                ->on('programa');
+                ->on('modulo');
 
-            $table->foreign('id_docente')
-                ->references('id')
-                ->on('persona');
+            // $table->foreign('id_docente')
+            //     ->references('id')
+            //     ->on('persona');
         });
     }
 
@@ -50,11 +51,11 @@ return new class extends Migration
             $table->dropForeign('id_alumno');
             $table->dropColumn('id_alumno');
 
-            $table->dropForeign('id_programa');
-            $table->dropColumn('id_programa');
+            $table->dropForeign('id_modulo');
+            $table->dropColumn('id_modulo');
 
-            $table->dropForeign('id_docente');
-            $table->dropColumn('id_docente');
+            // $table->dropForeign('id_docente');
+            // $table->dropColumn('id_docente');
         });
 
         Schema::dropIfExists('nota');

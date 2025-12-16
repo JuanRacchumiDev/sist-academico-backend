@@ -211,6 +211,30 @@ class DetalleParametroSeeder extends Seeder
                 'venta' => false,
                 'created_at' => $now,
                 'updated_at' => $now
+            ],
+            [
+                'parametro_clase' => 1003,
+                'nombre' => 'CONSTANCIA DE ESTUDIOS',
+                'nombre_url' => 'constancia-de-estudios',
+                'longitud' => null,
+                'en_persona' => true,
+                'en_empresa' => false,
+                'compra' => false,
+                'venta' => false,
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'parametro_clase' => 1003,
+                'nombre' => 'CERTIFICADO',
+                'nombre_url' => 'certificado',
+                'longitud' => null,
+                'en_persona' => true,
+                'en_empresa' => false,
+                'compra' => false,
+                'venta' => false,
+                'created_at' => $now,
+                'updated_at' => $now
             ]
         ]);
 

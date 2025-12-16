@@ -17,6 +17,8 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Validation\ValidationException;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Dompdf\Dompdf;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class MatriculaService implements IMatriculaService {
     protected IMatriculaRepository $matriculaRepository;
@@ -86,6 +88,64 @@ class MatriculaService implements IMatriculaService {
     public function getMatriculaById(int $id): ?Matricula
     {
         return $this->matriculaRepository->findById($id);
+    }
+
+    public function getCertificadoPDF(array $filters): array
+    {
+        // Verificar si el certificado ya existe
+        if ($this->matriculaRepository->existsCertificado($filters)) {
+            $pdfContent = $this->matriculaRepository->getPDF($filters);
+            return [
+                'pdfContent' => $pdfContent,
+                'status' => 'success',
+                'message' => 'Certificado obtenido de la caché de archivos'
+            ];
+        }
+
+        // Si no existe, obtener datos y generar
+        $matricula = $this->matriculaRepository->getCertificadoData($filters);
+
+        if (!$matricula) {
+            return [
+                'pdfContent' => null,
+                'status' => 'error',
+                'message' => 'Matrícula no encontrada'
+            ];
+        }
+
+        $matriculaId = $filters['id_matricula'];
+        $programaId = $filters['id_programa'];
+        $alumnoId = $filters['id_alumno'];
+
+        // Generar el código QR de validación
+        // Esta URL debe apuntar a un endpoint público para validar el certificado
+        $validationUrl = url("/public/certificados/validar/matricula/{$matriculaId}/programa/{$programaId}/alumno/{$alumnoId}");
+
+        $qrCodeSvg = QrCode::size(100)
+            ->color(0, 0, 0)
+            ->generate($validationUrl);
+
+        $html = view('pdf.certificado', [
+            'title' => 'CONSTANCIA DE ESTUDIOS',
+            'matricula' => $matricula,
+            'qrCodeSvg' => $qrCodeSvg,
+            'validationUrl' => $validationUrl
+        ])->render();
+
+        $domPDF = new Dompdf();
+        $domPDF->loadHtml($html);
+        $domPDF->setPaper('A4', 'portrait');
+        $domPDF->render();
+        $pdfContent = $domPDF->output();
+
+        // Guardar el certificado generado para futuras solicitudes
+        $this->matriculaRepository->savePDF($filters, $pdfContent);
+
+        return [
+            'pdfContent' => $pdfContent,
+            'status' => 'success',
+            'message' => 'Certificado generado y almacenado'
+        ];
     }
 
     public function createMatricula(MatriculaCreateDTO $matriculaCreateDTO): Matricula|null

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
 
             $table->string('numero_ruc', 15);
-            $table->string('razon_social', 100);
+            $table->string('razon_social', 120);
             $table->string('tipo_contribuyente', 50)->nullable();
             $table->string('estado_sunat', 20)->nullable();
             $table->string('condicion_sunat', 50)->nullable();
@@ -28,9 +28,9 @@ return new class extends Migration
             $table->enum('origen', ['API', 'WEB', 'APP'])->default('WEB');
             $table->string('telefonos', 50)->nullable();
             $table->string('horario_atencion', 200)->nullable();
-            $table->string('user_crea', 10)->nullable();
-            $table->string('user_actualiza', 10)->nullable();
-            $table->string('user_elimina', 10)->nullable();
+            $table->string('user_crea', 12)->nullable();
+            $table->string('user_actualiza', 12)->nullable();
+            $table->string('user_elimina', 12)->nullable();
             $table->boolean('estado')->default(true);
             $table->timestamps();
         });

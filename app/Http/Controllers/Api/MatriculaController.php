@@ -152,6 +152,37 @@ class MatriculaController extends Controller
         }
     }
 
+    public function getCertificado(Request $request) {
+        $request->validate([
+            'id_matricula' => 'required|integer|exists:matricula,id',
+            'id_programa' => 'required|integer|exists:programa,id',
+            'id_alumno' => 'required|integer|exists:persona,id'
+        ]);
+
+        $matriculaId = $request->input('id_matricula');
+        $programaId = $request->input('id_programa');
+        $alumnoId = $request->input('id_alumno');
+
+        $filters = [
+            'id_matricula' => $matriculaId,
+            'id_programa' => $programaId,
+            'id_alumno' => $alumnoId
+        ];
+
+        $result = $this->matriculaService->getCertificadoPDF($filters);
+
+        if ($result['status'] === 'error') {
+            return response($result['message'], 404);
+        }
+
+        // Devolver el archivo PDF como respuesta binaria
+        $filename = "certificado_{$matriculaId}.pdf";
+
+        return response($result['pdfContent'], 200)
+            ->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', "inline; filename=\"{$filename}\"");
+    }
+
     /**
      * Store a newly created resource in storage.
      */
@@ -160,6 +191,13 @@ class MatriculaController extends Controller
             $data = $request->all();
 
             $dto = MatriculaCreateDTO::from($data);
+
+            // return response()->json([
+            //     'success' => false,
+            //     'data' => $data,
+            //     'dto' => $dto,
+            //     'message' => 'Error de matrícula'
+            // ], 422);
 
             $matricula = $this->matriculaService->createMatricula($dto);
 

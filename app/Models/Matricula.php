@@ -15,7 +15,7 @@ class Matricula extends Model
     protected $fillable = [
         "id_alumno",
         "id_sede",
-        "id_formapago",
+        "id_metodopago",
         "id_estadomatricula",
         'nombre_alumno',
         'nombre_sede',
@@ -51,9 +51,9 @@ class Matricula extends Model
         return $this->belongsTo(DetalleParametro::class, 'id_sede', 'codigo');
     }
 
-    public function formaPago(): BelongsTo
+    public function metodoPago(): BelongsTo
     {
-        return $this->belongsTo(DetalleParametro::class, 'id_formapago', 'codigo');
+        return $this->belongsTo(DetalleParametro::class, 'id_metodopago', 'codigo');
     }
 
     public function estadoMatricula(): BelongsTo

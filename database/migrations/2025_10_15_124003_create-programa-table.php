@@ -23,9 +23,10 @@ return new class extends Migration
             $table->string('nombre', 150);
             $table->string('nombre_url', 180)->nullable();
             $table->string('descripcion', 150)->nullable();
-            $table->string('duracion', 20)->nullable();
             $table->string('fecha_inicio', 10)->nullable();
             $table->string('fecha_final', 10)->nullable();
+            $table->string('duracion', 20)->nullable();
+            $table->integer('horas_academicas')->nullable();
             $table->integer('modulos')->nullable();
             $table->integer('creditos')->nullable();
             $table->string('plan', 100)->nullable();
@@ -34,11 +35,11 @@ return new class extends Migration
             $table->integer('capacidad_minima')->nullable();
             $table->integer('capacidad_maxima')->nullable();
             $table->integer('cantidad_inscritos')->nullable();
-            $table->decimal('valor_cuota', 10, 2)->nullable();
+            $table->decimal('precio', 10, 2)->nullable();
             $table->boolean('is_vigente')->default(true);
-            $table->string('user_crea', 10)->nullable();
-            $table->string('user_actualiza', 10)->nullable();
-            $table->string('user_elimina', 10)->nullable();
+            $table->string('user_crea', 12)->nullable();
+            $table->string('user_actualiza', 12)->nullable();
+            $table->string('user_elimina', 12)->nullable();
             $table->boolean('estado')->default(true);
             $table->timestamps();
 

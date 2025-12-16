@@ -16,7 +16,10 @@ class DetalleMatricula extends Model
     protected $fillable = [
         'id_matricula',
         'id_programa',
+        'id_alumno',
         'nombre_programa',
+        'nombre_alumno',
+        'promedio',
         'user_crea',
         'user_actualiza',
         'user_elimina',
@@ -39,5 +42,10 @@ class DetalleMatricula extends Model
     public function programa(): BelongsTo
     {
         return $this->belongsTo(Programa::class, 'id_programa', 'id');
+    }
+
+    public function alumno(): BelongsTo
+    {
+        return $this->belongsTo(Persona::class, 'id_alumno', 'id');
     }
 }

@@ -29,9 +29,9 @@ return new class extends Migration
             $table->integer('capacidad_minima')->nullable();
             $table->integer('capacidad_maxima')->nullable();
             $table->integer('cantidad_inscritos')->nullable();
-            $table->string('user_crea', 10)->nullable();
-            $table->string('user_actualiza', 10)->nullable();
-            $table->string('user_elimina', 10)->nullable();
+            $table->string('user_crea', 12)->nullable();
+            $table->string('user_actualiza', 12)->nullable();
+            $table->string('user_elimina', 12)->nullable();
             $table->boolean('estado')->default(true);
             $table->timestamps();
 

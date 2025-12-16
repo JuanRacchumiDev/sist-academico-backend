@@ -14,6 +14,16 @@ interface IMatriculaRepository
 
     public function getUniqueForFilters(array $filters): ?Matricula;
 
+    public function getFilePath(array $filters): string;
+
+    public function getCertificadoData(array $filters): ?array;
+
+    public function existsCertificado(array $filters): bool;
+
+    public function savePDF(array $filters, string $pdfContent): void;
+
+    public function getPDF(array $filters): string;
+
     public function findById(int $id): ?Matricula;
 
     public function create(MatriculaCreateDTO $dto): Matricula;

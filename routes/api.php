@@ -78,6 +78,7 @@ Route::prefix('v1')->group(function() {
         Route::prefix('matriculas')->group(function() {
             Route::get('/paginate', [MatriculaController::class, 'getFilteredPaginate'])->name('matriculas.paginate');
             Route::get('/ficha', [MatriculaController::class, 'getFicha'])->name('matriculas.ficha');
+            Route::get('/certificado', [MatriculaController::class, 'getCertificado'])->name('matriculas.certificado');
             Route::get('{id}', [MatriculaController::class, 'show'])->name('matriculas.show');
             Route::get('/', [MatriculaController::class, 'index'])->name('matriculas');
             Route::post('/', [MatriculaController::class, 'store'])->name('matriculas.store');

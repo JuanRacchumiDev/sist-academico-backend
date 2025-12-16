@@ -15,7 +15,7 @@ return new class extends Migration
             $table->integer('clase')->primary()->unique();
             $table->string('nombre', 100)->unique();
             $table->string('nombre_url', 120)->unique();
-            $table->string('descripcion', 100)->nullable();
+            $table->string('descripcion', 150)->nullable();
             $table->string('user_crea', 12)->nullable();
             $table->string('user_actualiza', 12)->nullable();
             $table->string('user_elimina', 12)->nullable();

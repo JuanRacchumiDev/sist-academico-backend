@@ -16,10 +16,17 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Validation\ValidationException;
 use Throwable;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Arr;
+
+use function PHPSTORM_META\map;
 
 class MatriculaRepository implements IMatriculaRepository {
     protected IPersonaRepository $personaRepository;
     protected IDetalleParametroRepository $detalleRepository;
+
+    protected string $disk = "public";
+    protected string $path = "certificados/";
 
     public function __construct(
         IPersonaRepository $personaRepository,
@@ -94,6 +101,72 @@ class MatriculaRepository implements IMatriculaRepository {
         ])->find($filters['id_matricula']);
     }
 
+    public function getFilePath(array $filters): string
+    {
+        $matriculaId = $filters['id_matricula'];
+        $programaId = $filters['id_programa'];
+        $alumnoId = $filters['id_alumno'];
+
+        return $this->path."certificado_{$matriculaId}_{$programaId}_{$alumnoId}.pdf";
+    }
+
+    public function existsCertificado(array $filters): bool
+    {
+        $filePath = $this->getFilePath($filters);
+        return Storage::disk($this->disk)->exists($filePath);
+    }
+
+    public function savePDF(array $filters, string $pdfContent): void
+    {
+        $filePath = $this->getFilePath($filters);
+        Storage::disk($this->disk)->put($filePath, $pdfContent);
+    }
+
+    public function getPDF(array $filters): string
+    {
+        $filePath = $this->getFilePath($filters);
+        return Storage::disk($this->disk)->get($filePath);
+    }
+
+    public function getCertificadoData(array $filters): ?array
+    {
+        Log::info('Validate getCertificadoData', ['filters' => $filters]);
+
+        $idMatricula = $filters['id_matricula'];
+        $idPrograma = $filters['id_programa'];
+        $idAlumno = $filters['id_alumno'];
+
+        $result = DB::table('detalle_matricula', 'dmat')
+            ->select([
+                'persona.numero_documento',
+                'persona.apellido_paterno',
+                'persona.apellido_materno',
+                'persona.nombre_completo',
+                'persona.email',
+                'persona.telefono',
+                'programa.nombre as nombre_programa',
+                'programa.fecha_inicio',
+                'programa.fecha_final',
+                'programa.duracion',
+                'programa.horas_academicas',
+                'programa.modulos',
+                'programa.creditos',
+                'programa.modalidad',
+                'matricula.fecha_matricula'
+            ])
+            ->join('persona', 'persona.id', '=', 'dmat.id_alumno')
+            ->join('programa', 'programa.id', '=', 'dmat.id_programa')
+            ->join('matricula', 'matricula.id', '=', 'dmat.id_matricula')
+            ->where('dmat.id_matricula', $idMatricula)
+            ->where('dmat.id_programa', $idPrograma)
+            ->where('dmat.id_alumno', $idAlumno)
+            ->first();
+
+        Log::info('Validate result', ['result' => $result]);
+
+        return $result ? (array) $result : null;
+    }
+
     public function findById(int $id): ?Matricula
     {
         return Matricula::with([
@@ -118,9 +191,9 @@ class MatriculaRepository implements IMatriculaRepository {
             $matriculaData = array_filter($matriculaData, fn($value) => !is_null($value));
             Log::debug("MatriculaRepository: matriculaData", ['matricula_data' => $matriculaData]);
 
-            if (isset($matriculaData['id_alumno'])) {
-                $idAlumno = $matriculaData['id_alumno'];
+            $idAlumno = $matriculaData['id_alumno'];
 
+            if (isset($idAlumno)) {
                 $alumno = $this->personaRepository->findById($idAlumno);
                 $nombre = $alumno->nombres." ".$alumno->apellido_paterno." ".$alumno->apellido_materno;
                 $matriculaData['nombre_alumno'] = $nombre;
@@ -152,7 +225,12 @@ class MatriculaRepository implements IMatriculaRepository {
 
             Log::debug("MatriculaRepository: matriculaData with nombre_estadomatricula", ['matricula_data' => $matriculaData]);
             
-            $matricula = Matricula::create($matriculaData);
+            $payloadMatricula = Arr::except($matriculaData, ['id_metodopago']);
+
+            Log::debug("MatriculaRepository: matriculaData without id_metodopago", ['matricula_data' => $matriculaData]);
+
+            // $matricula = Matricula::create($matriculaData);
+            $matricula = Matricula::create($payloadMatricula);
 
             Log::debug("MatriculaRepository: matricula", ['matricula_data' => $matricula]);
             
@@ -170,7 +248,9 @@ class MatriculaRepository implements IMatriculaRepository {
                 $detalleMatriculaData[] = [
                     'id_matricula' => $matricula->id,
                     'id_programa' => $programaId,
+                    'id_alumno' => $idAlumno,
                     'nombre_programa' => $nombrePrograma,
+                    'nombre_alumno' => (isset($matriculaData['nombre_alumno'])) ? $matriculaData['nombre_alumno'] : null,
                     'estado' => $dto->estado
                 ];
 

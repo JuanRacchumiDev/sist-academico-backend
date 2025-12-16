@@ -15,6 +15,8 @@ interface IMatriculaService {
 
     public function getMatriculaById(int $id): ?Matricula;
 
+    public function getCertificadoPDF(array $filters): array;
+
     public function createMatricula(MatriculaCreateDTO $matriculaCreateDTO): Matricula|null;
 
     public function deleteMatricula(int $id): bool;

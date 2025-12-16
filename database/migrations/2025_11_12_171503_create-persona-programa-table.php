@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('persona_programa', function(Blueprint $table) {
             $table->unsignedBigInteger('id_persona');
             $table->unsignedBigInteger('id_programa');
+            
+            $table->decimal('promedio', 10, 2)->nullable();
             $table->timestamps();
 
             $table->foreign('id_persona')

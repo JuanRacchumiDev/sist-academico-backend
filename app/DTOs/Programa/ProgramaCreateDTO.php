@@ -18,9 +18,10 @@ class ProgramaCreateDTO extends Data {
         public ?string $sigla = null,
         public ?string $nombre_url = null,
         public ?string $descripcion = null,
-        public ?string $duracion = null,
         public ?string $fecha_inicio = null,
         public ?string $fecha_final = null,
+        public ?string $duracion = null,
+        public ?int $horas_academicas = null,
         public ?int $modulos = null,
         public ?int $creditos = null,
         public UploadedFile|string|null $plan,
@@ -28,7 +29,7 @@ class ProgramaCreateDTO extends Data {
         public ?int $capacidad_minima = null,
         public ?int $capacidad_maxima = null,
         public ?int $cantidad_inscritos = null,
-        public ?int $valor_cuota = null,
+        public ?int $precio = null,
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null
@@ -83,12 +84,6 @@ class ProgramaCreateDTO extends Data {
                 'max:150',
                 'nullable'
             ],
-            'duracion' => [
-                'sometimes',
-                'string',
-                'max:20',
-                'nullable'
-            ],
             'fecha_inicio' => [
                 'sometimes',
                 'string',
@@ -99,6 +94,17 @@ class ProgramaCreateDTO extends Data {
                 'sometimes',
                 'string',
                 'max:10',
+                'nullable'
+            ],
+            'duracion' => [
+                'sometimes',
+                'string',
+                'max:20',
+                'nullable'
+            ],
+            'horas_academicas' => [
+                'sometimes',
+                'integer',
                 'nullable'
             ],
             'modulos' => [
@@ -144,7 +150,7 @@ class ProgramaCreateDTO extends Data {
                 'integer',
                 'nullable'
             ],
-            'valor_cuota' => [
+            'precio' => [
                 'sometimes',
                 'integer',
                 'nullable',

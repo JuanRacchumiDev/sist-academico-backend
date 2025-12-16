@@ -15,7 +15,6 @@ class PersonaCreateDTO extends Data
         public string $nombre_completo,
         public string $email,
         public string $fecha_nacimiento,
-        public string $estado_civil,
         public string $sexo,
         public string $origen = "WEB",
         public bool $estado = true, 
@@ -32,6 +31,7 @@ class PersonaCreateDTO extends Data
         public ?string $ubigeo_sunat = null,
         public ?string $ubigeo = null,
         public ?string $foto = null,
+        public ?string $estado_civil = null,
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null
@@ -141,7 +141,7 @@ class PersonaCreateDTO extends Data
                 'max:10'
             ],
             'estado_civil' => [
-                'required',
+                'sometimes',
                 'string',
                 'max:20',
                 // 'exists:detalle_parametro,codigo'

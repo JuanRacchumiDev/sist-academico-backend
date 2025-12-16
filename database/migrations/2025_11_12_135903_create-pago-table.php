@@ -19,7 +19,8 @@ return new class extends Migration
             $table->unsignedBigInteger('id_formapago');
             $table->unsignedBigInteger('id_metodopago');
             $table->unsignedBigInteger('id_estadopago');
-            $table->string('concepto', 100);
+
+            $table->string('concepto', 150);
             $table->string('fecha_pago', 10);
             $table->string('nro_operacion', 30)->nullable();
             $table->string('fecha_proximo_pago')->nullable();
@@ -30,9 +31,9 @@ return new class extends Migration
             $table->decimal('monto_total', 10, 2);
             $table->decimal('monto_pagado', 10, 2);
             $table->decimal('monto_saldo', 10, 2)->default(0);
-            $table->string('user_crea', 10)->nullable();
-            $table->string('user_actualiza', 10)->nullable();
-            $table->string('user_elimina', 10)->nullable();
+            $table->string('user_crea', 12)->nullable();
+            $table->string('user_actualiza', 12)->nullable();
+            $table->string('user_elimina', 12)->nullable();
             $table->boolean('estado')->default(true);
             $table->timestamps();
 
