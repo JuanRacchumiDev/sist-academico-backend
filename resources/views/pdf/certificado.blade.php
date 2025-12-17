@@ -22,47 +22,63 @@ $modalidad = $matricula['modalidad'] ?? null;
     <meta charset="utf-8">
     <title>{{ $title }}</title>
     <style>
+        /* Estilo base para Dompdf */
         body {
             font-family: 'Times New Roman', serif;
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-size: 11pt; /* Tamaño base de la letra */
+            font-size: 11pt;
         }
-        .certificado {
+        .container {
             width: 100%;
-            height: 100%; /* Ocupa toda la página A4 */
-            padding: 50px 70px; /* Margen interior */
-            text-align: center;
-            /* Estilo de borde mejorado, si se desea */
-            /* border: 1px solid #003366; */ 
+            height: 100vh;
+            padding: 50px;
+            /* Marco decorativo */
+            border: 5px solid #003366; 
+            border-style: double;
         }
         .header {
             margin-bottom: 30px;
-            padding-bottom: 10px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ccc;
         }
         .header h1 {
             color: #003366;
-            font-size: 24pt;
+            font-size: 26pt;
             margin: 0;
             text-transform: uppercase;
+            letter-spacing: 2px;
         }
         .header h2 {
-            color: #cc0000;
-            font-size: 16pt;
+            color: #555;
+            font-size: 14pt;
             margin-top: 5px;
             font-weight: normal;
         }
         .body-text {
-            margin-top: 40px;
+            margin-top: 30px;
             text-align: justify;
             line-height: 1.8;
             font-size: 12pt;
         }
         .highlight {
             font-weight: bold;
-            color: #000; /* Negro para formalidad */
+            color: #000;
             text-transform: uppercase;
+        }
+        .program-title {
+            text-align: center; 
+            font-size: 16pt; 
+            font-weight: bold; 
+            color: #cc0000;
+            border: 2px solid #cc0000;
+            padding: 10px;
+            margin: 25px 0;
+            display: inline-block;
+            width: 80%; /* Para que el borde no sea de 100% de ancho */
+            margin-left: 10%;
+            margin-right: 10%;
         }
         .data-table {
             width: 90%;
@@ -71,65 +87,67 @@ $modalidad = $matricula['modalidad'] ?? null;
             font-size: 11pt;
         }
         .data-table th, .data-table td {
-            padding: 8px 15px;
+            padding: 10px 15px;
             border: 1px solid #e0e0e0;
             text-align: left;
         }
         .data-table th {
-            background-color: #f7f7f7;
+            background-color: #f0f4f7;
             color: #003366;
             width: 35%;
         }
-        .data-table td {
-            font-weight: normal;
-            color: #333;
-        }
         .footer-section {
-            margin-top: 40px;
+            margin-top: 50px;
+            padding-top: 20px;
+            position: relative;
+            height: 150px; /* Para contener los elementos flotantes */
+        }
+        .signature-block {
+            width: 40%;
+            float: right;
             text-align: center;
-            position: absolute; /* Para posicionar en el pie de página */
-            bottom: 50px;
-            left: 0;
-            right: 0;
-            padding: 0 70px;
         }
         .signature-line {
-            width: 250px;
+            width: 100%;
             margin: 0 auto 5px auto;
             border-top: 1px solid #000;
             padding-top: 5px;
         }
         .qr-area {
-            position: absolute;
-            bottom: 50px;
-            left: 70px; /* Posicionar QR a la izquierda */
+            width: 40%;
+            float: left;
             text-align: left;
             font-size: 9pt;
         }
         .qr-code-svg {
             margin-top: 5px;
         }
+        .clearfix::after {
+            content: "";
+            clear: both;
+            display: table;
+        }
     </style>
 </head>
 <body>
-    <div class="certificado">
+    <div class="container">
         <div class="header">
             <h1>{{ $title }}</h1>
         </div>
 
         <div class="body-text">
-            <p>El Director(a) de IPEDE, deja constancia que:</p>
+            <p style="text-align: center;">El Director(a) de IPEDE, deja constancia que:</p>
 
             <p style="text-align: center; margin: 30px 0;">
                 El(la) estudiante <span class="highlight">{{ $nombreCompleto }}</span>, identificado(a) con DNI N° <span class="highlight">{{ $numeroDocumento }}</span>, se encuentra registrado(a) y matriculado(a) en el programa académico de:
             </p>
             
-            <p style="text-align: center; font-size: 14pt; font-weight: bold; color: #003366; border: 1px solid #003366; padding: 10px;">
+            <p class="program-title">
                 "{{ $nombrePrograma }}"
             </p>
             
-            <p style="margin-top: 40px;">
-                La matrícula fue realizada con fecha <span class="highlight">{{ $fechaMatricula }}</span>. A continuación, se detallan las características del programa:
+            <p style="margin-top: 40px; text-align: justify;">
+                La matrícula fue registrada el <span class="highlight">{{ $fechaMatricula }}</span>. A continuación, se detallan las características del programa:
             </p>
 
             {{-- ------------------------------------------------ --}}
@@ -193,15 +211,15 @@ $modalidad = $matricula['modalidad'] ?? null;
             </p>
         </div>
 
-        <div class="footer-section">
-            <div style="width: 50%; float: right; text-align: center;">
+        <div class="footer-section clearfix">
+            <div class="signature-block">
                 <div style="height: 50px;"></div> {{-- Espacio para el sello/firma --}}
                 <div class="signature-line"></div>
                 <p style="margin-top: 5px;">Firma y Sello de la Dirección Académica</p>
             </div>
             
             <div class="qr-area">
-                {{-- <p style="margin: 0; padding: 0;">Certificado Digital N°: {{ $matricula->id_matricula }}-{{ $matricula->id_programa }}</p> --}}
+                {{-- <p style="margin: 0; padding: 0;">**Certificado Digital N°:** {{ $mIdPadded }}-{{ $pIdPadded }}</p> --}}
                 <p style="margin: 0; padding: 0;">Verificar validez escaneando el código:</p>
                 <div class="qr-code-svg" style="width: 100px; height: 100px;">
                     {!! $qrCodeSvg !!}

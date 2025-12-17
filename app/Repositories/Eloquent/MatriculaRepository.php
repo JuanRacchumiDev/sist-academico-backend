@@ -107,7 +107,18 @@ class MatriculaRepository implements IMatriculaRepository {
         $programaId = $filters['id_programa'];
         $alumnoId = $filters['id_alumno'];
 
-        return $this->path."certificado_{$matriculaId}_{$programaId}_{$alumnoId}.pdf";
+        $mIdPadded = sprintf('%04d', $matriculaId);
+        $pIdPadded = sprintf('%04d', $programaId);
+        $aIdPadded = sprintf('%04d', $alumnoId);
+
+        Log::info('Validate path certificado pdf', ['mIdPadded' => $mIdPadded]);
+        Log::info('Validate path certificado pdf', ['pIdPadded' => $pIdPadded]);
+        Log::info('Validate path certificado pdf', ['aIdPadded' => $aIdPadded]);
+
+        $pathPDF = $this->path . "certificado_{$mIdPadded}_{$pIdPadded}_{$aIdPadded}.pdf"; 
+        Log::info('Validate path certificado pdf', ['pathPDF' => $pathPDF]);
+
+        return $pathPDF;
     }
 
     public function existsCertificado(array $filters): bool
