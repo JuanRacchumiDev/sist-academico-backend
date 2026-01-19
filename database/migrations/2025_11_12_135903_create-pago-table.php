@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
 
             $table->unsignedBigInteger('id_matricula');
+            $table->unsignedBigInteger('id_programa');
             $table->unsignedBigInteger('id_alumno');
             $table->unsignedBigInteger('id_formapago');
             $table->unsignedBigInteger('id_metodopago');
@@ -23,9 +24,9 @@ return new class extends Migration
             $table->string('concepto', 150);
             $table->string('fecha_pago', 10);
             $table->string('nro_operacion', 30)->nullable();
-            $table->string('fecha_proximo_pago')->nullable();
-            $table->string('fecha_compromiso_pago')->nullable();
-            $table->integer('nro_cuota')->nullable();
+            // $table->string('fecha_proximo_pago')->nullable();
+            // $table->string('fecha_compromiso_pago')->nullable();
+            $table->integer('numero_modulo')->nullable();
             $table->decimal('monto_efectivo', 10, 2)->default(0);
             $table->decimal('monto_tarjeta', 10, 2)->default(0);
             $table->decimal('monto_total', 10, 2);
@@ -40,6 +41,10 @@ return new class extends Migration
             $table->foreign('id_matricula')
                 ->references('id')
                 ->on('matricula');
+
+            $table->foreign('id_programa')
+                ->references('id')
+                ->on('programa');
 
             $table->foreign('id_alumno')
                 ->references('id')
@@ -67,6 +72,9 @@ return new class extends Migration
         Schema::table('pago', function(Blueprint $table) {
             $table->dropForeign('id_matricula');
             $table->dropColumn('id_matricula');
+
+            $table->dropForeign('id_programa');
+            $table->dropColumn('id_programa');
 
             $table->dropForeign('id_alumno');
             $table->dropColumn('id_alumno');

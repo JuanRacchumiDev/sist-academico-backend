@@ -228,6 +228,22 @@ class MatriculaRepository implements IMatriculaRepository {
 
             Log::debug("MatriculaRepository: matriculaData with nombre_formapago", ['matricula_data' => $matriculaData]);
 
+            if (isset($matriculaData['id_estadopago'])) {
+                $idEstadoPago = $matriculaData['id_estadopago'];
+                $estadoPago = $this->detalleRepository->findByCodigo($idEstadoPago);
+                $matriculaData['nombre_estadopago'] = $estadoPago->nombre;
+            }
+
+            Log::debug("MatriculaRepository: matriculaData with nombre_estadopago", ['matricula_data' => $matriculaData]);
+
+            if (isset($matriculaData['id_metodopago'])) {
+                $idMetodoPago = $matriculaData['id_metodopago'];
+                $metodoPago = $this->detalleRepository->findByCodigo($idMetodoPago);
+                $matriculaData['nombre_metodopago'] = $metodoPago->nombre;
+            }
+
+            Log::debug("MatriculaRepository: matriculaData with nombre_metodopago", ['matricula_data' => $matriculaData]);
+
             if (isset($matriculaData['id_estadomatricula'])) {
                 $idEstadoMatricula = $matriculaData['id_estadomatricula'];
                 $estadoMatricula = $this->detalleRepository->findByCodigo($idEstadoMatricula);
@@ -236,17 +252,19 @@ class MatriculaRepository implements IMatriculaRepository {
 
             Log::debug("MatriculaRepository: matriculaData with nombre_estadomatricula", ['matricula_data' => $matriculaData]);
             
-            $payloadMatricula = Arr::except($matriculaData, ['id_metodopago']);
+            // $payloadMatricula = Arr::except($matriculaData, ['id_metodopago']);
 
-            Log::debug("MatriculaRepository: matriculaData without id_metodopago", ['matricula_data' => $matriculaData]);
+            // Log::debug("MatriculaRepository: matriculaData without id_metodopago", ['matricula_data' => $matriculaData]);
 
-            // $matricula = Matricula::create($matriculaData);
-            $matricula = Matricula::create($payloadMatricula);
+            Log::debug('Test MatriculaData', ['matricula_data' => $matriculaData]);
+
+            $matricula = Matricula::create($matriculaData);
+            // $matricula = Matricula::create($payloadMatricula);
 
             Log::debug("MatriculaRepository: matricula", ['matricula_data' => $matricula]);
             
             $detalleMatriculaData = [];
-            $personaProgramaData = [];
+            // $personaProgramaData = [];
 
             $programas = Programa::whereIn('id', $dto->programas)
                 ->pluck('nombre', 'id');
@@ -259,16 +277,16 @@ class MatriculaRepository implements IMatriculaRepository {
                 $detalleMatriculaData[] = [
                     'id_matricula' => $matricula->id,
                     'id_programa' => $programaId,
-                    'id_alumno' => $idAlumno,
+                    // 'id_alumno' => $idAlumno,
                     'nombre_programa' => $nombrePrograma,
-                    'nombre_alumno' => (isset($matriculaData['nombre_alumno'])) ? $matriculaData['nombre_alumno'] : null,
+                    // 'nombre_alumno' => (isset($matriculaData['nombre_alumno'])) ? $matriculaData['nombre_alumno'] : null,
                     'estado' => $dto->estado
                 ];
 
-                $personaProgramaData[] = [
-                    'id_persona' => $dto->id_alumno,
-                    'id_programa' => $programaId
-                ];
+                // $personaProgramaData[] = [
+                //     'id_persona' => $dto->id_alumno,
+                //     'id_programa' => $programaId
+                // ];
             }
 
             $pagoData = [
@@ -279,10 +297,18 @@ class MatriculaRepository implements IMatriculaRepository {
                 'id_estadopago' => $matriculaData['id_estadopago'],
                 'concepto' => 'PAGO DE MATRÍCULA',
                 'fecha_pago' => $fechaActual,
+                // 'nro_operacion' => $matriculaData['numero_operacion'],
                 'monto_total' => $matriculaData['monto'],
                 'monto_pagado' => $matriculaData['monto'],
                 'estado' => true
             ];
+
+            if (isset($matriculaData['numero_operacion'])) {
+                Log::debug('Validate numero_operacion', ['código test' => 1]);
+                $pagoData['nro_operacion'] = $matriculaData['numero_operacion'];
+            } else {
+                Log::debug('Validate numero_operacion', ['código test' => 2]);
+            }
 
             Log::debug("MatriculaRepository: pagoData", ['pago_data' => $pagoData]);
 
@@ -290,9 +316,9 @@ class MatriculaRepository implements IMatriculaRepository {
                 DetalleMatricula::insert($detalleMatriculaData);
             }
 
-            if (!empty($personaProgramaData)) {
-                PersonaPrograma::insert($personaProgramaData);
-            }
+            // if (!empty($personaProgramaData)) {
+            //     PersonaPrograma::insert($personaProgramaData);
+            // }
 
             if (!empty($pagoData)) {
                 Pago::insert($pagoData);

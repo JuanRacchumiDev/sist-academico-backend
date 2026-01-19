@@ -13,6 +13,7 @@ class Pago extends Model
 
     protected $fillable = [
         'id_matricula',
+        'id_programa',
         'id_alumno',
         'id_formapago',
         'id_metodopago',
@@ -20,9 +21,9 @@ class Pago extends Model
         'concepto',
         'fecha_pago',
         'nro_operacion',
-        'fecha_proximo_pago',
-        'fecha_compromiso_pago',
-        'nro_cuota',
+        // 'fecha_proximo_pago',
+        // 'fecha_compromiso_pago',
+        'numero_modulo',
         'monto_efectivo',
         'monto_tarjeta',
         'monto_total',
@@ -53,6 +54,11 @@ class Pago extends Model
     public function matricula(): BelongsTo
     {
         return $this->belongsTo(Matricula::class, 'id_matricula', 'id');
+    }
+
+    public function programa(): BelongsTo
+    {
+        return $this->belongsTo(Programa::class, 'id_programa', 'id');
     }
 
     public function alumno(): BelongsTo

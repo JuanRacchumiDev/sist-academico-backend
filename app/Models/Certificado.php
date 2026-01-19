@@ -14,7 +14,7 @@ class Certificado extends Model
         'id_tipocertificado',
         'id_plantilla',
         'id_programa',
-        'codigo_qr_verificacion',
+        'codigo_verificacion',
         'codigo_qr_path',
         'path_file',
         'filename',

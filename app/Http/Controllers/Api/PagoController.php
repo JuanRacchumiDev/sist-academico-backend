@@ -50,6 +50,57 @@ class PagoController extends Controller
         }
     }
 
+    public function getFilteredPaginate(Request $request): JsonResponse
+    {
+        try {
+            $filters = [];
+
+            if ($request->has('search')) {
+                $filters['search'] = $request->input('search');
+            }
+
+            $perPage = $request->input('per_page', 10);
+
+            $filters = array_map(function($value) {
+                if ($value === 'true') return true;
+                if ($value === 'false') return false;
+                return $value;
+            }, $filters);
+
+            $pagos = $this->pagoService->getAllPagosWithFilters($filters, $perPage);
+
+            if ($pagos->isEmpty()) {
+                return response()->json([
+                    'result' => false,
+                    'data' => [],
+                    'message' => 'No se encontraron resultados'
+                ], 200);
+            }
+
+            return response()->json([
+                'result' => true,
+                'data' => $pagos,
+                'message' => 'Resultados encontrados correctamente',
+                'pagination' => [
+                    'total' => $pagos->total(),
+                    'per_page' => $pagos->perPage(),
+                    'current_page' => $pagos->currentPage(),
+                    'last_page' => $pagos->lastPage(),
+                    'from' => $pagos->firstItem(),
+                    'to' => $pagos->lastItem()
+                ]
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error("Error filtering pagos: " . $e->getMessage());
+            
+            return response()->json([
+                'result' => false,
+                'message' => 'Error al obtener pagos.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     /**
      * Store a newly created resource in storage.
      */

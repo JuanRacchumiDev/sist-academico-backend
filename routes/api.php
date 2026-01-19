@@ -85,6 +85,7 @@ Route::prefix('v1')->group(function() {
         });
 
         Route::prefix('pagos')->group(function() {
+            Route::get('/paginate', [PagoController::class, 'getFilteredPaginate'])->name('pagos.paginate');
             Route::get('{id}', [PagoController::class, 'show'])->name('pagos.show');
             Route::get('/', [PagoController::class, 'index'])->name('pagos');
             Route::post('/', [PagoController::class, 'store'])->name('pagos.store');

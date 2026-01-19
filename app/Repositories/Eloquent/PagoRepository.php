@@ -11,6 +11,7 @@ class PagoRepository implements IPagoRepository {
     {
         $query = Pago::with([
             'matricula',
+            'programa',
             'alumno',
             'formaPago',
             'metodoPago',
@@ -34,6 +35,7 @@ class PagoRepository implements IPagoRepository {
     {
         $query = Pago::with([
             'matricula',
+            'programa',
             'alumno',
             'formaPago',
             'metodoPago',
@@ -62,6 +64,7 @@ class PagoRepository implements IPagoRepository {
     {
         return Pago::with([
             'matricula',
+            'programa',
             'alumno',
             'formaPago',
             'metodoPago',

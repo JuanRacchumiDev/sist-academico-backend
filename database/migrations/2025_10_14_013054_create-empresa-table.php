@@ -27,7 +27,7 @@ return new class extends Migration
             $table->string('ubigeo_sunat', 10)->nullable();
             $table->enum('origen', ['API', 'WEB', 'APP'])->default('WEB');
             $table->string('telefonos', 50)->nullable();
-            $table->string('horario_atencion', 200)->nullable();
+            $table->string('horario_atencion', 100)->nullable();
             $table->string('user_crea', 12)->nullable();
             $table->string('user_actualiza', 12)->nullable();
             $table->string('user_elimina', 12)->nullable();

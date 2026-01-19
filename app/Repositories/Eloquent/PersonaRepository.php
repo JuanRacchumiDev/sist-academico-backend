@@ -19,7 +19,8 @@ class PersonaRepository implements IPersonaRepository {
     public function getAll(?array $searchParams = null): Collection
     {
         $query = Persona::with([
-            'tipoDocumento'
+            'tipoDocumento',
+            'matriculas'
         ]);
 
         if ($searchParams) {
@@ -52,7 +53,8 @@ class PersonaRepository implements IPersonaRepository {
     public function getAllFiltered(array $filters, int $perPage): LengthAwarePaginator
     {
         $query = Persona::with([
-            'tipoDocumento'
+            'tipoDocumento',
+            'matriculas'
         ]);
 
         // Aplicar filtros directos
@@ -88,14 +90,14 @@ class PersonaRepository implements IPersonaRepository {
     {
         // throw ValidationException::withMessages(['nombreGrupo' => $nombreGrupo, 'location' => 'personaRepository']);
 
-        return Persona::with(['tipoDocumento'])->whereHas('grupos', function($query) use ($nombreGrupo) {
+        return Persona::with(['tipoDocumento', 'matriculas'])->whereHas('grupos', function($query) use ($nombreGrupo) {
             $query->where('nombre_url', $nombreGrupo);
         })->get();
     }
 
     public function getAllByGrupoFiltered(string $nombreGrupo, array $filters, int $perPage): LengthAwarePaginator
     {
-        $query = Persona::with(['tipoDocumento'])->whereHas('grupos', function($queryGrupo) use ($nombreGrupo) {
+        $query = Persona::with(['tipoDocumento', 'matriculas'])->whereHas('grupos', function($queryGrupo) use ($nombreGrupo) {
             $queryGrupo->where('nombre_url', $nombreGrupo);
         });
 
@@ -119,7 +121,7 @@ class PersonaRepository implements IPersonaRepository {
      */
     public function findById(int $id): ?Persona
     {
-        return Persona::with(['tipoDocumento', 'grupos'])->findOrFail($id);
+        return Persona::with(['tipoDocumento', 'grupos', 'matriculas'])->findOrFail($id);
     }
 
     /**
@@ -130,7 +132,7 @@ class PersonaRepository implements IPersonaRepository {
      */
     public function findByTipoDocAndNumDoc(int $idTipoDoc, string $numDoc): ?Persona
     {
-        return Persona::with('tipoDocumento')
+        return Persona::with(['tipoDocumento', 'matriculas'])
             ->where('id_tipodocumento', $idTipoDoc)
             ->where('numero_documento',$numDoc)
             ->first();

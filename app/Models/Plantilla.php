@@ -13,6 +13,7 @@ class Plantilla extends Model
     protected $fillable = [
         'nombre',
         'descripcion',
+        'imagen',
         'path',
         'user_crea',
         'user_actualiza',

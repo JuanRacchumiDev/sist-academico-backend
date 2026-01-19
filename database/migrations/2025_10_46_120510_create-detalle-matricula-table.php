@@ -16,10 +16,10 @@ return new class extends Migration
 
             $table->unsignedBigInteger('id_matricula');
             $table->unsignedBigInteger('id_programa');
-            $table->unsignedBigInteger('id_alumno');
+            // $table->unsignedBigInteger('id_alumno');
 
-            $table->string('nombre_programa', 150)->nullable();
-            $table->string('nombre_alumno', 100)->nullable();
+            $table->string('nombre_programa', 100)->nullable();
+            // $table->string('nombre_alumno', 100)->nullable();
             $table->decimal('promedio', 10, 2)->nullable();
 
             $table->string('user_crea', 12)->nullable();
@@ -36,9 +36,9 @@ return new class extends Migration
                 ->references('id')
                 ->on('programa');
 
-            $table->foreign('id_alumno')
-                ->references('id')
-                ->on('persona');
+            // $table->foreign('id_alumno')
+            //     ->references('id')
+            //     ->on('persona');
         });
     }
 

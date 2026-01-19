@@ -30,7 +30,7 @@ return new class extends Migration
             $table->string('ubigeo_sunat', 12)->nullable();
             $table->string('ubigeo', 12)->nullable();
             $table->string('fecha_nacimiento', 10)->nullable();
-            $table->string('estado_civil', 20)->nullable();
+            $table->string('estado_civil', 15)->nullable();
             $table->string('foto', 100)->nullable();
             $table->enum('sexo', ['M', 'F'])->default('M');
             $table->enum('origen', ['API', 'WEB', 'APP'])->default('WEB');

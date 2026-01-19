@@ -33,10 +33,10 @@ class Programa extends Model
         'capacidad_maxima',
         'cantidad_inscritos',
         'precio',
+        'is_vigente',
         'user_crea',
         'user_actualiza',
         'user_elimina',
-        'is_vigente',
         'estado'
     ];
 
@@ -83,5 +83,10 @@ class Programa extends Model
     public function detalleMatricula()
     {
         return $this->hasMany(DetalleMatricula::class, 'id_programa', 'id');
+    }
+
+    public function detalleModulos()
+    {
+        return $this->hasMany(Modulo::class, 'id_programa', 'id');
     }
 }

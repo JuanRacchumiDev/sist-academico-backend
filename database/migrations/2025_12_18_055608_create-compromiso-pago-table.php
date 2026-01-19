@@ -11,17 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('nota', function(Blueprint $table) {
+        Schema::create('compromiso_pago', function(Blueprint $table) {
             $table->id();
-
+            
             $table->unsignedBigInteger('id_alumno');
-            $table->unsignedBigInteger('id_modulo');
-            // $table->unsignedBigInteger('id_docente');
-
-            $table->decimal('valor_numerico', 10, 2);
-            $table->string('valor_letras', 50);
-            $table->string('descripcion', 100)->nullable();
-            $table->string('fecha_registro', 10);
+            $table->unsignedBigInteger('id_pago')->nullable();
+            $table->unsignedBigInteger('id_modulo')->nullable();
+            
+            $table->string('fecha_proximo_pago', 10)->nullable();
+            $table->string('fecha_vencimiento', 10)->nullable();
             $table->string('user_crea', 12)->nullable();
             $table->string('user_actualiza', 12)->nullable();
             $table->string('user_elimina', 12)->nullable();
@@ -32,13 +30,13 @@ return new class extends Migration
                 ->references('id')
                 ->on('persona');
 
+            $table->foreign('id_pago')
+                ->references('id')
+                ->on('pago');
+
             $table->foreign('id_modulo')
                 ->references('id')
                 ->on('modulo');
-
-            // $table->foreign('id_docente')
-            //     ->references('id')
-            //     ->on('persona');
         });
     }
 
@@ -47,17 +45,17 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('nota', function(Blueprint $table) {
+        Schema::table('compromiso_pago', function(Blueprint $table) {
             $table->dropForeign('id_alumno');
             $table->dropColumn('id_alumno');
 
+            $table->dropForeign('id_pago');
+            $table->dropColumn('id_pago');
+
             $table->dropForeign('id_modulo');
             $table->dropColumn('id_modulo');
-
-            // $table->dropForeign('id_docente');
-            // $table->dropColumn('id_docente');
         });
 
-        Schema::dropIfExists('nota');
+        Schema::dropIfExists('compromiso_pago');
     }
 };

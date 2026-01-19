@@ -19,14 +19,14 @@ return new class extends Migration
             $table->unsignedBigInteger('id_plantilla');
             $table->unsignedBigInteger('id_programa')->nullable();
 
-            $table->string('codigo_verificacion', 12);
-            $table->string('codigo_qr_path', 350);
+            $table->string('codigo_verificacion', 12)->nullable();
+            $table->string('codigo_qr_path', 350)->nullable();
             $table->string('path_file', 350);
             $table->string('filename', 150);
             $table->string('nombre_impresion', 150);
             $table->string('user_crea', 12)->nullable();
             $table->string('user_actualiza', 12)->nullable();
-            $table->string('user_elimina', 1120)->nullable();
+            $table->string('user_elimina', 12)->nullable();
             $table->boolean('estado')->default(true);
             $table->timestamps();
 

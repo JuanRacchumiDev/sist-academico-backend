@@ -17,11 +17,15 @@ return new class extends Migration
             $table->unsignedBigInteger('id_alumno');
             $table->unsignedBigInteger('id_sede')->nullable();
             $table->unsignedBigInteger('id_formapago')->nullable();
+            $table->unsignedBigInteger('id_estadopago')->nullable();
+            $table->unsignedBigInteger('id_metodopago')->nullable();
             $table->unsignedBigInteger('id_estadomatricula')->nullable();
             
             $table->string('nombre_alumno', 100)->nullable();
             $table->string('nombre_sede', 60)->nullable();
             $table->string('nombre_formapago', 60)->nullable();
+            $table->string('nombre_estadopago', 60)->nullable();
+            $table->string('nombre_metodopago', 60)->nullable();
             $table->string('nombre_estadomatricula', 60)->nullable();
 
             $table->string('fecha_matricula', 10);
@@ -44,6 +48,14 @@ return new class extends Migration
                 ->references('codigo')
                 ->on('detalle_parametro');
 
+            $table->foreign('id_estadopago')
+                ->references('codigo')
+                ->on('detalle_parametro');
+
+            $table->foreign('id_metodopago')
+                ->references('codigo')
+                ->on('detalle_parametro');
+
             $table->foreign('id_estadomatricula')
                 ->references('codigo')
                 ->on('detalle_parametro');
@@ -61,6 +73,12 @@ return new class extends Migration
 
             $table->dropForeign('id_sede');
             $table->dropColumn('id_sede');
+
+            $table->dropForeign('id_formapago');
+            $table->dropColumn('id_formapago');
+
+            $table->dropForeign('id_estadopago');
+            $table->dropColumn('id_estadopago');
 
             $table->dropForeign('id_metodopago');
             $table->dropColumn('id_metodopago');

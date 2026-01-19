@@ -26,6 +26,10 @@ class Empresa extends Model
         'ubigeo_sunat',
         'origen',
         'telefonos',
+        'horario_atencion',
+        'user_crea',
+        'user_actualiza',
+        'user_elimina',
         'estado'
     ];
 }

@@ -20,8 +20,8 @@ return new class extends Migration
 
             $table->string('codigo_old', 10)->nullable();
             $table->string('sigla', 10)->nullable();
-            $table->string('nombre', 150);
-            $table->string('nombre_url', 180)->nullable();
+            $table->string('nombre', 100);
+            $table->string('nombre_url', 120)->nullable();
             $table->string('descripcion', 150)->nullable();
             $table->string('fecha_inicio', 10)->nullable();
             $table->string('fecha_final', 10)->nullable();

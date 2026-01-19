@@ -24,6 +24,7 @@ class DetalleParametro extends Model
         'en_empresa',
         'compra',
         'venta',
+        'visible',
         'user_crea',
         'user_actualiza',
         'user_elimina',

@@ -17,7 +17,8 @@ class ProgramaRepository implements IProgramaRepository {
         $query = Programa::with([
             'segmento',
             'tipoPrograma',
-            'categoriaPrograma'
+            'categoriaPrograma',
+            'detalleModulos'
         ]);
 
         if ($searchParams) {
@@ -45,7 +46,8 @@ class ProgramaRepository implements IProgramaRepository {
         $query = Programa::with([
             'segmento',
             'tipoPrograma',
-            'categoriaPrograma'
+            'categoriaPrograma',
+            'detalleModulos'
         ]);
 
         if (isset($filters['estado'])) {
@@ -77,7 +79,8 @@ class ProgramaRepository implements IProgramaRepository {
         return Programa::with([
             'segmento',
             'tipoPrograma',
-            'categoriaPrograma'
+            'categoriaPrograma',
+            'detalleModulos'
         ])->find($id);
     }
 
