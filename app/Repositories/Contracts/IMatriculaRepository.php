@@ -16,7 +16,7 @@ interface IMatriculaRepository
 
     public function getFilePath(array $filters): string;
 
-    public function getCertificadoData(array $filters): ?array;
+    public function getCertificadoData(array $filters);
 
     public function existsCertificado(array $filters): bool;
 

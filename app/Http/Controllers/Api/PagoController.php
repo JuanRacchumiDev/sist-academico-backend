@@ -101,6 +101,35 @@ class PagoController extends Controller
         }
     }
 
+    public function getMatricula(Request $request) {
+        $request->validate([
+            'id_alumno' => 'required|integer|exists:persona,id',
+            'id_matricula' => 'required|integer|exists:matricula,id',
+        ]);
+
+        $idMatricula = $request->input('id_matricula');
+        $idAlumno = $request->input('id_alumno');
+
+        $filters = [
+            'id_matricula' => $idMatricula,
+            'id_alumno' => $idAlumno
+        ];
+
+        // $result = $this->pagoService->getPagoMatriculaByFilters($filters);
+        $result = $this->pagoService->getMatriculaPDF($filters);
+
+        if ($result['status'] === 'error') {
+            return response($result['message'], 404);
+        }
+
+        // Devolver el archivo PDF como respuesta binaria
+        $filename = "pago_matricula_{$idMatricula}.pdf";
+
+        return response($result['pdfContent'], 200)
+            ->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', "inline; filename=\"{$filename}\"");
+    }
+
     /**
      * Store a newly created resource in storage.
      */

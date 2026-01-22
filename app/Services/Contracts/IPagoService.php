@@ -21,6 +21,8 @@ interface IPagoService {
      */
     public function getAllPagosWithFilters(array $filters, int $perPage): LengthAwarePaginator;
 
+    public function getMatriculaPDF(array $filters): array;
+
     /**
      * Obtiene un pago por ID
      * @param int $id

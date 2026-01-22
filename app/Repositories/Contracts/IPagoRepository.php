@@ -22,6 +22,16 @@ interface IPagoRepository
      */
     public function getAllFiltered(array $filters, int $perPage): LengthAwarePaginator;
 
+    public function getMatriculaData(array $filters);
+
+    public function getFilePath(array $filters): string;
+
+    public function existsMatricula(array $filters): bool;
+
+    public function savePDF(array $filters, string $pdfContent): void;
+
+    public function getPDF(array $filters): string;
+
     /**
      * Obtener pago por id
      * @param int $id

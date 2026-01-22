@@ -16,9 +16,10 @@ use App\Services\Contracts\IMatriculaService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Validation\ValidationException;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Dompdf\Dompdf;
+use Barryvdh\DomPDF\Facade\Pdf;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Illuminate\Support\Facades\Log;
 
 class MatriculaService implements IMatriculaService {
     protected IMatriculaRepository $matriculaRepository;
@@ -92,60 +93,128 @@ class MatriculaService implements IMatriculaService {
 
     public function getCertificadoPDF(array $filters): array
     {
+        Log::info('Iniciando proceso de Certificado/Constancia', ['filters' => $filters]);
+
         // Verificar si el certificado ya existe
         if ($this->matriculaRepository->existsCertificado($filters)) {
-            $pdfContent = $this->matriculaRepository->getPDF($filters);
+            Log::info('Recuperando PDF desde Storage');
+
             return [
-                'pdfContent' => $pdfContent,
+                'pdfContent' => $this->matriculaRepository->getPDF($filters),
                 'status' => 'success',
-                'message' => 'Certificado obtenido de la caché de archivos'
+                'message' => 'Certificado recuperado del almacenamiento'
             ];
         }
 
         // Si no existe, obtener datos y generar
-        $matricula = $this->matriculaRepository->getCertificadoData($filters);
+        $matricula = (object)$this->matriculaRepository->getCertificadoData($filters);
 
         if (!$matricula) {
+            Log::warning('No se encontraron datos para la matrícula', $filters);
             return [
                 'pdfContent' => null,
                 'status' => 'error',
-                'message' => 'Matrícula no encontrada'
+                'message' => 'Los datos de la matrícula no existen en el sistema.'
             ];
         }
 
-        $matriculaId = $filters['id_matricula'];
-        $programaId = $filters['id_programa'];
-        $alumnoId = $filters['id_alumno'];
+        $matriculaArray = (array)$matricula;
 
-        // Generar el código QR de validación
-        // Esta URL debe apuntar a un endpoint público para validar el certificado
-        $validationUrl = url("/public/certificados/validar/matricula/{$matriculaId}/programa/{$programaId}/alumno/{$alumnoId}");
+        $empresa = [
+            'razon_social' => 'COOPERATIVA DE SERVICIOS EDUCACIONALES CAPACITA',
+            'ruc' => '20603337337',
+            'logo' => public_path('images/LOGO.jpg')
+        ];
 
-        $qrCodeSvg = QrCode::size(100)
-            ->color(0, 0, 0)
-            ->generate($validationUrl);
+        $qrContent = url("/validar/matricula/{$matricula->id}");
+        $qrCode = base64_encode(QrCode::format('svg')->size(120)->errorCorrection('H')->generate($qrContent));
 
-        $html = view('pdf.certificado', [
+        $dataPDF = [
             'title' => 'CONSTANCIA DE ESTUDIOS',
-            'matricula' => $matricula,
-            'qrCodeSvg' => $qrCodeSvg,
-            'validationUrl' => $validationUrl
-        ])->render();
+            'matricula' => $matriculaArray,
+            'empresa' => $empresa,
+            'qrCode' => $qrCode,
+            'validationUrl' => $qrContent
+        ];
 
-        $domPDF = new Dompdf();
-        $domPDF->loadHtml($html);
-        $domPDF->setPaper('A4', 'portrait');
-        $domPDF->render();
-        $pdfContent = $domPDF->output();
+        $pdf = Pdf::loadView('pdf.certificado', $dataPDF);
+        $pdfContent = $pdf->output();
 
-        // Guardar el certificado generado para futuras solicitudes
         $this->matriculaRepository->savePDF($filters, $pdfContent);
 
         return [
             'pdfContent' => $pdfContent,
             'status' => 'success',
-            'message' => 'Certificado generado y almacenado'
+            'message' => 'Certificado generado exitosamente'
         ];
+
+        // $empresa = [
+        //     'razon_social' => 'COOPERATIVA DE SERVICIOS EDUCACIONALES CAPACITA',
+        //     'ruc' => '20603337337',
+        //     'logo' => public_path('images/LOGO.jpg')
+        // ];
+
+        // $dataPDF = [
+        //     'title' => 'RECIBO DE PAGO DE MATRÍCULA',
+        //     'matricula' => $matricula,
+        //     'empresa' => $empresa
+        // ];
+
+        // $qrContent = json_encode([
+        //     'idMatricula' => $matricula->id,
+        //     'alumno' => $matricula->nombre_completo,
+        //     'programa' => $matricula->nombre_programa,
+        //     'fechaMatricula' => $matricula->fecha_matricula,
+        //     'verificacion' => url("/validar/matricula/{$matricula->id}")
+        // ]);
+
+        // // Usamos format('svg') para mejor calidad en el PDF
+        // $qrCode = base64_encode(QrCode::format('svg')->size(100)->errorCorrection('H')->generate($qrContent));
+
+        // $pdf = Pdf::loadView('pdf.certificado', compact('dataPDF', 'qrCode'));
+        // $pdfContent = $pdf->output();
+
+        // $this->matriculaRepository->savePDF($filters, $pdfContent);
+
+        // return [
+        //     'pdfContent' => $pdfContent,
+        //     'status' => 'success',
+        //     'message' => 'Certificado generado y almacenado exitosamente'
+        // ];
+
+        // $matriculaId = $filters['id_matricula'];
+        // $programaId = $filters['id_programa'];
+        // $alumnoId = $filters['id_alumno'];
+
+        // // Generar el código QR de validación
+        // // Esta URL debe apuntar a un endpoint público para validar el certificado
+        // $validationUrl = url("/public/certificados/validar/matricula/{$matriculaId}/programa/{$programaId}/alumno/{$alumnoId}");
+
+        // $qrCodeSvg = QrCode::size(100)
+        //     ->color(0, 0, 0)
+        //     ->generate($validationUrl);
+
+        // $html = view('pdf.certificado', [
+        //     'title' => 'CONSTANCIA DE ESTUDIOS',
+        //     'matricula' => $matricula,
+        //     'qrCodeSvg' => $qrCodeSvg,
+        //     'validationUrl' => $validationUrl
+        // ])->render();
+
+        // $domPDF = new Dompdf();
+        // $domPDF->loadHtml($html);
+        // $domPDF->setPaper('A4', 'portrait');
+        // $domPDF->render();
+        // $pdfContent = $domPDF->output();
+
+        // // Guardar el certificado generado para futuras solicitudes
+        // $this->matriculaRepository->savePDF($filters, $pdfContent);
+
+        // return [
+        //     'pdfContent' => $pdfContent,
+        //     'status' => 'success',
+        //     'message' => 'Certificado generado y almacenado'
+        // ];
     }
 
     public function createMatricula(MatriculaCreateDTO $matriculaCreateDTO): Matricula|null

@@ -6,7 +6,6 @@ use App\Repositories\Contracts\IDetalleParametroRepository;
 use App\DTOs\Matricula\MatriculaCreateDTO;
 use App\Models\Matricula;
 use App\Models\DetalleMatricula;
-use App\Models\PersonaPrograma;
 use App\Models\Programa;
 use App\Models\Pago;
 use Illuminate\Support\Facades\DB;
@@ -17,16 +16,13 @@ use Illuminate\Validation\ValidationException;
 use Throwable;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Arr;
-
-use function PHPSTORM_META\map;
 
 class MatriculaRepository implements IMatriculaRepository {
     protected IPersonaRepository $personaRepository;
     protected IDetalleParametroRepository $detalleRepository;
 
     protected string $disk = "public";
-    protected string $path = "certificados/";
+    protected string $path = "pdfs/certificados/";
 
     public function __construct(
         IPersonaRepository $personaRepository,
@@ -91,8 +87,6 @@ class MatriculaRepository implements IMatriculaRepository {
 
     public function getUniqueForFilters(array $filters): ?Matricula
     {
-        // throw ValidationException::withMessages(['filters' => $filters]);
-
         return Matricula::with([
             'alumno',
             'sede',
@@ -103,43 +97,28 @@ class MatriculaRepository implements IMatriculaRepository {
 
     public function getFilePath(array $filters): string
     {
-        $matriculaId = $filters['id_matricula'];
-        $programaId = $filters['id_programa'];
-        $alumnoId = $filters['id_alumno'];
-
-        $mIdPadded = sprintf('%04d', $matriculaId);
-        $pIdPadded = sprintf('%04d', $programaId);
-        $aIdPadded = sprintf('%04d', $alumnoId);
-
-        Log::info('Validate path certificado pdf', ['mIdPadded' => $mIdPadded]);
-        Log::info('Validate path certificado pdf', ['pIdPadded' => $pIdPadded]);
-        Log::info('Validate path certificado pdf', ['aIdPadded' => $aIdPadded]);
-
-        $pathPDF = $this->path . "certificado_{$mIdPadded}_{$pIdPadded}_{$aIdPadded}.pdf"; 
-        Log::info('Validate path certificado pdf', ['pathPDF' => $pathPDF]);
-
-        return $pathPDF;
+        $mId = sprintf('%05d', $filters['id_matricula']);
+        $pId = $filters['id_programa'];
+        $aId = sprintf('%05d', $filters['id_alumno']);
+        return "{$this->path}certificado_{$mId}_{$pId}_{$aId}.pdf";
     }
 
     public function existsCertificado(array $filters): bool
     {
-        $filePath = $this->getFilePath($filters);
-        return Storage::disk($this->disk)->exists($filePath);
+        return Storage::disk($this->disk)->exists($this->getFilePath($filters));
     }
 
     public function savePDF(array $filters, string $pdfContent): void
     {
-        $filePath = $this->getFilePath($filters);
-        Storage::disk($this->disk)->put($filePath, $pdfContent);
+        Storage::disk($this->disk)->put($this->getFilePath($filters), $pdfContent);
     }
 
     public function getPDF(array $filters): string
     {
-        $filePath = $this->getFilePath($filters);
-        return Storage::disk($this->disk)->get($filePath);
+        return Storage::disk($this->disk)->get($this->getFilePath($filters));
     }
 
-    public function getCertificadoData(array $filters): ?array
+    public function getCertificadoData(array $filters)
     {
         Log::info('Validate getCertificadoData', ['filters' => $filters]);
 
@@ -147,7 +126,7 @@ class MatriculaRepository implements IMatriculaRepository {
         $idPrograma = $filters['id_programa'];
         $idAlumno = $filters['id_alumno'];
 
-        $result = DB::table('detalle_matricula', 'dmat')
+        $matriculaData = DB::table('detalle_matricula as dmat')
             ->select([
                 'persona.numero_documento',
                 'persona.apellido_paterno',
@@ -163,19 +142,23 @@ class MatriculaRepository implements IMatriculaRepository {
                 'programa.modulos',
                 'programa.creditos',
                 'programa.modalidad',
-                'matricula.fecha_matricula'
+                'matricula.fecha_matricula',
+                'matricula.id'
             ])
-            ->join('persona', 'persona.id', '=', 'dmat.id_alumno')
             ->join('programa', 'programa.id', '=', 'dmat.id_programa')
             ->join('matricula', 'matricula.id', '=', 'dmat.id_matricula')
+            ->join('persona', 'persona.id', '=', 'matricula.id_alumno')
             ->where('dmat.id_matricula', $idMatricula)
             ->where('dmat.id_programa', $idPrograma)
-            ->where('dmat.id_alumno', $idAlumno)
+            ->where('matricula.id_alumno', $idAlumno)
             ->first();
 
-        Log::info('Validate result', ['result' => $result]);
+        Log::info('matriculaData getCertificadoData', ['matriculaData' => $matriculaData]);
 
-        return $result ? (array) $result : null;
+        return $matriculaData;
+
+        // Log::info('Validate result', ['result' => $result]);
+        // return $result ? (array) $result : null;
     }
 
     public function findById(int $id): ?Matricula

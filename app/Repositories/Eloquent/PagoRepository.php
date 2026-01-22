@@ -5,8 +5,15 @@ use App\Models\Pago;
 use App\Repositories\Contracts\IPagoRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class PagoRepository implements IPagoRepository {
+
+    protected string $disk = "public";
+    protected string $path = "pdfs/matriculas/";
+
     public function getAll(?array $searchParams = null): Collection
     {
         $query = Pago::with([
@@ -58,6 +65,68 @@ class PagoRepository implements IPagoRepository {
         $query->orderBy('id', 'desc');
 
         return $query->paginate($perPage);
+    }
+
+    public function getMatriculaData(array $filters)
+    {
+        Log::info('Validate paremeters filters getMatricula', ['filters' => $filters]);
+
+        $idAlumno = $filters['id_alumno'];
+        $idMatricula = $filters['id_matricula'];
+
+        Log::info('idAlumno getMatricula', ['idAlumno' => $idAlumno]);
+        Log::info('idMatricula getMatricula', ['idMatricula' => $idMatricula]);
+
+        $pagoData = DB::table('pago as p')
+            ->join('matricula as m', 'm.id', '=', 'p.id_matricula')
+            ->join('persona as p2', 'p2.id', '=', 'p.id_alumno')
+            ->join('detalle_parametro as dp', 'dp.codigo', '=', 'p.id_formapago')
+            ->join('detalle_parametro as dp2', 'dp2.codigo', '=', 'p.id_metodopago')
+            ->join('detalle_parametro as dp3', 'dp3.codigo', '=', 'p.id_estadopago')
+            ->select(
+                'm.fecha_matricula',
+                'p2.nombres',
+                'p2.apellido_paterno',
+                'p2.apellido_materno',
+                'p2.nombre_completo',
+                'p2.id_tipodocumento',
+                'p2.numero_documento',
+                'dp.nombre as nombre_formapago',
+                'dp2.nombre as nombre_metodopago',
+                'dp3.nombre as nombre_estadopago',
+                'p.*'
+            )
+            ->where('p.concepto', 'like', '%PAGO%MATRÍCULA%')
+            ->whereNull('p.id_programa')
+            ->where('p.id_alumno', $idAlumno)
+            ->where('p.id_matricula', $idMatricula)
+            ->first();
+
+        Log::info('pagoData getMatriculaData', ['pagoData' => $pagoData]);
+
+        return $pagoData;
+    }
+
+    public function getFilePath(array $filters): string
+    {
+        $mId = sprintf('%05d', $filters['id_matricula']);
+        $aId = sprintf('%05d', $filters['id_alumno']);
+        return "{$this->path}recibo_matricula_{$mId}_alumno_{$aId}.pdf";
+    }
+
+    public function existsMatricula(array $filters): bool
+    {
+        return Storage::disk($this->disk)->exists($this->getFilePath($filters));
+    }
+
+    public function savePDF(array $filters, string $pdfContent): void
+    {
+        Storage::disk($this->disk)->put($this->getFilePath($filters), $pdfContent);
+    }
+
+    public function getPDF(array $filters): string
+    {
+        return Storage::disk($this->disk)->get($this->getFilePath($filters));
     }
 
     public function findById(int $id): ?Pago

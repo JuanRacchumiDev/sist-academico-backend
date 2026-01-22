@@ -1,20 +1,7 @@
-<?php
-use Carbon\Carbon;
-
-$numeroDocumento = $matricula['numero_documento'] ?? 'N/A';
-$nombreCompleto = $matricula['nombre_completo'] ?? 'N/A';
-$nombrePrograma = $matricula['nombre_programa'] ?? 'N/A';
-$fechaMatricula = $matricula['fecha_matricula'] ? Carbon::parse($matricula['fecha_matricula'])->format('d/m/Y') : null;
-
-// Variables del programa que deben ser evaluadas
-$fechaInicio = $matricula['fecha_inicio'] ?? null;
-$fechaFinal = $matricula['fecha_final'] ?? null;
-$duracion = $matricula['duracion'] ?? null;
-$horasAcademicas = $matricula['horas_academicas'] ?? null;
-$modulos = $matricula['modulos'] ?? null;
-$creditos = $matricula['creditos'] ?? null;
-$modalidad = $matricula['modalidad'] ?? null;
-?>
+@php
+    use Carbon\Carbon;
+    $m = $matricula;
+@endphp
 
 <!DOCTYPE html>
 <html>
@@ -22,210 +9,140 @@ $modalidad = $matricula['modalidad'] ?? null;
     <meta charset="utf-8">
     <title>{{ $title }}</title>
     <style>
-        /* Estilo base para Dompdf */
+        @page { margin: 0; }
         body {
             font-family: 'Times New Roman', serif;
+            background-color: #fff;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-            font-size: 11pt;
         }
-        .container {
-            width: 100%;
-            height: 100vh;
-            padding: 50px;
-            /* Marco decorativo */
-            border: 5px solid #003366; 
-            border-style: double;
+        .border-double {
+            margin: 30px;
+            padding: 40px;
+            border: 10px double #003366;
+            height: 900px;
         }
-        .header {
-            margin-bottom: 30px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #ccc;
+        .header { text-align: center; margin-bottom: 40px; }
+        .header h1 { 
+            color: #003366; 
+            font-size: 32pt; 
+            margin: 0; 
+            letter-spacing: 3px;
         }
-        .header h1 {
-            color: #003366;
-            font-size: 26pt;
-            margin: 0;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-        .header h2 {
-            color: #555;
-            font-size: 14pt;
-            margin-top: 5px;
-            font-weight: normal;
-        }
-        .body-text {
-            margin-top: 30px;
-            text-align: justify;
-            line-height: 1.8;
-            font-size: 12pt;
-        }
-        .highlight {
-            font-weight: bold;
-            color: #000;
-            text-transform: uppercase;
-        }
-        .program-title {
+        .header h2 { font-size: 14pt; color: #666; font-style: italic; }
+        
+        .content { margin-top: 50px; line-height: 1.8; font-size: 13pt; text-align: justify; }
+        .student-name { 
+            display: block; 
             text-align: center; 
-            font-size: 16pt; 
+            font-size: 18pt; 
             font-weight: bold; 
+            margin: 20px 0;
+            text-decoration: underline;
+        }
+        .program-box {
+            text-align: center;
+            background-color: #f9f9f9;
+            border: 1px solid #003366;
+            padding: 15px;
+            margin: 25px auto;
+            width: 85%;
+            font-weight: bold;
             color: #cc0000;
-            border: 2px solid #cc0000;
-            padding: 10px;
-            margin: 25px 0;
-            display: inline-block;
-            width: 80%; /* Para que el borde no sea de 100% de ancho */
-            margin-left: 10%;
-            margin-right: 10%;
+            font-size: 15pt;
         }
-        .data-table {
-            width: 90%;
-            margin: 30px auto 30px auto;
+        .details-table {
+            width: 80%;
+            margin: 30px auto;
             border-collapse: collapse;
-            font-size: 11pt;
         }
-        .data-table th, .data-table td {
-            padding: 10px 15px;
-            border: 1px solid #e0e0e0;
+        .details-table th {
             text-align: left;
-        }
-        .data-table th {
-            background-color: #f0f4f7;
-            color: #003366;
-            width: 35%;
-        }
-        .footer-section {
-            margin-top: 50px;
-            padding-top: 20px;
-            position: relative;
-            height: 150px; /* Para contener los elementos flotantes */
-        }
-        .signature-block {
+            background-color: #eee;
+            padding: 8px;
+            border: 1px solid #ccc;
             width: 40%;
+        }
+        .details-table td {
+            padding: 8px;
+            border: 1px solid #ccc;
+        }
+        
+        .footer { margin-top: 60px; }
+        .signature-section {
             float: right;
+            width: 300px;
             text-align: center;
         }
         .signature-line {
-            width: 100%;
-            margin: 0 auto 5px auto;
             border-top: 1px solid #000;
-            padding-top: 5px;
+            margin-bottom: 5px;
         }
-        .qr-area {
-            width: 40%;
+        .qr-section {
             float: left;
-            text-align: left;
-            font-size: 9pt;
+            width: 200px;
+            text-align: center;
+            font-size: 8pt;
         }
-        .qr-code-svg {
-            margin-top: 5px;
-        }
-        .clearfix::after {
-            content: "";
-            clear: both;
-            display: table;
-        }
+        .clearfix { clear: both; }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="border-double">
         <div class="header">
+            <img src="{{ public_path('LOGO.jpg') }}" style="width: 80px; margin-bottom: 10px;">
             <h1>{{ $title }}</h1>
+            <h2>Instituto Profesional de Educación y Desarrollo Empresarial</h2>
         </div>
 
-        <div class="body-text">
-            <p style="text-align: center;">El Director(a) de IPEDE, deja constancia que:</p>
-
-            <p style="text-align: center; margin: 30px 0;">
-                El(la) estudiante <span class="highlight">{{ $nombreCompleto }}</span>, identificado(a) con DNI N° <span class="highlight">{{ $numeroDocumento }}</span>, se encuentra registrado(a) y matriculado(a) en el programa académico de:
-            </p>
+        <div class="content">
+            <p style="text-align: center;">La Dirección Académica de <strong>IPEDE</strong> hace constar que:</p>
             
-            <p class="program-title">
-                "{{ $nombrePrograma }}"
-            </p>
+            <span class="student-name">{{ $m['nombre_completo'] }}</span>
             
-            <p style="margin-top: 40px; text-align: justify;">
-                La matrícula fue registrada el <span class="highlight">{{ $fechaMatricula }}</span>. A continuación, se detallan las características del programa:
-            </p>
+            <p style="text-align: center;">Identificado(a) con DNI N° <strong>{{ $m['numero_documento'] }}</strong>, se encuentra debidamente registrado(a) y matriculado(a) en el programa de capacitación de:</p>
 
-            {{-- ------------------------------------------------ --}}
-            {{-- Tabla con datos académicos y evaluación condicional --}}
-            {{-- ------------------------------------------------ --}}
-            <table class="data-table">
-                <tbody>
-                    @if ($fechaInicio)
-                        <tr>
-                            <th>Fecha de Inicio</th>
-                            <td>{{ Carbon::parse($fechaInicio)->format('d/m/Y') }}</td>
-                        </tr>
-                    @endif
-                    
-                    @if ($fechaFinal)
-                        <tr>
-                            <th>Fecha de Finalización</th>
-                            <td>{{ Carbon::parse($fechaFinal)->format('d/m/Y') }}</td>
-                        </tr>
-                    @endif
-                    
-                    @if ($duracion)
-                        <tr>
-                            <th>Duración</th>
-                            <td>{{ $duracion }}</td>
-                        </tr>
-                    @endif
+            <div class="program-box">
+                "{{ $m['nombre_programa'] }}"
+            </div>
 
-                    @if ($horasAcademicas)
-                        <tr>
-                            <th>Horas Académicas</th>
-                            <td>{{ $horasAcademicas }} horas</td>
-                        </tr>
-                    @endif
-
-                    @if ($modulos)
-                        <tr>
-                            <th>Módulos</th>
-                            <td>{{ $modulos }}</td>
-                        </tr>
-                    @endif
-                    
-                    @if ($creditos)
-                        <tr>
-                            <th>Créditos</th>
-                            <td>{{ $creditos }} créditos</td>
-                        </tr>
-                    @endif
-
-                    @if ($modalidad)
-                        <tr>
-                            <th>Modalidad</th>
-                            <td>{{ $modalidad }}</td>
-                        </tr>
-                    @endif
-                </tbody>
+            <table class="details-table">
+                @if($m['fecha_inicio'])
+                <tr>
+                    <th>Fecha de Inicio</th>
+                    <td>{{ Carbon::parse($m['fecha_inicio'])->format('d/m/Y') }}</td>
+                </tr>
+                @endif
+                @if($m['horas_academicas'])
+                <tr>
+                    <th>Horas Académicas</th>
+                    <td>{{ $m['horas_academicas'] }} Horas Lectivas</td>
+                </tr>
+                @endif
+                @if($m['modalidad'])
+                <tr>
+                    <th>Modalidad</th>
+                    <td>{{ $m['modalidad'] }}</td>
+                </tr>
+                @endif
             </table>
 
-            <p style="margin-top: 40px; text-align: justify;">
-                Se expide la presente a solicitud del interesado para los fines que estime conveniente.
-            </p>
+            <p style="margin-top: 30px;">Se expide la presente a solicitud del interesado, para los fines que estime convenientes, con fecha de registro de matrícula {{ Carbon::parse($m['fecha_matricula'])->format('d/m/Y') }}.</p>
         </div>
 
-        <div class="footer-section clearfix">
-            <div class="signature-block">
-                <div style="height: 50px;"></div> {{-- Espacio para el sello/firma --}}
-                <div class="signature-line"></div>
-                <p style="margin-top: 5px;">Firma y Sello de la Dirección Académica</p>
+        <div class="footer">
+            <div class="qr-section">
+                <img src="data:image/svg+xml;base64,{{ $qrCode }}" width="90">
+                <p>Verificación Digital<br>{{ $validationUrl }}</p>
             </div>
             
-            <div class="qr-area">
-                {{-- <p style="margin: 0; padding: 0;">**Certificado Digital N°:** {{ $mIdPadded }}-{{ $pIdPadded }}</p> --}}
-                <p style="margin: 0; padding: 0;">Verificar validez escaneando el código:</p>
-                <div class="qr-code-svg" style="width: 100px; height: 100px;">
-                    {!! $qrCodeSvg !!}
-                </div>
-                <p style="font-size: 8pt; word-wrap: break-word; max-width: 120px; text-align: left; margin-top: 5px;">{{ $validationUrl }}</p>
+            <div class="signature-section">
+                <div style="height: 80px;"></div>
+                <div class="signature-line"></div>
+                <strong>DIRECCIÓN ACADÉMICA</strong><br>
+                IPEDE
             </div>
+            <div class="clearfix"></div>
         </div>
     </div>
 </body>
