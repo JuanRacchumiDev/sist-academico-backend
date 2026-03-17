@@ -18,6 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('id_tipocertificado');
             $table->unsignedBigInteger('id_plantilla')->nullable();
             $table->unsignedBigInteger('id_programa')->nullable();
+            $table->unsignedBigInteger('id_institucion')->nullable();
 
             $table->string('codigo_verificacion', 12)->nullable();
             $table->string('codigo_qr_path', 350)->nullable();
@@ -46,6 +47,10 @@ return new class extends Migration
             $table->foreign('id_programa')
                 ->references('id')
                 ->on('programa');
+
+            $table->foreign('id_institucion')
+                ->references('id')
+                ->on('institucion');
         });
     }
 
@@ -66,6 +71,9 @@ return new class extends Migration
 
             $table->dropForeign('id_programa');
             $table->dropColumn('id_programa');
+
+            $table->dropForeign('id_institucion');
+            $table->dropColumn('id_institucion');
         });
 
         Schema::dropIfExists('certificado');

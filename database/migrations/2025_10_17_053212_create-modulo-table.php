@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
 
             $table->unsignedBigInteger('id_programa')->nullable();
+            $table->unsignedBigInteger('id_institucion')->nullable();
 
             $table->string('titulo', 100);
             $table->string('titulo_url', 120);
@@ -31,6 +32,10 @@ return new class extends Migration
             $table->foreign('id_programa')
                 ->references('id')
                 ->on('programa');
+
+            $table->foreign('id_institucion')
+                ->references('id')
+                ->on('institucion');
         });
     }
 
@@ -42,6 +47,9 @@ return new class extends Migration
         Schema::table('modulo', function(Blueprint $table) {
             $table->dropForeign('id_programa');
             $table->dropColumn('id_programa');
+
+            $table->dropForeign('id_institucion');
+            $table->dropColumn('id_institucion');
         });
 
         Schema::dropIfExists('modulo');

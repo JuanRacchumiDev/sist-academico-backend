@@ -79,9 +79,11 @@ Route::prefix('v1')->group(function() {
         Route::prefix('matriculas')->group(function() {
             Route::get('/paginate', [MatriculaController::class, 'getFilteredPaginate'])->name('programas.paginate');
             Route::get('/{id}', [MatriculaController::class, 'show'])->name('programas.show');
+            Route::get('/{id}/pdf', [MatriculaController::class, 'downloadFicha'])->name('matriculas.pdf');
             Route::get('/', [MatriculaController::class, 'index'])->name('programas');
             Route::post('/', [MatriculaController::class, 'store'])->name('programas.store');
             Route::patch('/{id}', [MatriculaController::class, 'update'])->name('programas.update');
+            Route::delete('/{id}/pdf', [MatriculaController::class, 'regenerateFicha'])->name('programas.delete');
         });
 
         Route::prefix('pagos')->group(function() {

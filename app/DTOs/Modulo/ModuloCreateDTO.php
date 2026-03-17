@@ -11,6 +11,7 @@ class ModuloCreateDTO extends Data {
         public int $orden,
         public bool $estado = true,
         public ?int $id_programa = null,
+        public ?int $id_institucion = null,
         public ?string $descripcion = null,
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
@@ -24,6 +25,12 @@ class ModuloCreateDTO extends Data {
                 'sometimes',
                 'integer',
                 'exists:programa:id',
+                'nullable'
+            ],
+            'id_institucion' => [
+                'sometimes',
+                'integer',
+                'exists:institucion:id',
                 'nullable'
             ],
             'titulo' => [

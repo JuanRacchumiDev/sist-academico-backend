@@ -15,6 +15,7 @@ class Pago extends Model
         'id_matricula',
         'id_modulo',
         'id_estadopago',
+        'id_institucion',
         'fecha_pago',
         'fecha_vencimiento',
         'cantidad',
@@ -53,5 +54,10 @@ class Pago extends Model
     public function estadoPago(): BelongsTo
     {
         return $this->belongsTo(DetalleParametro::class, 'id_estadopago', 'codigo');
+    }
+
+    public function institucion(): BelongsTo
+    {
+        return $this->belongsTo(Institucion::class, 'id_institucion', 'id');
     }
 }

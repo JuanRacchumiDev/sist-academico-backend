@@ -7,17 +7,15 @@ use Illuminate\Http\UploadedFile;
 
 class ProgramaUpdateDTO extends Data {
     public function __construct(
-        public ?string $titulo,
-        public ?string $titulo_url,
-        public ?string $modalidad,
-        public ?bool $is_vigente,
-        public ?bool $estado,
         public ?int $id_segmento = null,
         public ?int $id_tipoprograma = null,
         public ?int $id_categoriaprograma = null,
+        public ?int $id_institucion = null,
         public ?string $codigo_old = null,
         public ?string $sigla = null,
-        public ?string $descripcion = null,
+        public ?string $titulo,
+        public ?string $titulo_url,
+        string $descripcion = null,
         public ?string $temario = null,
         public ?string $fecha_inicio = null,
         public ?string $fecha_final = null,
@@ -26,13 +24,16 @@ class ProgramaUpdateDTO extends Data {
         public ?int $numero_modulos = null,
         public ?int $creditos = null,
         public ?string $plan = null,
+        public ?string $modalidad,
         public ?int $capacidad_minima = null,
         public ?int $capacidad_maxima = null,
         public ?int $cantidad_inscritos = null,
         public ?int $precio_modulo = null,
+        public ?bool $is_vigente,
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
-        public ?string $user_elimina = null
+        public ?string $user_elimina = null,
+        public ?bool $estado
     ){}
 
     public static function rules(): array
@@ -54,6 +55,12 @@ class ProgramaUpdateDTO extends Data {
                 'sometimes',
                 'integer',
                 'exists:detalle_parametro:codigo',
+                'nullable'
+            ],
+            'id_institucion' => [
+                'sometimes',
+                'integer',
+                'exists:institucion:id',
                 'nullable'
             ],
             'codigo_old' => [

@@ -23,7 +23,8 @@ class DatabaseSeeder extends Seeder
             ParametroSeeder::class,
             DetalleParametroSeeder::class,
             EmpresaSeeder::class,
-            UserSeeder::class
+            UserSeeder::class,
+            InstitucionSeeder::class
         ]);
 
         // Habilita verificación de claves foráneas

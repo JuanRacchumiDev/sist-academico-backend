@@ -9,6 +9,7 @@ class AdjuntoUpdateDTO extends Data
     public function __construct(
         public ?int $id_programa,
         public ?int $id_modulo,
+        public ?int $id_institucion,
         public ?string $titulo,
         public ?string $titulo_url,
         public ?string $descripcion = null,
@@ -40,6 +41,12 @@ class AdjuntoUpdateDTO extends Data
                 'sometimes',
                 'integer',
                 'exists:modulo,id',
+                'nullable'
+            ],
+            'id_institucion' => [
+                'sometimes',
+                'integer',
+                'exists:institucion,id',
                 'nullable'
             ],
             'titulo' => [

@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\DB;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Validation\ValidationException;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Storage;
 
 class MatriculaService implements IMatriculaService {
     protected IMatriculaRepository $matriculaRepository;
@@ -47,6 +50,64 @@ class MatriculaService implements IMatriculaService {
     public function getMatriculaById(int $id): ?Matricula
     {
         return $this->matriculaRepository->findById($id);
+    }
+
+    public function generateFichaPDF(int $id)
+    {
+        $matricula = $this->matriculaRepository->findById($id);
+
+        // Definir la ruta: año/institucion/documento/ficha.php
+        $anio = \Carbon\Carbon::parse($matricula->fecha_matricula)->year;
+        $institucion = "peruinnova";
+        $documento = $matricula->persona->numero_documento;
+
+        $folderPath = "matriculas/{$anio}/{$institucion}/{$documento}";
+        $fileName = "ficha_matricula_{$matricula->id}.pdf";
+        $fullPath = "{$folderPath}/{$fileName}";
+
+        // Verificar si ya existe
+        if (Storage::disk("local")->exists($fullPath)) {
+            return Storage::disk("local")->path($fullPath);
+        }
+
+        // Si no existe, generarlo
+        
+        // Generar QR en Base64 para embeberlo en el HTML
+        $qrData = route('programas.show', $matricula->id);
+        $qrCode = base64_encode(QrCode::format('svg')->size(100)->generate($qrData));
+
+        $data = [
+            'matricula' => $matricula,
+            'qrCode' => $qrCode,
+            'fecha' => now()->format('d/m/Y H:i A'),
+            'logo' => public_path('images/logo_institucion.png')
+        ];
+
+        $pdf = Pdf::loadView('pdf.ficha_matricula', $data);
+
+        $pdf->setPaper('a4', 'portrait');
+
+        Storage::disk('local')->put($fullPath, $pdf->output());
+
+        return Storage::disk('local')->path($fullPath);
+    }
+
+    public function deleteFichaPDF(int $id): bool
+    {
+        $matricula = $this->matriculaRepository->findById($id);
+        if (!$matricula) return false;
+
+        $anio = \Carbon\Carbon::parse($matricula->fecha_matricula)->year;
+        $institucion = "peruinnova";
+        $documento = $matricula->persona->numero_documento;
+
+        $fullPath = "matriculas/{$anio}/{$institucion}/{$documento}/ficha_matricula_{$id}.pdf";
+
+        if (Storage::disk('local')->exists($fullPath)) {
+            return Storage::disk('local')->delete($fullPath);
+        }
+
+        return true;
     }
 
     /**

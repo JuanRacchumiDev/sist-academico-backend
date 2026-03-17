@@ -29,6 +29,10 @@ interface IMatriculaService {
      * @return Matricula|null
      */
     public function getMatriculaById(int $id): ?Matricula;
+
+    public function generateFichaPDF(int $id);
+
+    public function deleteFichaPDF(int $id): bool;
     
     /**
      * Crear una nueva matrícula

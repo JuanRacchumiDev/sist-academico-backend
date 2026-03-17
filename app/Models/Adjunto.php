@@ -12,6 +12,8 @@ class Adjunto extends Model
     protected $fillable = [
         'id_programa',
         'id_modulo',
+        'id_institucion',
+
         'titulo',
         'titulo_url',
         'descripcion',
@@ -44,5 +46,10 @@ class Adjunto extends Model
     public function modulo(): BelongsTo
     {
         return $this->belongsTo(modulo::class, 'id_modulo', 'id');
+    }
+
+    public function institucion(): BelongsTo
+    {
+        return $this->belongsTo(Institucion::class, 'id_institucion', 'id');
     }
 }

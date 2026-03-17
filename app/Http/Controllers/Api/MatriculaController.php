@@ -101,6 +101,39 @@ class MatriculaController extends Controller
         }
     }
 
+    public function downloadFicha(int $id)
+    {
+        try {
+            $path = $this->matriculaService->generateFichaPDF($id);
+
+            // Retornar el archivo para visualizar en el navegador
+            return response()->file($path, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline, filename="ficha_matricula.pdf"'
+            ]);
+
+            // return $pdf->stream("ficha_matricula_${id}.pdf");
+        } catch (\Exception $e) {
+            Log::error("Error al obtener PDF: " . $e->getMessage());
+            return response()->json(['message' => 'Error al procesar el archivo'], 500);
+        }
+    }
+
+    public function regenerateFicha(int $id)
+    {
+        try {
+            // Eliminar la ficha actual si existe
+            $this->matriculaService->deleteFichaPDF($id);
+
+            // Generar la nueva y obtener su ruta
+            $path = $this->matriculaService->generateFichaPDF($id);
+
+            return response()->file($path);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Error al regenerar'], 500);
+        }
+    }
+
     public function store(Request $request)
     {
         try {

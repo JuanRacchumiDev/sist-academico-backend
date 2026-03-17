@@ -17,6 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('id_matricula');
             $table->unsignedBigInteger('id_modulo');
             $table->unsignedBigInteger('id_estadopago');
+            $table->unsignedBigInteger('id_institucion');
 
             $table->string('fecha_pago')->nullable();
             $table->string('fecha_vencimiento')->nullable();
@@ -40,6 +41,10 @@ return new class extends Migration
             $table->foreign('id_estadopago')
                 ->references('codigo')
                 ->on('detalle_parametro');
+
+            $table->foreign('id_institucion')
+                ->references('id')
+                ->on('institucion');
         });
     }
 
@@ -57,6 +62,9 @@ return new class extends Migration
 
             $table->dropForeign('id_estadopago');
             $table->dropColumn('id_estadopago');
+
+            $table->dropForeign('id_institucion');
+            $table->dropColumn('id_institucion');
         });
 
         Schema::dropIfExists('pago');

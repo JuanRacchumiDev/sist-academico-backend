@@ -7,6 +7,7 @@ use Spatie\LaravelData\Data;
 class ModuloUpdateDTO extends Data {
     public function __construct(
         public ?int $id_programa,
+        public ?int $id_institucion,
         public ?string $titulo,
         public ?string $titulo_url,
         public ?int $orden,
@@ -24,6 +25,12 @@ class ModuloUpdateDTO extends Data {
                 'sometimes',
                 'integer',
                 'exists:programa:id',
+                'nullable'
+            ],
+            'id_institucion' => [
+                'sometimes',
+                'integer',
+                'exists:institucion:id',
                 'nullable'
             ],
             'titulo' => [

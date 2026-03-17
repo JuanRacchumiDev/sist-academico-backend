@@ -14,6 +14,8 @@ class Certificado extends Model
         'id_tipocertificado',
         'id_plantilla',
         'id_programa',
+        'id_institucion',
+
         'codigo_verificacion',
         'codigo_qr_path',
         'path_file',
@@ -67,5 +69,14 @@ class Certificado extends Model
     public function programa(): BelongsTo
     {
         return $this->belongsTo(Programa::class, 'id_programa', 'id');
+    }
+
+    /**
+     * Obtener la institución asociado a un certificado
+     * @return BelongsTo<Institucion, $this>
+     */
+    public function institucion(): BelongsTo
+    {
+        return $this->belongsTo(Institucion::class, 'id_institucion', 'id');
     }
 }

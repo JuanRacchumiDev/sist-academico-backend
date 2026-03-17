@@ -9,6 +9,7 @@ class PagoUpdateDTO extends Data
         public ?int $id_matricula,
         public ?int $id_modulo,
         public ?int $id_estadopago,
+        public ?int $id_institucion,
         public ?bool $estado = true,
         public ?string $fecha_pago = null,
         public ?string $fecha_vencimiento = null,
@@ -37,6 +38,12 @@ class PagoUpdateDTO extends Data
                 'sometimes',
                 'integer',
                 'exists:detalle_parametro,codigo',
+                'nullable'
+            ],
+            'id_institucion' => [
+                'sometimes',
+                'integer',
+                'exists:institucion,id',
                 'nullable'
             ],
             'fecha_pago' => [

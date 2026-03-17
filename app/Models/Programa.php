@@ -15,6 +15,8 @@ class Programa extends Model
         'id_segmento',
         'id_tipoprograma',
         'id_categoriaprograma',
+        'id_institucion',
+        
         'codigo_old',
         'sigla',
         'titulo',
@@ -78,6 +80,15 @@ class Programa extends Model
     public function categoriaPrograma(): BelongsTo
     {
         return $this->belongsTo(DetalleParametro::class, 'id_categoriaprograma', 'codigo');
+    }
+
+    /**
+     * Obtener la institución asociado a un programa
+     * @return BelongsTo<Institucion, $this>
+     */
+    public function institucion(): BelongsTo
+    {
+        return $this->belongsTo(Institucion::class, 'id_institucion', 'id');
     }
 
     public function detalleMatricula()

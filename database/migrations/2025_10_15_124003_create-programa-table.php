@@ -17,6 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('id_segmento')->nullable();
             $table->unsignedBigInteger('id_tipoprograma')->nullable();
             $table->unsignedBigInteger('id_categoriaprograma')->nullable();
+            $table->unsignedBigInteger('id_institucion')->nullable();
 
             $table->string('codigo_old', 10)->nullable();
             $table->string('sigla', 10)->nullable();
@@ -54,6 +55,10 @@ return new class extends Migration
             $table->foreign('id_categoriaprograma')
                 ->references('codigo')
                 ->on('detalle_parametro');
+
+            $table->foreign('id_institucion')
+                ->references('id')
+                ->on('institucion');
         });
     }
 
@@ -71,6 +76,9 @@ return new class extends Migration
 
             $table->dropForeign('id_categoriaprograma');
             $table->dropColumn('id_categoriaprograma');
+
+            $table->dropForeign('id_institucion');
+            $table->dropColumn('id_institucion');
         });
 
         Schema::dropIfExists('programa');

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Plantilla extends Model
 {
@@ -11,6 +12,8 @@ class Plantilla extends Model
     protected $guarded = ['id'];
 
     protected $fillable = [
+        'id_institucion',
+
         'nombre',
         'descripcion',
         'imagen',
@@ -32,4 +35,9 @@ class Plantilla extends Model
     protected $casts = [
         'estado' => 'boolean'
     ];
+
+    public function institucion(): BelongsTo
+    {
+        return $this->belongsTo(Institucion::class, 'id_institucion', 'id');
+    }
 }

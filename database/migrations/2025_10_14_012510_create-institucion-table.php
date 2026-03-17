@@ -11,25 +11,24 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('plantilla', function(Blueprint $table) {
+        Schema::create('institucion', function(Blueprint $table) {
             $table->id();
 
-            $table->unsignedBigInteger('id_institucion');
+            $table->string('nombre', 60);
+            $table->string('sigla', 100)->nullable();
+            $table->string('ruc', 13)->nullable();
+            $table->string('ubicacion', 100)->nullable();
+            $table->string('telefono_contacto', 20)->nullable();
+            $table->string('logo_path', 150)->nullable();
+            $table->string('firma_digital')->nullable();
+            $table->string('color_primario')->nullable();
 
-            $table->string('nombre', 100);
-            $table->string('descripcion', 150)->nullable();
-            $table->string('imagen', 150)->nullable();
-            $table->string('path', 100);
             $table->string('user_crea', 12)->nullable();
             $table->string('user_actualiza', 12)->nullable();
             $table->string('user_elimina', 12)->nullable();
             $table->boolean('estado')->default(true);
 
             $table->timestamps();
-
-            $table->foreign('id_institucion')
-                ->references('id')
-                ->on('institucion');
         });
     }
 
@@ -38,10 +37,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('plantilla', function(Blueprint $table) {
-            $table->dropForeign('id_institucion');
-            $table->dropColumn('id_institucion');
-        });
-        Schema::dropIfExists('plantilla');
+        Schema::dropIfExists('institucion');
     }
 };

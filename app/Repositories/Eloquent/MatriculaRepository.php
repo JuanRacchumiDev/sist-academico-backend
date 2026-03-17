@@ -53,8 +53,9 @@ class MatriculaRepository implements IMatriculaRepository {
         return Matricula::with([
             'persona',
             'estadoMatricula',
-            'detalles'
-        ])->find($id);
+            'detalles.programa.tipoPrograma',
+            'detalles.programa.categoriaPrograma'
+        ])->findOrFail($id);
     }
 
     /**

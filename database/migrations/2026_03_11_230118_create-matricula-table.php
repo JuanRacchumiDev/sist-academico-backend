@@ -16,6 +16,7 @@ return new class extends Migration
 
             $table->unsignedBigInteger('id_persona');
             $table->unsignedBigInteger('id_estadomatricula');
+            $table->unsignedBigInteger('id_institucion');
 
             $table->string('fecha_matricula', 10);
             $table->string('fecha_retiro', 10)->nullable();
@@ -36,6 +37,10 @@ return new class extends Migration
             $table->foreign('id_estadomatricula')
                 ->references('codigo')
                 ->on('detalle_parametro');
+
+            $table->foreign('id_institucion')
+                ->references('id')
+                ->on('institucion');
         });
     }
 
@@ -50,6 +55,9 @@ return new class extends Migration
 
             $table->dropForeign('id_estadomatricula');
             $table->dropColumn('id_estadomatricula');
+
+            $table->dropForeign('id_institucion');
+            $table->dropColumn('id_institucion');
         });
 
         Schema::dropIfExists('matricula');

@@ -15,6 +15,7 @@ class ProgramaCreateDTO extends Data {
         public ?int $id_segmento = null,
         public ?int $id_tipoprograma = null,
         public ?int $id_categoriaprograma = null,
+        public ?int $id_institucion = null,
         public ?string $codigo_old = null,
         public ?string $sigla = null,
         public ?string $descripcion = null,
@@ -54,6 +55,12 @@ class ProgramaCreateDTO extends Data {
                 'sometimes',
                 'integer',
                 'exists:detalle_parametro:codigo',
+                'nullable'
+            ],
+            'id_institucion' => [
+                'sometimes',
+                'integer',
+                'exists:institucion:id',
                 'nullable'
             ],
             'codigo_old' => [
