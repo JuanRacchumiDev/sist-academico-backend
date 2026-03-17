@@ -7,7 +7,10 @@ class AsignacionPlantillaCreateDTO extends Data
 {
     public function __construct(
         public int $id_plantilla,
-        public int $id_evento
+        public int $id_programa,
+        public ?string $user_crea = null,
+        public ?string $user_actualiza = null,
+        public ?string $user_elimina = null,
     ){}
 
     public static function rules(): array
@@ -18,11 +21,29 @@ class AsignacionPlantillaCreateDTO extends Data
                 'integer',
                 'exists:plantilla,id'
             ],
-            'id_evento' => [
+            'id_programa' => [
                 'required',
                 'integer',
-                'exists:evento,id'
-            ]
+                'exists:programa,id'
+            ],
+            'user_crea' => [
+                'sometimes',
+                'string',
+                'max:12',
+                'nullable'
+            ],
+            'user_actualiza' => [
+                'sometimes',
+                'string',
+                'max:12',
+                'nullable'
+            ],
+            'user_elimina' => [
+                'sometimes',
+                'string',
+                'max:12',
+                'nullable'
+            ],
         ];
     } 
 }

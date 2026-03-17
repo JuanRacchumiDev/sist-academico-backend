@@ -22,6 +22,10 @@ return new class extends Migration
             $table->foreignId('id_programa')
                 ->constrained('programa');
 
+            $table->string('user_crea', 12)->nullable();
+            $table->string('user_actualiza', 12)->nullable();
+            $table->string('user_elimina', 12)->nullable();
+
             $table->timestamps();
         });
     }

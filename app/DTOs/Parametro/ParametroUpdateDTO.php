@@ -28,13 +28,15 @@ class ParametroUpdateDTO extends Data
                 'sometimes',
                 'string',
                 'max:100',
-                Rule::unique('parametro', 'nombre')->ignore($clase, 'clase')
+                Rule::unique('parametro', 'nombre')->ignore($clase, 'clase'),
+                'nullable'
             ],
             'nombre_url' => [
                 'sometimes',
                 'string',
                 'max:120',
-                Rule::unique('parametro', 'nombre_url')->ignore($clase, 'clase')
+                Rule::unique('parametro', 'nombre_url')->ignore($clase, 'clase'),
+                'nullable'
             ],
             'descripcion' => [
                 'sometimes',
@@ -45,21 +47,25 @@ class ParametroUpdateDTO extends Data
             'user_crea' => [
                 'sometimes',
                 'string',
+                'max:12',
                 'nullable'
             ],
             'user_actualiza' => [
                 'sometimes',
                 'string',
+                'max:12',
                 'nullable'
             ],
             'user_elimina' => [
                 'sometimes',
                 'string',
+                'max:12',
                 'nullable'
             ],
             'estado' => [
                 'sometimes',
-                'boolean'
+                'boolean',
+                'nullable'
             ]
         ];
     }

@@ -13,8 +13,11 @@ return new class extends Migration
     {
         Schema::create('grupo_persona', function(Blueprint $table) {
             $table->unsignedBigInteger('codigo_detalle_parametro');
-
             $table->unsignedBigInteger('id_persona');
+
+            $table->string('user_crea', 12)->nullable();
+            $table->string('user_actualiza', 12)->nullable();
+            $table->string('user_elimina', 12)->nullable();
 
             $table->timestamps();
 

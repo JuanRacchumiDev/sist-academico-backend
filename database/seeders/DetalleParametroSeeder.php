@@ -271,49 +271,6 @@ class DetalleParametroSeeder extends Seeder
         DB::table('detalle_parametro')->insert([
             [
                 'parametro_clase' => 1006,
-                'nombre' => 'PAGO TOTAL',
-                'nombre_url' => 'pago-total',
-                'longitud' => null,
-                'en_persona' => false,
-                'en_empresa' => false,
-                'compra' => false,
-                'venta' => false,
-                'created_at' => $now,
-                'updated_at' => $now
-            ],
-            [
-                'parametro_clase' => 1006,
-                'nombre' => 'PAGO PARCIAL',
-                'nombre_url' => 'pago-parcial',
-                'longitud' => null,
-                'en_persona' => false,
-                'en_empresa' => false,
-                'compra' => false,
-                'venta' => false,
-                'created_at' => $now,
-                'updated_at' => $now
-            ]
-        ]);
-
-        DB::table('detalle_parametro')->insert([
-            [
-                'parametro_clase' => 1007,
-                'nombre' => 'SOLES',
-                'nombre_url' => 'soles',
-                'abreviatura' => 'S/.',
-                'longitud' => null,
-                'en_persona' => false,
-                'en_empresa' => false,
-                'compra' => false,
-                'venta' => false,
-                'created_at' => $now,
-                'updated_at' => $now
-            ]
-        ]);
-
-        DB::table('detalle_parametro')->insert([
-            [
-                'parametro_clase' => 1008,
                 'nombre' => 'EDUCACIÓN',
                 'nombre_url' => 'educacion',
                 'abreviatura' => null,
@@ -326,7 +283,7 @@ class DetalleParametroSeeder extends Seeder
                 'updated_at' => $now
             ],
             [
-                'parametro_clase' => 1008,
+                'parametro_clase' => 1006,
                 'nombre' => 'SALUD',
                 'nombre_url' => 'salud',
                 'abreviatura' => null,
@@ -339,7 +296,7 @@ class DetalleParametroSeeder extends Seeder
                 'updated_at' => $now
             ],
             [
-                'parametro_clase' => 1008,
+                'parametro_clase' => 1006,
                 'nombre' => 'PSICOLOGÍA',
                 'nombre_url' => 'psicologia',
                 'abreviatura' => null,
@@ -352,7 +309,7 @@ class DetalleParametroSeeder extends Seeder
                 'updated_at' => $now
             ],
             [
-                'parametro_clase' => 1008,
+                'parametro_clase' => 1006,
                 'nombre' => 'DERECHO',
                 'nombre_url' => 'derecho',
                 'abreviatura' => null,
@@ -365,7 +322,7 @@ class DetalleParametroSeeder extends Seeder
                 'updated_at' => $now
             ],
             [
-                'parametro_clase' => 1008,
+                'parametro_clase' => 1006,
                 'nombre' => 'AGROPECUARIA',
                 'nombre_url' => 'agropecuaria',
                 'abreviatura' => null,
@@ -378,7 +335,7 @@ class DetalleParametroSeeder extends Seeder
                 'updated_at' => $now
             ],
             [
-                'parametro_clase' => 1008,
+                'parametro_clase' => 1006,
                 'nombre' => 'INGENIERÍA',
                 'nombre_url' => 'ingenieria',
                 'abreviatura' => null,
@@ -391,7 +348,7 @@ class DetalleParametroSeeder extends Seeder
                 'updated_at' => $now
             ],
             [
-                'parametro_clase' => 1008,
+                'parametro_clase' => 1006,
                 'nombre' => 'EMPRESARIALES',
                 'nombre_url' => 'empresariales',
                 'abreviatura' => null,
@@ -407,34 +364,58 @@ class DetalleParametroSeeder extends Seeder
 
         DB::table('detalle_parametro')->insert([
             [
-                'parametro_clase' => 1009,
+                'parametro_clase' => 1007,
                 'nombre' => 'GRUPO ALUMNO',
                 'nombre_url' => 'grupo-alumno',
                 'descripcion' => 'Grupo que almacenará a todos los alumnos',
+                'abreviatura' => null,
+                'longitud' => null,
+                'en_persona' => false,
+                'en_empresa' => false,
+                'compra' => false,
+                'venta' => false,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
             [
-                'parametro_clase' => 1009,
+                'parametro_clase' => 1007,
                 'nombre' => 'GRUPO PROMOTOR',
                 'nombre_url' => 'grupo-promotor',
                 'descripcion' => 'Grupo que almacenará a todos los promotores',
+                'abreviatura' => null,
+                'longitud' => null,
+                'en_persona' => false,
+                'en_empresa' => false,
+                'compra' => false,
+                'venta' => false,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
             [
-                'parametro_clase' => 1009,
+                'parametro_clase' => 1007,
                 'nombre' => 'GRUPO DOCENTE',
                 'nombre_url' => 'grupo-docente',
                 'descripcion' => 'Grupo que almacenará a todos los docentes',
+                'abreviatura' => null,
+                'longitud' => null,
+                'en_persona' => false,
+                'en_empresa' => false,
+                'compra' => false,
+                'venta' => false,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
             [
-                'parametro_clase' => 1009,
+                'parametro_clase' => 1007,
                 'nombre' => 'GRUPO COBRADOR',
                 'nombre_url' => 'grupo-cobrador',
                 'descripcion' => 'Grupo que almacenará a todos los cobradores',
+                'abreviatura' => null,
+                'longitud' => null,
+                'en_persona' => false,
+                'en_empresa' => false,
+                'compra' => false,
+                'venta' => false,
                 'created_at' => $now,
                 'updated_at' => $now
             ]
@@ -442,112 +423,30 @@ class DetalleParametroSeeder extends Seeder
 
         DB::table('detalle_parametro')->insert([
             [
-                'parametro_clase' => 1010,
-                'nombre' => 'PENDIENTE DE PAGO',
-                'nombre_url' => 'pendiente-de-pago',
-                'descripcion' => 'Estado pendiente de pago',
-                'created_at' => $now,
-                'updated_at' => $now
-            ],
-            [
-                'parametro_clase' => 1010,
-                'nombre' => 'PAGO PARCIAL',
-                'nombre_url' => 'pago-parcial',
-                'descripcion' => 'Estado pago parcial',
-                'created_at' => $now,
-                'updated_at' => $now
-            ],
-            [
-                'parametro_clase' => 1010,
-                'nombre' => 'PAGO TOTAL',
-                'nombre_url' => 'pago-total',
-                'descripcion' => 'Estado pago total',
-                'created_at' => $now,
-                'updated_at' => $now
-            ],
-            [
-                'parametro_clase' => 1010,
-                'nombre' => 'PENDIENTE DE VALIDACIÓN',
-                'nombre_url' => 'pendiente-de-validacion',
-                'descripcion' => 'Estado pendiente de validación',
-                'created_at' => $now,
-                'updated_at' => $now
-            ],
-            [
-                'parametro_clase' => 1010,
-                'nombre' => 'CONFIRMADO',
-                'nombre_url' => 'confirmado',
-                'descripcion' => 'Estado confirmado de pago',
-                'created_at' => $now,
-                'updated_at' => $now
-            ],
-            [
-                'parametro_clase' => 1010,
-                'nombre' => 'ANULADO',
-                'nombre_url' => 'anulado',
-                'descripcion' => 'Estado pago anulado',
-                'created_at' => $now,
-                'updated_at' => $now
-            ]
-        ]);
-
-        DB::table('detalle_parametro')->insert([
-            [
-                'parametro_clase' => 1011,
-                'nombre' => 'PRE MATRICULADO',
-                'nombre_url' => 'pre-matricula',
-                'descripcion' => 'Estado pre inscripción',
-                'created_at' => $now,
-                'updated_at' => $now
-            ],
-            [
-                'parametro_clase' => 1011,
-                'nombre' => 'MATRICULADO',
-                'nombre_url' => 'matriculado',
-                'descripcion' => 'Estado matriculado',
-                'created_at' => $now,
-                'updated_at' => $now
-            ],
-            [
-                'parametro_clase' => 1011,
-                'nombre' => 'RESERVADA',
-                'nombre_url' => 'reservada',
-                'descripcion' => 'Estado matriculado',
-                'created_at' => $now,
-                'updated_at' => $now
-            ],
-            [
-                'parametro_clase' => 1011,
-                'nombre' => 'RETIRADO',
-                'nombre_url' => 'retirado',
-                'descripcion' => 'Estado retirado',
-                'created_at' => $now,
-                'updated_at' => $now
-            ],
-            [
-                'parametro_clase' => 1011,
-                'nombre' => 'GRADUADO',
-                'nombre_url' => 'graduado',
-                'descripcion' => 'Estado graduado',
-                'created_at' => $now,
-                'updated_at' => $now
-            ]
-        ]);
-
-        DB::table('detalle_parametro')->insert([
-            [
-                'parametro_clase' => 1012,
+                'parametro_clase' => 1008,
                 'nombre' => 'BN-CAPACITA',
                 'nombre_url' => 'bn-capacita',
                 'valor' => '1111-2222-3333',
+                'abreviatura' => null,
+                'longitud' => null,
+                'en_persona' => false,
+                'en_empresa' => false,
+                'compra' => false,
+                'venta' => false,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
             [
-                'parametro_clase' => 1012,
+                'parametro_clase' => 1008,
                 'nombre' => 'BCP-CAPACITA',
                 'nombre_url' => 'bcp-capacita',
                 'valor' => '4444-5555-6666',
+                'abreviatura' => null,
+                'longitud' => null,
+                'en_persona' => false,
+                'en_empresa' => false,
+                'compra' => false,
+                'venta' => false,
                 'created_at' => $now,
                 'updated_at' => $now
             ]
@@ -555,77 +454,87 @@ class DetalleParametroSeeder extends Seeder
 
         DB::table('detalle_parametro')->insert([
             [
-                'parametro_clase' => 1013,
-                'nombre' => 'EFECTIVO',
-                'nombre_url' => 'efectivo',
-                'descripcion' => 'Forma de pago efectivo',
+                'parametro_clase' => 1010,
+                'nombre' => 'Activo',
+                'nombre_url' => 'activo',
+                'abreviatura' => null,
+                'longitud' => null,
+                'en_persona' => false,
+                'en_empresa' => false,
+                'compra' => false,
+                'venta' => false,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
             [
-                'parametro_clase' => 1013,
-                'nombre' => 'TARJETA DE DÉBITO',
-                'nombre_url' => 'tarjeta-de-debito',
-                'descripcion' => 'Forma de pago tarjeta de débito',
+                'parametro_clase' => 1010,
+                'nombre' => 'Suspendido',
+                'nombre_url' => 'suspendido',
+                'abreviatura' => null,
+                'longitud' => null,
+                'en_persona' => false,
+                'en_empresa' => false,
+                'compra' => false,
+                'venta' => false,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
             [
-                'parametro_clase' => 1013,
-                'nombre' => 'TARJETA DE CRÉDITO',
-                'nombre_url' => 'tarjeta-de-credito',
-                'descripcion' => 'Forma de pago tarjeta de crédito',
-                'created_at' => $now,
-                'updated_at' => $now
-            ],
-            [
-                'parametro_clase' => 1013,
-                'nombre' => 'DEPÓSITO BANCARIO',
-                'nombre_url' => 'deposito-bancario',
-                'descripcion' => 'Forma de pago depósito bancario',
-                'created_at' => $now,
-                'updated_at' => $now
-            ],
-            [
-                'parametro_clase' => 1013,
-                'nombre' => 'TRANSFERENCIA',
-                'nombre_url' => 'transferencia',
-                'descripcion' => 'Forma de pago transferencia',
-                'created_at' => $now,
-                'updated_at' => $now
-            ],
-            [
-                'parametro_clase' => 1013,
-                'nombre' => 'YAPE',
-                'nombre_url' => 'yape',
-                'descripcion' => 'Forma de pago yape',
-                'created_at' => $now,
-                'updated_at' => $now
-            ],
-            [
-                'parametro_clase' => 1013,
-                'nombre' => 'PLIN',
-                'nombre_url' => 'plin',
-                'descripcion' => 'Forma de pago plin',
-                'created_at' => $now,
-                'updated_at' => $now
-            ],
-            [
-                'parametro_clase' => 1013,
-                'nombre' => 'NIUBIZ',
-                'nombre_url' => 'niubiz',
-                'descripcion' => 'Forma de pago niubiz',
-                'created_at' => $now,
-                'updated_at' => $now
-            ],
-            [
-                'parametro_clase' => 1013,
-                'nombre' => 'REFERIDOS',
-                'nombre_url' => 'referidos',
-                'descripcion' => 'Forma de pago referidos',
+                'parametro_clase' => 1010,
+                'nombre' => 'Completada',
+                'nombre_url' => 'completada',
+                'abreviatura' => null,
+                'longitud' => null,
+                'en_persona' => false,
+                'en_empresa' => false,
+                'compra' => false,
+                'venta' => false,
                 'created_at' => $now,
                 'updated_at' => $now
             ]
         ]);
+
+        DB::table('detalle_parametro')->insert([
+            [
+                'parametro_clase' => 1011,
+                'nombre' => 'Pendiente',
+                'nombre_url' => 'pendiente',
+                'abreviatura' => null,
+                'longitud' => null,
+                'en_persona' => false,
+                'en_empresa' => false,
+                'compra' => false,
+                'venta' => false,
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'parametro_clase' => 1011,
+                'nombre' => 'Pagado',
+                'nombre_url' => 'pagado',
+                'abreviatura' => null,
+                'longitud' => null,
+                'en_persona' => false,
+                'en_empresa' => false,
+                'compra' => false,
+                'venta' => false,
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'parametro_clase' => 1010,
+                'nombre' => 'Atrasado',
+                'nombre_url' => 'atrasado',
+                'abreviatura' => null,
+                'longitud' => null,
+                'en_persona' => false,
+                'en_empresa' => false,
+                'compra' => false,
+                'venta' => false,
+                'created_at' => $now,
+                'updated_at' => $now
+            ]
+        ]);
+
     }
 }

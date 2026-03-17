@@ -24,35 +24,11 @@ interface IPersonaService {
     public function getAllPersonasWithFilters(array $filters, int $perPage): LengthAwarePaginator;
 
     /**
-     * Obtiene todas las personas por grupo
-     * @param string $nombreGrupoUrl
-     * @return Collection<int, Persona>
-     */
-    public function getAllPersonaByGrupo(string $nombreGrupoUrl): Collection;
-
-    /**
-     * Obtiene todas las personas por grupo
-     * @param string $nombreGrupoUrl
-     * @param array<string, mixed> $filters
-     * @param int $perPage
-     * @return LengthAwarePaginator<Persona>
-     */
-    public function getAllPersonaByGrupoFiltered(string $nombreGrupoUrl, array $filters, int $perPage): LengthAwarePaginator;
-
-    /**
      * Obtiene una persona por ID
      * @param int $id
      * @return Persona|null
      */
     public function getPersonaById(int $id): ?Persona;
-
-    /**
-     * Obtiene una persona por idTipoDoc and numDoc
-     * @param int $idTipoDoc
-     * @param string $numDoc
-     * @return Persona|null
-     */
-    public function getPersonaByIdTipoDocAndNumDoc(int $idTipoDoc, string $numDoc): ?Persona;
 
     /**
      * Crear una nueva persona

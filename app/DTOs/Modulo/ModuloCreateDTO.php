@@ -6,14 +6,12 @@ use Spatie\LaravelData\Data;
 
 class ModuloCreateDTO extends Data {
     public function __construct(
-        public int $id_programa,
         public string $titulo,
+        public string $titulo_url,
+        public int $orden,
         public bool $estado = true,
-        public ?int $orden = null,
-        public ?string $titulo_url = null,
+        public ?int $id_programa = null,
         public ?string $descripcion = null,
-        public ?string $adjunto = null,
-        public ?string $video = null,
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null
@@ -23,9 +21,10 @@ class ModuloCreateDTO extends Data {
     {
         return [
             'id_programa' => [
-                'required',
+                'sometimes',
                 'integer',
-                'exists:programa:id'
+                'exists:programa:id',
+                'nullable'
             ],
             'titulo' => [
                 'required',
@@ -34,11 +33,10 @@ class ModuloCreateDTO extends Data {
                 Rule::unique('modulo', 'titulo')
             ],
             'titulo_url' => [
-                'sometimes',
+                'required',
                 'string',
                 'max:120',
-                Rule::unique('modulo', 'titulo_url'),
-                'nullable'
+                Rule::unique('modulo', 'titulo_url')
             ],
             'descripcion' => [
                 'sometimes',
@@ -46,22 +44,9 @@ class ModuloCreateDTO extends Data {
                 'max:150',
                 'nullable'
             ],
-            'adjunto' => [
-                'sometimes',
-                'string',
-                'max:150',
-                'nullable'
-            ],
-            'video' => [
-                'sometimes',
-                'string',
-                'max:150',
-                'nullable'
-            ],
             'orden' => [
-                'sometimes',
+                'required',
                 'integer',
-                'nullable'
             ],
             'user_crea' => [
                 'sometimes',

@@ -42,20 +42,23 @@ class ParametroCreateDTO extends Data
             'user_crea' => [
                 'sometimes',
                 'string',
+                'max:12',
                 'nullable'
             ],
             'user_actualiza' => [
                 'sometimes',
                 'string',
+                'max:12',
                 'nullable'
             ],
             'user_elimina' => [
                 'sometimes',
                 'string',
+                'max:12',
                 'nullable'
             ],
             'estado' => [
-                'sometimes',
+                'required',
                 'boolean'
             ]
         ];

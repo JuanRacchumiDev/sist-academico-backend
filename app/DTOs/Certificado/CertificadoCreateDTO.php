@@ -7,18 +7,19 @@ use Spatie\LaravelData\Data;
 class CertificadoCreateDTO extends Data
 {
     public function __construct(
-        public int $id_evento,
         public int $id_persona,
         public int $id_tipocertificado,
-        public int $id_plantilla,
-        public string $path_codigo_qr,
         public string $path_file,
-        public string $file_name,
+        public string $filename,
         public string $nombre_impresion,
-        public bool $estado = true,
+        public bool $estado,
+        public ?int $id_plantilla = null,
+        public ?int $id_programa = null,
+        public ?string $codigo_verificacion = null,
+        public ?string $codigo_qr_path = null,
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
-        public ?string $user_elimina = null,
+        public ?string $user_elimina = null
     ){}
 
     /**
@@ -34,11 +35,6 @@ class CertificadoCreateDTO extends Data
     public static function rules(): array
     {
         return [
-            'id_evento' => [
-                'required',
-                'integer',
-                'exists:evento,id'
-            ],
             'id_persona' => [
                 'required',
                 'integer',
@@ -50,45 +46,62 @@ class CertificadoCreateDTO extends Data
                 'exists:detalle_parametro,codigo'
             ],
             'id_plantilla' => [
-                'required',
+                'sometimes',
                 'integer',
-                'exists:plantilla,id'
+                'exists:plantilla,id',
+                'nullable'
             ],
-            'codigo' => [
-                'required',
+            'id_programa' => [
+                'sometimes',
+                'integer',
+                'exists:programa,id',
+                'nullable'
+            ],
+            'codigo_verificacion' => [
+                'sometimes',
                 'string',
                 'max:12',
-                Rule::unique('certificado', 'codigo')
+                Rule::unique('certificado', 'codigo_verificacion'),
+                'nullable'
             ],
-            'path_codigo_qr' => [
-                'required',
-                'string'
+            'codigo_qr_path' => [
+                'sometimes',
+                'string',
+                'max:350',
+                Rule::unique('certificado', 'codigo_qr_path'),
+                'nullable'
             ],
             'path_file' => [
                 'required',
-                'string'
+                'string',
+                'max:350'
             ],
             'filename' => [
                 'required',
-                'string'
+                'string',
+                'max:150'
             ],
             'nombre_impresion' => [
                 'required',
-                'string'
+                'string',
+                'max:150'
             ],
             'user_crea' => [
                 'sometimes',
                 'string',
+                'max:12',
                 'nullable'
             ],
             'user_actualiza' => [
                 'sometimes',
                 'string',
+                'max:12',
                 'nullable'
             ],
             'user_elimina' => [
                 'sometimes',
                 'string',
+                'max:12',
                 'nullable'
             ],
             'estado' => [

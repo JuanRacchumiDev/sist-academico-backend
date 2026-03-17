@@ -71,6 +71,6 @@ class Persona extends Model
     }
 
     public function matriculas(): HasMany {
-        return $this->hasMany(Matricula::class, 'id_alumno', 'id');
+        return $this->hasMany(Matricula::class, 'id_persona', 'id');
     }
 }

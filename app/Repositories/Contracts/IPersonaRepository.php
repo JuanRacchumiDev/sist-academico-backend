@@ -24,34 +24,11 @@ interface IPersonaRepository {
     public function getAllFiltered(array $filters, int $perPage): LengthAwarePaginator;
 
     /**
-     * Obtiene todas las personas por grupo
-     * @param string $nombreGrupo
-     * @return Collection<int, persona>
-     */
-    public function getAllByGrupo(string $nombreGrupo): Collection;
-
-    /**
-     * Obtiene todas las personas por grupo
-     * @param array<string, mixed> $filters
-     * @param int $perPage
-     * @return LengthAwarePaginator
-     */
-    public function getAllByGrupoFiltered(string $nombreGrupo, array $filters, int $perPage): LengthAwarePaginator;
-
-    /**
      * Obtener una persona por ID
      * @param int $id
      * @return Persona|null
      */
     public function findById(int $id): ?Persona;
-
-    /**
-     * Obtener una persona por tipo de documento y número de documento
-     * @param int $idTipoDoc
-     * @param string $numDoc
-     * @return Persona|null
-     */
-    public function findByTipoDocAndNumDoc(int $idTipoDoc, string $numDoc): ?Persona;
 
     /**
      * Crea una persona
@@ -76,4 +53,6 @@ interface IPersonaRepository {
     public function delete(int $id): bool;
 
     public function updateOrCreateFromAPI(PersonaAPIDTO $dto): Persona;
+
+    public function syncGrupos(Persona $persona, array $grupoIds): void;
 }

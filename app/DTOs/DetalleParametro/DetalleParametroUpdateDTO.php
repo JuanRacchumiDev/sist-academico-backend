@@ -1,6 +1,7 @@
 <?php
 namespace App\DTOs\DetalleParametro;
 
+use Illuminate\Validation\Rule;
 use Spatie\LaravelData\Data;
 
 class DetalleParametroUpdateDTO extends Data
@@ -24,19 +25,6 @@ class DetalleParametroUpdateDTO extends Data
         public ?bool $estado = null
     ){}
 
-    /**
-     * Manipula los datos de la validación
-     */
-    // public static function prepareForValidation(array $payload): array
-    // {
-    //     // Verificamos si el campo nombre está en la petición
-    //     if (isset($payload['nombre'])) {
-    //         $payload['nombre_url'] = Str::slug($payload['nombre']);
-    //     }
-
-    //     return $payload;
-    // }
-
     public static function rules(): array
     {
         $detalleParametroId = request()->route('detalleParametro');
@@ -51,15 +39,15 @@ class DetalleParametroUpdateDTO extends Data
                 'sometimes',
                 'string',
                 'max:100',
-                // Rule::unique('detalle_parametro', 'nombre')
-                //     ->ignore($detalleParametroId)
+                Rule::unique('detalle_parametro', 'nombre')
+                    ->ignore($detalleParametroId)
             ],
             'nombre_url' => [
                 'sometimes',
                 'string',
                 'max:120',
-                // Rule::unique('detalle_parametro', 'nombre_url')
-                //     ->ignore($detalleParametroId)
+                Rule::unique('detalle_parametro', 'nombre_url')
+                    ->ignore($detalleParametroId)
             ],
             'descripcion' => [
                 'sometimes',

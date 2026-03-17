@@ -44,7 +44,7 @@ class ProgramaController extends Controller
                 'message' => 'Listado de programas correctos'
             ], 200);
         } catch (\Exception $e) {
-            Log::error('Error fetchinf programas: ' . $e->getMessage());
+            Log::error('Error fetching programas: ' . $e->getMessage());
 
             return response()->json([
                 'result' => false,
@@ -112,8 +112,8 @@ class ProgramaController extends Controller
         try {
             $data = $request->all();
 
-            if (isset($data['nombre'])) {
-                $data['nombre_url'] = Str::slug($data['nombre']);
+            if (isset($data['titulo'])) {
+                $data['titulo_url'] = Str::slug($data['titulo']);
             }
 
             $programaCreateDTO = ProgramaCreateDTO::from($data);
@@ -170,22 +170,5 @@ class ProgramaController extends Controller
                 'message' => 'Error al obtener el programa: ' . $e->getMessage()
             ], 500);
         }
-    }
-
-    public function downloadPlan(Programa $programa) {
-        $planPath = $programa->plan;
-
-        if (!$planPath || !Storage::disk('public')->exists($planPath)) {
-            return response()->json([
-                'result' => false,
-                'message' => 'El archivo del plan de estudios no fue encontrado'
-            ], 404);
-        }
-
-        // El nombre del usuario que se le dará al usuario
-        $fileName = $programa->sigla.'_plan.pdf';
-
-        // Usando Storage::download para enviar el archivo al navegador
-        return Storage::disk('public')->download($planPath, $fileName);
     }
 }

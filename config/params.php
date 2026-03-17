@@ -8,13 +8,11 @@ return [
         'tipo-certificado' => 1003,
         'sede' => 1004,
         'universidad' => 1005,
-        'forma-pago' => 1006,
-        'moneda' => 1007,
-        'segmento' => 1008,
-        'grupo' => 1009,
-        'estado-pago' => 1010,
-        'estado-matricula' => 1011,
-        'banco-cuenta' => 1012,
-        'metodo-pago' => 1013
+        'segmento' => 1006,
+        'grupo' => 1007,
+        'banco-cuenta' => 1008,
+        'categoria-programa' => 1009,
+        'estado-matriicula' => 1010,
+        'estado-pago' => 1011
     ]
 ];

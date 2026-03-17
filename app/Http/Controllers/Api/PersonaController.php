@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\DTOs\Persona\PersonaCreateDTO;
 use App\DTOs\Persona\PersonaUpdateDTO;
 use App\Http\Controllers\Controller;
-use App\Services\Contracts\IPersonaService;
-use App\Services\Contracts\IPersonaAPIService;
+use App\Services\PersonaService;
+use App\Services\PersonaAPIService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -14,10 +14,10 @@ use Illuminate\Validation\ValidationException;
 
 class PersonaController extends Controller
 {
-    protected IPersonaService $personaService;
-    protected IPersonaAPIService $personaAPIService;
+    protected PersonaService $personaService;
+    protected PersonaAPIService $personaAPIService;
 
-    public function __construct(IPersonaService $personaService, IPersonaAPIService $personaAPIService)
+    public function __construct(PersonaService $personaService, PersonaAPIService $personaAPIService)
     {
         $this->personaService = $personaService;
         $this->personaAPIService = $personaAPIService;
@@ -26,85 +26,32 @@ class PersonaController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function getAll(string $nombreGrupo): JsonResponse
+    public function index(Request $request): JsonResponse
     {
         try {
-            $personas = $this->personaService->getAllPersonaByGrupo($nombreGrupo);
+            $filters = $request->only(['search', 'id_tipodocumento', 'estado', 'grupo']);
+            $perPage = (int)$request->input('per_page', 10);
 
-            if ($personas->isEmpty()) {
-                return response()->json([
-                    'result' => true,
-                    'data' => [],
-                    'message' => 'No se encontraron personas'
-                ], 200);
-            }
+            $personas = $this->personaService->getAllPersonasWithFilters($filters, $perPage);
 
             return response()->json([
                 'result' => true,
-                'data' => $personas,
-                'message' => 'Listado de personas correctos'
-            ]);
-
-        } catch (\Exception $e) {
-            Log::error("Error fetching parámetros: " . $e->getMessage());
-            
-            return response()->json([
-                'result' => false,
-                'message' => 'Error al obtener parámetros: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    public function getFilteredPaginate(Request $request, string $nombreGrupo): JsonResponse
-    {
-        try {
-            $filters = [];
-
-            if ($request->has('search')) {
-                $filters['search'] = $request->input('search');
-            }
-
-            $perPage = $request->input('per_page', 10);
-
-            $filters = array_map(function($value) {
-                if ($value === 'true') return true;
-                if ($value === 'false') return false;
-                return $value;
-            }, $filters);
-
-            $personas = $this->personaService->getAllPersonaByGrupoFiltered(
-                $nombreGrupo,
-                $filters,
-                $perPage
-            );
-
-            if ($personas->isEmpty()) {
-                return response()->json([
-                    'result' => false,
-                    'data' => [],
-                    'message' => 'No se encontraron resultados'
-                ], 200);
-            }
-
-            return response()->json([
-                'result' => true,
-                'data' => $personas,
-                'message' => 'Resultados encontrados correctamente',
+                'data' => $personas->items(),
+                'message' => $personas->isEmpty() ? 'No se encontraron resultados' : 'Listado de personas correctos',
                 'pagination' => [
                     'total' => $personas->total(),
                     'per_page' => $personas->perPage(),
                     'current_page' => $personas->currentPage(),
-                    'last_page' => $personas->lastPage(),
-                    'from' => $personas->firstItem(),
-                    'to' => $personas->lastItem()
+                    'last_page' => $personas->lastPage()
                 ]
             ], 200);
+
         } catch (\Exception $e) {
-            Log::error("Error filtering personas: " . $e->getMessage());
+            Log::error("Error fetching personas: " . $e->getMessage());
             
             return response()->json([
                 'result' => false,
-                'message' => 'Error al obtener personas filtradas.',
+                'message' => 'Error al obtener personas: ' . $e->getMessage(),
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -118,16 +65,17 @@ class PersonaController extends Controller
         try {
             $data = $request->all();
 
-            // Validar si existe un alumno registrado
-            $alumnoExiste = $this->personaService->getPersonaByIdTipoDocAndNumDoc(
-                (int)$data['id_tipodocumento'],
-                $data['numero_documento']
-            );
+            $filters = [
+                'id_tipodocumento' => $data['id_tipodocumento'],
+                'numero_documento' => $data['numero_documento']
+            ];
 
-            if ($alumnoExiste) {
+            $personaExistente = $this->personaService->getAllPersonas($filters)->first();
+
+            if ($personaExistente) {
                 return response()->json([
                     'result' => true,
-                    'data' => $alumnoExiste,
+                    'data' => $personaExistente,
                     'message' => 'El número de documento ingresado se encuentra registrado',
                     'code' => 'PREVIOUSLY_REGISTERED'
                 ], 200);
@@ -242,11 +190,11 @@ class PersonaController extends Controller
         try {
             $data = $request->all();
 
-            $validationRules = PersonaUpdateDTO::rules($id);
-
-            $validatedData = $request->validate($validationRules);
-
-            $personaUpdateDTO = PersonaUpdateDTO::from($validatedData);
+            // Validando y transformado el DTO en un solo paso
+            $personaUpdateDTO = PersonaUpdateDTO::from([
+                ...$data,
+                'id' => $id
+            ]);
 
             $persona = $this->personaService->updatePersona($id, $personaUpdateDTO);
 
@@ -261,7 +209,7 @@ class PersonaController extends Controller
             return response()->json([
                 'result' => true,
                 'data' => $persona,
-                'message' => 'Persona actualiza correctamente'
+                'message' => 'Datos de persona actualizados correctamente'
             ], 200);
         } catch (ValidationException $e) {
             return response()->json([
@@ -286,6 +234,18 @@ class PersonaController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        try {
+            $deleted = $this->personaService->deletePersona($id);
+
+            return response()->json([
+                'result' => $deleted,
+                'message' => $deleted ? 'Eliminado' : 'No encontrado'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'result' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 }

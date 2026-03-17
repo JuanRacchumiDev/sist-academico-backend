@@ -2,235 +2,109 @@
 namespace App\Services;
 
 use App\DTOs\Matricula\MatriculaCreateDTO;
+use App\DTOs\Matricula\MatriculaUpdateDTO;
 use App\Models\Matricula;
-use App\Repositories\Contracts\IDetalleParametroRepository;
 use App\Repositories\Contracts\IMatriculaRepository;
-use App\Repositories\Contracts\IPagoRepository;
-use App\Repositories\Contracts\IPersonaRepository;
-use App\Repositories\Contracts\IProgramaRepository;
-use App\Repositories\Eloquent\DetalleParametroRepository;
-use App\Repositories\Eloquent\PagoRepository;
-use App\Repositories\Eloquent\PersonaRepository;
-use App\Repositories\Eloquent\ProgramaRepository;
 use App\Services\Contracts\IMatriculaService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
+use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Validation\ValidationException;
-use Dompdf\Dompdf;
-use Barryvdh\DomPDF\Facade\Pdf;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
-use Illuminate\Support\Facades\Log;
 
 class MatriculaService implements IMatriculaService {
     protected IMatriculaRepository $matriculaRepository;
-    protected IPersonaRepository $personaRepository;
-    protected IDetalleParametroRepository $detalleRepository;
-    protected IProgramaRepository $programaRepository;
-    protected IPagoRepository $pagoRepository;
 
-    public function __construct(
-        IMatriculaRepository $matriculaRepository,
-        PersonaRepository $personaRepository,
-        DetalleParametroRepository $detalleRepository,
-        ProgramaRepository $programaRepository,
-        PagoRepository $pagoRepository
-        )
-    {
+    public function __construct(IMatriculaRepository $matriculaRepository) {
         $this->matriculaRepository = $matriculaRepository;
-        $this->personaRepository = $personaRepository;
-        $this->detalleRepository = $detalleRepository;
-        $this->programaRepository = $programaRepository;
-        $this->pagoRepository = $pagoRepository;
     }
 
-    public function getAllMatriculas(?array $searchParams = null): Collection
-    {
+    /**
+     * Obtener todas las matrículas
+     * @param array<string, mixed>|null $searchParams
+     * @return Collection<int, Matricula>
+     */
+    public function getAllMatriculas(?array $searchParams = null): Collection {
         return $this->matriculaRepository->getAll($searchParams);
     }
 
+    /**
+     * Obtiene todos las matrículas con filtros aplicados
+     * @param array<string, mixed> $filters
+     * @param int $perPage
+     * @return LengthAwarePaginator
+     */ 
     public function getAllMatriculasWithFilters(array $filters, int $perPage): LengthAwarePaginator
     {
         return $this->matriculaRepository->getAllFiltered($filters, $perPage);
     }
 
-    public function getFichaByFilters(array $filters)
-    {
-        // Obtener datos de la matrícula
-        $matricula = $this->matriculaRepository->getUniqueForFilters($filters);
-
-        $empresa = [
-            'razon_social' => 'COOPERATIVA DE SERVICIOS EDUCACIONALES CAPACITA',
-            'ruc' => '20603337337'
-        ];
-
-        $pago = [
-            'matricula' => '120.00',
-            'cuotas' => '12',
-            'monto_cuota' => '120.00',
-            'total' => '1560.00'
-        ];
-
-        $dataPDF = [
-            'title' => 'FICHA DE MATRÍCULA',
-            'content' => [
-                'matricula' => $matricula,
-                'empresa' => $empresa,
-                'pago' => $pago
-            ]
-        ];
-
-        $pdf = Pdf::loadView('pdf.ficha', $dataPDF);
-
-        $filename = 'matricula_0001.pdf';
-
-        return $pdf->download($filename);
-    }
-
+    /**
+     * Obtiene una matrícula por ID
+     * @param int $id
+     * @return Matricula|null
+     */
     public function getMatriculaById(int $id): ?Matricula
     {
         return $this->matriculaRepository->findById($id);
     }
 
-    public function getCertificadoPDF(array $filters): array
+    /**
+     * Crear una nueva matrícula
+     * @param MatriculaCreateDTO $matriculaCreateDTO
+     * @return Matricula
+     */
+    public function createMatricula(MatriculaCreateDTO $matriculaCreateDTO): Matricula
     {
-        Log::info('Iniciando proceso de Certificado/Constancia', ['filters' => $filters]);
+        return DB::transaction(function() use ($matriculaCreateDTO) {
+            $matricutaData = $matriculaCreateDTO->toArray();
 
-        // Verificar si el certificado ya existe
-        if ($this->matriculaRepository->existsCertificado($filters)) {
-            Log::info('Recuperando PDF desde Storage');
+            // Extraemos los ids de los programas
+            $programasIds = $matricutaData['programas'] ?? [];
 
-            return [
-                'pdfContent' => $this->matriculaRepository->getPDF($filters),
-                'status' => 'success',
-                'message' => 'Certificado recuperado del almacenamiento'
-            ];
-        }
+            // Quitamos 'programas' del array original
+            unset($matricutaData['programas']);
 
-        // Si no existe, obtener datos y generar
-        $matricula = (object)$this->matriculaRepository->getCertificadoData($filters);
+            // Filtrar nulos
+            $dataCabecera = array_filter($matricutaData, fn($value) => !is_null($value));
 
-        if (!$matricula) {
-            Log::warning('No se encontraron datos para la matrícula', $filters);
-            return [
-                'pdfContent' => null,
-                'status' => 'error',
-                'message' => 'Los datos de la matrícula no existen en el sistema.'
-            ];
-        }
+            // Crear la matrícula
+            /** @var Matricula $matricula */
+            $matricula = $this->matriculaRepository->create($dataCabecera);
 
-        $matriculaArray = (array)$matricula;
+            // Crear el detalle de la matrícula
+            foreach($programasIds as $idPrograma) {
+                $matricula->detalles()->create([
+                    'id_programa' => $idPrograma,
+                    'user_crea'   => $dataCabecera['user_crea'] ?? null,
+                    'estado'      => true
+                ]);
+            }
 
-        $empresa = [
-            'razon_social' => 'COOPERATIVA DE SERVICIOS EDUCACIONALES CAPACITA',
-            'ruc' => '20603337337',
-            'logo' => public_path('images/LOGO.jpg')
-        ];
-
-        $qrContent = url("/validar/matricula/{$matricula->id}");
-        $qrCode = base64_encode(QrCode::format('svg')->size(120)->errorCorrection('H')->generate($qrContent));
-
-        $dataPDF = [
-            'title' => 'CONSTANCIA DE ESTUDIOS',
-            'matricula' => $matriculaArray,
-            'empresa' => $empresa,
-            'qrCode' => $qrCode,
-            'validationUrl' => $qrContent
-        ];
-
-        $pdf = Pdf::loadView('pdf.certificado', $dataPDF);
-        $pdfContent = $pdf->output();
-
-        $this->matriculaRepository->savePDF($filters, $pdfContent);
-
-        return [
-            'pdfContent' => $pdfContent,
-            'status' => 'success',
-            'message' => 'Certificado generado exitosamente'
-        ];
-
-        // $empresa = [
-        //     'razon_social' => 'COOPERATIVA DE SERVICIOS EDUCACIONALES CAPACITA',
-        //     'ruc' => '20603337337',
-        //     'logo' => public_path('images/LOGO.jpg')
-        // ];
-
-        // $dataPDF = [
-        //     'title' => 'RECIBO DE PAGO DE MATRÍCULA',
-        //     'matricula' => $matricula,
-        //     'empresa' => $empresa
-        // ];
-
-        // $qrContent = json_encode([
-        //     'idMatricula' => $matricula->id,
-        //     'alumno' => $matricula->nombre_completo,
-        //     'programa' => $matricula->nombre_programa,
-        //     'fechaMatricula' => $matricula->fecha_matricula,
-        //     'verificacion' => url("/validar/matricula/{$matricula->id}")
-        // ]);
-
-        // // Usamos format('svg') para mejor calidad en el PDF
-        // $qrCode = base64_encode(QrCode::format('svg')->size(100)->errorCorrection('H')->generate($qrContent));
-
-        // $pdf = Pdf::loadView('pdf.certificado', compact('dataPDF', 'qrCode'));
-        // $pdfContent = $pdf->output();
-
-        // $this->matriculaRepository->savePDF($filters, $pdfContent);
-
-        // return [
-        //     'pdfContent' => $pdfContent,
-        //     'status' => 'success',
-        //     'message' => 'Certificado generado y almacenado exitosamente'
-        // ];
-
-        // $matriculaId = $filters['id_matricula'];
-        // $programaId = $filters['id_programa'];
-        // $alumnoId = $filters['id_alumno'];
-
-        // // Generar el código QR de validación
-        // // Esta URL debe apuntar a un endpoint público para validar el certificado
-        // $validationUrl = url("/public/certificados/validar/matricula/{$matriculaId}/programa/{$programaId}/alumno/{$alumnoId}");
-
-        // $qrCodeSvg = QrCode::size(100)
-        //     ->color(0, 0, 0)
-        //     ->generate($validationUrl);
-
-        // $html = view('pdf.certificado', [
-        //     'title' => 'CONSTANCIA DE ESTUDIOS',
-        //     'matricula' => $matricula,
-        //     'qrCodeSvg' => $qrCodeSvg,
-        //     'validationUrl' => $validationUrl
-        // ])->render();
-
-        // $domPDF = new Dompdf();
-        // $domPDF->loadHtml($html);
-        // $domPDF->setPaper('A4', 'portrait');
-        // $domPDF->render();
-        // $pdfContent = $domPDF->output();
-
-        // // Guardar el certificado generado para futuras solicitudes
-        // $this->matriculaRepository->savePDF($filters, $pdfContent);
-
-        // return [
-        //     'pdfContent' => $pdfContent,
-        //     'status' => 'success',
-        //     'message' => 'Certificado generado y almacenado'
-        // ];
+            return $matricula->load('detalles.programa');
+        });
     }
 
-    public function createMatricula(MatriculaCreateDTO $matriculaCreateDTO): Matricula|null
+    public function updateMatricula(int $id, MatriculaUpdateDTO $dto): ?Matricula
     {
-        // throw ValidationException::withMessages(['matriculaCreateDTO' => $matriculaCreateDTO]);
-        return $this->matriculaRepository->create($matriculaCreateDTO);
-    }
+        return DB::transaction(function() use ($id, $dto) {
+            $data = array_filter($dto->toArray(), fn($v) => !is_null($v));
 
-    public function deleteMatricula(int $id): bool
-    {
-        $matricula = $this->matriculaRepository->findById($id);
+            $matricula = $this->matriculaRepository->update($id, $data);
 
-        if (!$matricula) {
-            return false;
-        }
+            if (isset($data['programas'])) {
+                $matricula->detalles()->delete();
 
-        return $this->matriculaRepository->delete($id);
+                foreach($data['programas'] as $programaId) {
+                    $matricula->detalles()->create([
+                        'id_programa' => $programaId,
+                        'user_crea' => $data['user_actualiza'] ?? null,
+                        'estado' => true
+                    ]);
+                }
+            }
+
+            return $matricula->load('detalles');
+        });
     }
 }

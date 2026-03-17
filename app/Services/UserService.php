@@ -197,7 +197,7 @@ class UserService implements IUserService {
         }
 
         if ($userUpdateDTO->persona) {
-            $existingPersona = $this->personaRepository->findByTipoDocAndNumDoc(
+            $existingPersona = $this->personaRepository->getAll(
                 $userUpdateDTO->persona->id_tipodocumento,
                 $userUpdateDTO->persona->numero_documento
             );

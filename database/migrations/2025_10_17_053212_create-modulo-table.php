@@ -17,16 +17,15 @@ return new class extends Migration
             $table->unsignedBigInteger('id_programa')->nullable();
 
             $table->string('titulo', 100);
-            $table->string('titulo_url', 120)->nullable();
+            $table->string('titulo_url', 120);
             $table->string('descripcion', 150)->nullable();
-            $table->string('adjunto', 150)->nullable();
-            $table->string('video', 150)->nullable();
             $table->integer('orden');
 
             $table->string('user_crea', 12)->nullable();
             $table->string('user_actualiza', 12)->nullable();
             $table->string('user_elimina', 12)->nullable();
             $table->boolean('estado')->default(true);
+
             $table->timestamps();
 
             $table->foreign('id_programa')

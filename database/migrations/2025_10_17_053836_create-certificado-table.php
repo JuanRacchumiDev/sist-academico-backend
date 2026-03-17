@@ -16,7 +16,7 @@ return new class extends Migration
 
             $table->unsignedBigInteger('id_persona');
             $table->unsignedBigInteger('id_tipocertificado');
-            $table->unsignedBigInteger('id_plantilla');
+            $table->unsignedBigInteger('id_plantilla')->nullable();
             $table->unsignedBigInteger('id_programa')->nullable();
 
             $table->string('codigo_verificacion', 12)->nullable();
@@ -28,6 +28,7 @@ return new class extends Migration
             $table->string('user_actualiza', 12)->nullable();
             $table->string('user_elimina', 12)->nullable();
             $table->boolean('estado')->default(true);
+            
             $table->timestamps();
 
             $table->foreign('id_persona')

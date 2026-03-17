@@ -20,22 +20,22 @@ return new class extends Migration
 
             $table->string('codigo_old', 10)->nullable();
             $table->string('sigla', 10)->nullable();
-            $table->string('nombre', 100);
-            $table->string('nombre_url', 120)->nullable();
+            $table->string('titulo', 100);
+            $table->string('titulo_url', 120);
             $table->string('descripcion', 150)->nullable();
+            $table->text('temario')->nullable();
             $table->string('fecha_inicio', 10)->nullable();
             $table->string('fecha_final', 10)->nullable();
             $table->string('duracion', 20)->nullable();
             $table->integer('horas_academicas')->nullable();
-            $table->integer('modulos')->nullable();
+            $table->integer('numero_modulos')->nullable();
             $table->integer('creditos')->nullable();
             $table->string('plan', 100)->nullable();
             $table->enum('modalidad', ['VIRTUAL', 'PRESENCIAL', 'MIXTO'], 20)->default('VIRTUAL');
-            $table->string('temario', 1000)->nullable();
             $table->integer('capacidad_minima')->nullable();
             $table->integer('capacidad_maxima')->nullable();
             $table->integer('cantidad_inscritos')->nullable();
-            $table->decimal('precio', 10, 2)->nullable();
+            $table->decimal('precio_modulo', 10, 2)->nullable();
             $table->boolean('is_vigente')->default(true);
             $table->string('user_crea', 12)->nullable();
             $table->string('user_actualiza', 12)->nullable();

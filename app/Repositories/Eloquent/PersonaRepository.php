@@ -18,28 +18,9 @@ class PersonaRepository implements IPersonaRepository {
      */
     public function getAll(?array $searchParams = null): Collection
     {
-        $query = Persona::with([
-            'tipoDocumento',
-            'matriculas'
-        ]);
+        $query = Persona::with(['tipoDocumento','grupos','matriculas']);
 
-        if ($searchParams) {
-            $query->where(function($q) use ($searchParams) {
-                if (isset($searchParams['id_tipodocumento'])) {
-                    $q->where('id_tipodocumento', $searchParams['id_tipodocumento']);
-                }
-
-                if (isset($searchParams['search'])) {
-                    $search = '%'.strtolower($searchParams['search']).'%';
-
-                    $q->whereRaw('LOWER(numero_documento) LIKE ?', [$search])
-                        ->orWhereRaw('LOWER(nombres) LIKE ?', [$search])
-                        ->orWhereRaw('LOWER(apellido_paterno) LIKE ?', [$search])
-                        ->orWhereRaw('LOWER(apellido_materno) LIKE ?', [$search])
-                        ->orWhereRaw('LOWER(nombre_completo) LIKE ?', [$search]);
-                }
-            });
-        }
+        $this->applyFilters($query, $searchParams ?? []);
 
         return $query->get();
     }
@@ -52,66 +33,11 @@ class PersonaRepository implements IPersonaRepository {
      */
     public function getAllFiltered(array $filters, int $perPage): LengthAwarePaginator
     {
-        $query = Persona::with([
-            'tipoDocumento',
-            'matriculas'
-        ]);
+        $query = Persona::with(['tipoDocumento', 'grupos', 'matriculas']);
 
-        // Aplicar filtros directos
-        if (isset($filters['id_tipodocumento'])) {
-            $query->where('id_tipodocumento', $filters['id_tipodocumento']);
-        }
+        $this->applyFilters($query, $filters);
 
-        if (isset($filters['estado'])) {
-            $query->where('estado', (bool)$filters['estado']);
-        }
-
-        // Aplicar búsqueda por texto
-        if (isset($filters['search'])) {
-            $search = '%'.strtolower($filters['search']).'%';
-            
-            $query->where(function ($q) use ($search) {
-                $q->whereRaw('LOWER(numero_documento) LIKE ?', [$search])
-                    ->orWhereRaw('LOWER(nombres) LIKE ?', [$search])
-                    ->orWhereRaw('LOWER(apellido_paterno) LIKE ?', [$search])
-                    ->orWhereRaw('LOWER(apellido_materno) LIKE ?', [$search])
-                    ->orWhereRaw('LOWER(nombre_completo) LIKE ?', [$search]);
-            });
-        }
-
-        $query->orderBy('apellido_paterno', 'asc')
-            ->orderBy('apellido_materno', 'asc')
-            ->orderBy('nombres', 'asc');
-
-        return $query->paginate($perPage);
-    }
-
-    public function getAllByGrupo(string $nombreGrupo): Collection
-    {
-        // throw ValidationException::withMessages(['nombreGrupo' => $nombreGrupo, 'location' => 'personaRepository']);
-
-        return Persona::with(['tipoDocumento', 'matriculas'])->whereHas('grupos', function($query) use ($nombreGrupo) {
-            $query->where('nombre_url', $nombreGrupo);
-        })->get();
-    }
-
-    public function getAllByGrupoFiltered(string $nombreGrupo, array $filters, int $perPage): LengthAwarePaginator
-    {
-        $query = Persona::with(['tipoDocumento', 'matriculas'])->whereHas('grupos', function($queryGrupo) use ($nombreGrupo) {
-            $queryGrupo->where('nombre_url', $nombreGrupo);
-        });
-
-        if (isset($filters['search'])) {
-            $search = '%'.strtolower($filters['search']).'%';
-
-            $query->whereRaw('numero_documento LIKE ?', [$search])
-                ->orWhereRaw('LOWER(nombre_completo) LIKE ?', [$search])
-                ->orWhereRaw('email LIKE ?', [$search]);
-        }
-
-        $query->orderBy('apellido_paterno', 'ASC');
-
-        return $query->paginate($perPage);
+        return $query->orderBy('apellido_paterno', 'ASC')->paginate($perPage);
     }
 
     /**
@@ -125,20 +51,6 @@ class PersonaRepository implements IPersonaRepository {
     }
 
     /**
-     * Busca una persona por idTipoDoc y numDoc
-     * @param int $idTipoDoc
-     * @param string $numDoc
-     * @return Persona|null
-     */
-    public function findByTipoDocAndNumDoc(int $idTipoDoc, string $numDoc): ?Persona
-    {
-        return Persona::with(['tipoDocumento', 'matriculas'])
-            ->where('id_tipodocumento', $idTipoDoc)
-            ->where('numero_documento',$numDoc)
-            ->first();
-    }
-
-    /**
      * Crear una persona
      * @param array<string, mixed> $data
      * @return Persona
@@ -148,12 +60,15 @@ class PersonaRepository implements IPersonaRepository {
         // Crear el registro de persona
         $persona = Persona::create($data);
 
-        // Obtener el código del grupo
-        $grupo = DetalleParametro::where('nombre_url', $data['nombre_grupo'])
-            ->where('parametro_clase', 1009)
-            ->firstOrFail();
+        if (isset($data['nombre_grupo'])) {
+            $grupo = DetalleParametro::where('nombre_url', $data['nombre_grupo'])
+                ->where('parametro_clase', 1007)
+                ->first();
 
-        $persona->grupos()->attach($grupo->codigo);
+            if ($grupo) {
+                $persona->grupos()->attach($grupo->codigo, ['user_crea' => $data['user_crea'] ?? null]);
+            }
+        }
 
         return $persona;
     }
@@ -174,7 +89,17 @@ class PersonaRepository implements IPersonaRepository {
 
         $persona->update($data);
 
+        // Opcional: Actualizar grupos
+        if (isset($data['grupos_ids'])) {
+            $this->syncGrupos($persona, $data['grupos_ids']);
+        }
+
         return $persona;
+    }
+
+    public function syncGrupos(Persona $persona, array $grupoIds): void
+    {
+        $persona->grupos()->sync($grupoIds);
     }
 
     /**
@@ -186,11 +111,7 @@ class PersonaRepository implements IPersonaRepository {
     {
         $persona = $this->findById($id);
 
-        if ($persona) {
-            return $persona->delete();
-        }
-        
-        return false;
+        return $persona ? $persona->delete() : false;
     }
 
     public function updateOrCreateFromAPI(PersonaAPIDTO $dto): Persona
@@ -223,6 +144,36 @@ class PersonaRepository implements IPersonaRepository {
         $persona->save();
         
         return $persona;
+    }
+
+    private function applyFilters($query, array $filters): void
+    {
+        if (isset($filters['id_tipodocumento'])) {
+            $query->where('id_tipodocumento', $filters['id_tipodocumento']);
+        }
+
+        if (isset($filters['numero_documento'])) {
+            $query->where('numero_documento', $filters['numero_documento']);
+        }
+
+        if (isset($filters['estado'])) {
+            $query->where('estado', filter_var($filters['estado'], FILTER_VALIDATE_BOOLEAN));
+        }
+
+        if (isset($filters['grupo'])) {
+            $query->whereHas('grupos', function($q) use ($filters) {
+                $q->where('nombre_url', $filters['grupo']);
+            });
+        }
+
+        if (isset($filters['search'])) {
+            $search = '%' . strtolower($filters['search']) . '%';
+            $query->where(function ($q) use ($search) {
+                $q->whereRaw('LOWER(numero_documento) LIKE ?', [$search])
+                  ->orWhereRaw('LOWER(nombre_completo) LIKE ?', [$search])
+                  ->orWhereRaw('LOWER(email) LIKE ?', [$search]);
+            });
+        }
     }
 }
 

@@ -45,7 +45,7 @@ class PagoService implements IPagoService {
         Log::info('Iniciando proceso de PDF de matrícula', ['filters' => $filters]);
 
         // Verificar si la matrícula ya existe
-        if ($this->pagoRepository->existsMatricula($filters)) {
+        if ($this->pagoRepository->existsPDF($filters)) {
             Log::info('Recuperando PDF desde Storage');
 
             return [
@@ -102,6 +102,64 @@ class PagoService implements IPagoService {
             'status' => 'success',
             'message' => 'Matrícula generada y guardada exitosamente'
         ];
+    }
+
+    public function getPagoModuloPDF(array $filters): array
+    {
+        Log::info('Iniciando proceso de PDF de pago de módulo', ['filters' => $filters]);
+
+        // Verificar si el pago de módulo ya existe
+        if ($this->pagoRepository->existsPDF($filters)) {
+            Log::info('Recuperando PDF desde Storage');
+
+            return [
+                'pdfContent' => $this->pagoRepository->getPDF($filters),
+                'status' => 'success',
+                'message' => 'Módulo de pago recuperado del almacenamiento'
+            ];
+        }
+
+        // Obtener datos del pago de módulo
+        $pagoModulo = (object)$this->pagoRepository->getPagoModuloData($filters);
+
+        if (!$pagoModulo) {
+            Log::warning('No se encontraron datos para el pago de módulo', $filters);
+            return [
+                'pdfContent' => null,
+                'status' => 'error',
+                'message' => 'Los datos del pago de módulo no existen en el sistema.'
+            ];
+        }
+
+        $empresa = [
+            'razon_social' => 'COOPERATIVA DE SERVICIOS EDUCACIONALES CAPACITA',
+            'ruc' => '20603337337',
+            'logo' => public_path('images/LOGO.jpg')
+        ];
+
+        $qrContent = url("/verificar/recibo-modulo/{$pagoModulo->id}");
+        
+        // Usamos format('svg') para mejor calidad en el PDF
+        $qrCode = base64_encode(QrCode::format('svg')->size(90)->generate($qrContent));
+
+        $dataPDF = [
+            'title' => 'RECIBO DE PAGO DE MÓDULO',
+            'pago' => $pagoModulo,
+            'empresa' => $empresa,
+            'qrCode' => $qrCode
+        ];
+
+        $pdf = Pdf::loadView('pdf.pagoModulo', $dataPDF)->setPaper('a4', 'portrait');
+        $pdfContent = $pdf->output();
+
+        $this->pagoRepository->savePDF($filters, $pdfContent);
+
+        return [
+            'pdfContent' => $pdfContent,
+            'status' => 'success',
+            'message' => 'Recibo de pago generado y guardado exitosamente'
+        ];
+
     }
 
     /**

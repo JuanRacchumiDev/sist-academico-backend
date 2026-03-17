@@ -112,7 +112,8 @@ class PagoController extends Controller
 
         $filters = [
             'id_matricula' => $idMatricula,
-            'id_alumno' => $idAlumno
+            'id_alumno' => $idAlumno,
+            'tipo' => 'matricula'
         ];
 
         // $result = $this->pagoService->getPagoMatriculaByFilters($filters);
@@ -124,6 +125,42 @@ class PagoController extends Controller
 
         // Devolver el archivo PDF como respuesta binaria
         $filename = "pago_matricula_{$idMatricula}.pdf";
+
+        return response($result['pdfContent'], 200)
+            ->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', "inline; filename=\"{$filename}\"");
+    }
+
+    public function getPagoModulo(Request $request) {
+        $request->validate([
+            'id_alumno' => 'required|integer|exists:persona,id',
+            'id_matricula' => 'required|integer|exists:matricula,id',
+            'numero_modulo' => 'required|integer'
+        ]);
+
+        $idAlumno = $request->input("id_alumno");
+        $idMatricula = $request->input("id_matricula");
+        $numeroModulo = $request->input("numero_modulo");
+
+        $filters = [
+            'id_alumno' => $idAlumno,
+            'id_matricula' => $idMatricula,
+            'numero_modulo' => $numeroModulo,
+            'tipo' => 'pago-modulo'
+        ];
+
+        Log::error("Filters getPagoModulo PagoController: " . implode(", ", $filters));
+
+        $result = $this->pagoService->getPagoModuloPDF($filters);
+
+        if ($result['status'] === 'error') {
+            return response($result['message'], 404);
+        }
+
+        // Devolver el archivo PDF como respuesta binaria
+        $filename = "pago_modulo_{$idMatricula}_{$numeroModulo}.pdf";
+
+        Log::error("Filename getPagoModulo PagoController: " . $filename);
 
         return response($result['pdfContent'], 200)
             ->header('Content-Type', 'application/pdf')

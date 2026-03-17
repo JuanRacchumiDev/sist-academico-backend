@@ -13,25 +13,23 @@ class PersonaCreateDTO extends Data
         public string $apellido_paterno,
         public string $apellido_materno,
         public string $nombre_completo,
-        public string $email,
-        public string $fecha_nacimiento,
         public string $sexo,
-        public string $origen = "WEB",
-        public bool $estado = true, 
-        
-        public ?int $codigo_grupo = null,
-        public ?string $nombre_grupo = null,
+        public string $origen,
+        public string $nombre_grupo,
+        public bool $estado, 
         public ?string $departamento = null,
         public ?string $provincia = null,
         public ?string $distrito = null,
         public ?string $direccion = null,
         public ?string $direccion_completa = null,
+        public ?string $email = null,
         public ?string $telefono = null,
         public ?string $ubigeo_reniec = null,
         public ?string $ubigeo_sunat = null,
         public ?string $ubigeo = null,
-        public ?string $foto = null,
+        public ?string $fecha_nacimiento = null,
         public ?string $estado_civil = null,
+        public ?string $foto = null,
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null
@@ -40,12 +38,12 @@ class PersonaCreateDTO extends Data
     /**
      * Define los valores por defecto para los campos opcionales/booleanos
      */
-    public static function withDefaults(): array
-    {
-        return [
-            'estado' => true
-        ];
-    }
+    // public static function withDefaults(): array
+    // {
+    //     return [
+    //         'origen' => 'WEB'
+    //     ];
+    // }
 
     public static function rules(): array
     {
@@ -76,6 +74,11 @@ class PersonaCreateDTO extends Data
                 'string',
                 'max:30'
             ],
+            'nombre_completo' => [
+                'required',
+                'string',
+                'max:100'
+            ],
             'departamento' => [
                 'sometimes',
                 'string',
@@ -97,7 +100,7 @@ class PersonaCreateDTO extends Data
             'direccion' => [
                 'sometimes',
                 'string',
-                'max:50',
+                'max:60',
                 'nullable'
             ],
             'direccion_completa' => [
@@ -107,53 +110,12 @@ class PersonaCreateDTO extends Data
                 'nullable'
             ],
             'email' => [
-                'required',
+                'sometimes',
                 'string',
                 'email',
                 'max:60',
-                Rule::unique('persona', 'email')
-            ],
-            'nombre_completo' => [
-                'required',
-                'string',
-                'max:100'
-            ],
-            'codigo_grupo' => [
-                'sometimes',
-                'integer',
-                'nullable',
-                'exists:detalle_parametro,codigo'
-            ],
-
-            'nombre_grupo' => [
-                'required_without:codigo_grupo',
-                'string',
-                'max:120'
-                // Asegura que el nombre_url exista y que pertenezca a la 'clase' Grupo (1010)
-                // Rule::exists('detalle_parametro', 'nombre_url')->where(function ($query) {
-                //     $query->where('parametro_clase', 1010);
-                // }),
-            ],
-
-            'fecha_nacimiento' => [
-                'required',
-                'string',
-                'max:10'
-            ],
-            'estado_civil' => [
-                'sometimes',
-                'string',
-                'max:20',
-                // 'exists:detalle_parametro,codigo'
-            ],
-            'sexo' => [
-                'required',
-                'string',
-                // 'exists:detalle_parametro,codigo'
-            ],
-            'origen' => [
-                'required',
-                'string'
+                Rule::unique('persona', 'email'),
+                'nullable'
             ],
             'telefono' => [
                 'sometimes',
@@ -179,11 +141,38 @@ class PersonaCreateDTO extends Data
                 'max:12',
                 'nullable'
             ],
+            'fecha_nacimiento' => [
+                'sometimes',
+                'string',
+                'max:10',
+                'nullable'
+            ],
+            'estado_civil' => [
+                'sometimes',
+                'string',
+                'max:15',
+                'nullable'
+            ],
             'foto' => [
                 'sometimes',
                 'string',
+                'max:100',
                 'nullable'
-            ],            
+            ],           
+            'sexo' => [
+                'required',
+                'string',
+                Rule::in(['M', 'F'])
+            ],
+            'origen' => [
+                'required',
+                'string',
+                Rule::in(['API', 'WEB', 'APP'])
+            ],
+            'nombre_grupo' => [
+                'required',
+                'string'
+            ],
             'user_crea' => [
                 'sometimes',
                 'string',

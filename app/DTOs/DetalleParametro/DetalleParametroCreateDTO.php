@@ -9,17 +9,17 @@ class DetalleParametroCreateDTO extends Data
     public function __construct(
         public int $parametro_clase,
         public string $nombre,
-        public bool $estado = true,
-        public ?string $nombre_url = null,
+        public string $nombre_url,
+        public bool $estado,
         public ?string $descripcion = null,
         public ?string $valor = null,
         public ?string $abreviatura = null,
         public ?int $longitud = null,
-        public ?bool $en_persona = false,
-        public ?bool $en_empresa = false,
-        public ?bool $compra = false,
-        public ?bool $venta = false,
-        public ?bool $visible = false,
+        public ?bool $en_persona = null,
+        public ?bool $en_empresa = null,
+        public ?bool $compra = null,
+        public ?bool $venta = null,
+        public ?bool $visible = null,
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null,
@@ -120,7 +120,7 @@ class DetalleParametroCreateDTO extends Data
                 'nullable'
             ],
             'estado' => [
-                'required',
+                'sometimes',
                 'boolean'
             ]
         ];

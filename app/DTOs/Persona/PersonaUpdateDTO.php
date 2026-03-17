@@ -20,43 +20,62 @@ class PersonaUpdateDTO extends Data
         public ?string $direccion_completa = null,
         public ?string $email = null,
         public ?string $telefono = null,
-        public ?string $fecha_nacimiento = null,
-        public ?string $estado_civil = null,
-        public ?string $sexo = null,
         public ?string $ubigeo_reniec = null,
         public ?string $ubigeo_sunat = null,
         public ?string $ubigeo = null,
-        public ?string $foto = null
+        public ?string $fecha_nacimiento = null,
+        public ?string $estado_civil = null,
+        public ?string $foto = null,
+        public ?string $sexo = null,
+        public ?string $origen = null,
+        public ?string $user_crea = null,
+        public ?string $user_actualiza = null,
+        public ?string $user_elimina = null,
+        public ?bool $estado = null
     ){}
 
-    public static function rules(int $id): array
+    public static function rules(): array
     {
+        // Recuperamos el ID del parámetro de la ruta para el Rule::unique
+        $id = request()->route('id') ?? request()->id;
+
         return [
             'id_tipodocumento' => [
                 'sometimes',
                 'integer',
-                'exists:detalle_parametro,codigo'
+                'exists:detalle_parametro,codigo',
+                'nullable'
             ],
             'numero_documento' => [
                 'sometimes',
                 'string',
-                'max:30',
-                Rule::unique('persona', 'numero_documento')->ignore($id)
+                'max:13',
+                Rule::unique('persona', 'numero_documento')->ignore($id),
+                'nullable'
             ],
             'nombres' => [
                 'sometimes',
                 'string',
-                'max:30'
+                'max:30',
+                'nullable'
             ],
             'apellido_paterno' => [
                 'sometimes',
                 'string',
-                'max:30'
+                'max:30',
+                'nullable'
             ],
             'apellido_materno' => [
                 'sometimes',
                 'string',
-                'max:30'
+                'max:30',
+                'nullable'
+            ],
+            'nombre_completo' => [
+                'sometimes',
+                'string',
+                'max:100',
+                'nullable'
             ],
             'departamento' => [
                 'sometimes',
@@ -79,7 +98,7 @@ class PersonaUpdateDTO extends Data
             'direccion' => [
                 'sometimes',
                 'string',
-                'max:50',
+                'max:6',
                 'nullable'
             ],
             'direccion_completa' => [
@@ -93,26 +112,8 @@ class PersonaUpdateDTO extends Data
                 'string',
                 'email',
                 'max:60',
-                Rule::unique('persona', 'email')->ignore($id)
-            ],
-            'nombre_completo' => [
-                'sometimes',
-                'string',
-                'max:100'
-            ],
-            'fecha_nacimiento' => [
-                'sometimes',
-                'string',
-                'max:10'
-            ],
-            'estado_civil' => [
-                'sometimes',
-                'string',
-                'max:20'
-            ],
-            'sexo' => [
-                'sometimes',
-                'string'
+                Rule::unique('persona', 'email')->ignore($id),
+                'nullable'
             ],
             'telefono' => [
                 'sometimes',
@@ -126,6 +127,71 @@ class PersonaUpdateDTO extends Data
                 'max:12',
                 'nullable'
             ],
+            'ubigeo_sunat' => [
+                'sometimes',
+                'string',
+                'max:12',
+                'nullable'
+            ],
+            'ubigeo' => [
+                'sometimes',
+                'string',
+                'max:12',
+                'nullable'
+            ],
+            'fecha_nacimiento' => [
+                'sometimes',
+                'string',
+                'max:10',
+                'nullable'
+            ],
+            'estado_civil' => [
+                'sometimes',
+                'string',
+                'max:15',
+                'nullable'
+            ],
+            'foto' => [
+                'sometimes',
+                'string',
+                'max:100',
+                'nullable'
+            ],
+            'sexo' => [
+                'sometimes',
+                'string',
+                Rule::in(['M', 'F']),
+                'nullable'
+            ],
+            'origen' => [
+                'sometimes',
+                'string',
+                Rule::in(['M', 'F']),
+                'nullable'
+            ],
+            'user_crea' => [
+                'sometimes',
+                'string',
+                'max:12',
+                'nullable'
+            ],
+            'user_actualiza' => [
+                'sometimes',
+                'string',
+                'max:12',
+                'nullable'
+            ],
+            'user_elimina' => [
+                'sometimes',
+                'string',
+                'max:12',
+                'nullable'
+            ],
+            'estado' => [
+                'sometimes',
+                'boolean',
+                'nullable'
+            ]
         ];
     }
 }

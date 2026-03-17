@@ -32,9 +32,4 @@ class Plantilla extends Model
     protected $casts = [
         'estado' => 'boolean'
     ];
-
-    // public function getFileUrlAttribute(): string
-    // {
-    //     return $this->path ? Storage::url($this->path) : '';
-    // }
 }

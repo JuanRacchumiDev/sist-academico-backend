@@ -26,11 +26,15 @@ interface IPagoRepository
 
     public function getFilePath(array $filters): string;
 
-    public function existsMatricula(array $filters): bool;
+    public function existsPDF(array $filters): bool;
 
     public function savePDF(array $filters, string $pdfContent): void;
 
     public function getPDF(array $filters): string;
+
+    public function getPagoModuloData(array $filters);
+
+    // public function existsPagoModulo(array $filters): bool;
 
     /**
      * Obtener pago por id

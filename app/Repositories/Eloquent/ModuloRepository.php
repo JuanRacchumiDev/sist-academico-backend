@@ -56,7 +56,7 @@ class ModuloRepository implements IModuloRepository {
             });
         }
 
-        $query->orderBy('id', 'desc');
+        $query->orderBy('id_programa', 'ASC')->orderBy('orden', 'ASC');
 
         return $query->paginate($perPage);
     }

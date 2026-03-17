@@ -7,29 +7,29 @@ use Illuminate\Http\UploadedFile;
 
 class ProgramaCreateDTO extends Data {
     public function __construct(
-        public string $nombre,
+        public string $titulo,
+        public string $titulo_url,
         public string $modalidad,
-        public bool $is_vigente = true,
-        public bool $estado = true,
+        public bool $is_vigente,
+        public bool $estado,
         public ?int $id_segmento = null,
         public ?int $id_tipoprograma = null,
         public ?int $id_categoriaprograma = null,
         public ?string $codigo_old = null,
         public ?string $sigla = null,
-        public ?string $nombre_url = null,
         public ?string $descripcion = null,
+        public ?string $temario = null,
         public ?string $fecha_inicio = null,
         public ?string $fecha_final = null,
         public ?string $duracion = null,
         public ?int $horas_academicas = null,
-        public ?int $modulos = null,
+        public ?int $numero_modulos = null,
         public ?int $creditos = null,
-        public UploadedFile|string|null $plan,
-        public ?string $temario = null,
+        public ?string $plan = null,
         public ?int $capacidad_minima = null,
         public ?int $capacidad_maxima = null,
         public ?int $cantidad_inscritos = null,
-        public ?int $precio = null,
+        public ?float $precio_modulo = null,
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null
@@ -41,17 +41,20 @@ class ProgramaCreateDTO extends Data {
             'id_segmento' => [
                 'sometimes',
                 'integer',
-                'exists:detalle_parametro:codigo'
+                'exists:detalle_parametro:codigo',
+                'nullable'
             ],
             'id_tipoprograma' => [
                 'sometimes',
                 'integer',
-                'exists:detalle_parametro:codigo'
+                'exists:detalle_parametro:codigo',
+                'nullable'
             ],
             'id_categoriaprograma' => [
                 'sometimes',
                 'integer',
-                'exists:detalle_parametro:codigo'
+                'exists:detalle_parametro:codigo',
+                'nullable'
             ],
             'codigo_old' => [
                 'sometimes',
@@ -67,21 +70,25 @@ class ProgramaCreateDTO extends Data {
                 Rule::unique('programa', 'sigla'),
                 'nullable'
             ],
-            'nombre' => [
+            'titulo' => [
                 'required',
                 'string',
                 'max:100'
             ],
-            'nombre_url' => [
-                'sometimes',
+            'titulo_url' => [
+                'required',
                 'string',
-                'max:120',
-                'nullable'
+                'max:120'
             ],
             'descripcion' => [
                 'sometimes',
                 'string',
                 'max:150',
+                'nullable'
+            ],
+            'temario' => [
+                'sometimes',
+                'text',
                 'nullable'
             ],
             'fecha_inicio' => [
@@ -107,7 +114,7 @@ class ProgramaCreateDTO extends Data {
                 'integer',
                 'nullable'
             ],
-            'modulos' => [
+            'numero_modulos' => [
                 'sometimes',
                 'integer',
                 'nullable'
@@ -119,21 +126,13 @@ class ProgramaCreateDTO extends Data {
             ],
             'plan' => [
                 'sometimes',
-                'file',
-                'mimes:pdf',
-                'max:2048',
+                'string',
                 'nullable'
             ],
             'modalidad' => [
                 'required',
                 'string',
-                'max:50'
-            ],
-            'temario' => [
-                'sometimes',
-                'string',
-                'max:1000',
-                'nullable'
+                'max:20'
             ],
             'capacidad_minima' => [
                 'sometimes',
@@ -150,37 +149,38 @@ class ProgramaCreateDTO extends Data {
                 'integer',
                 'nullable'
             ],
-            'precio' => [
+            'precio_modulo' => [
                 'sometimes',
-                'integer',
+                'float',
                 'nullable',
             ],
             'is_vigente' => [
                 'required',
                 'boolean'
             ],
-            'estado' => [
-                'required',
-                'boolean'
-            ],
             'user_crea' => [
                 'sometimes',
                 'string',
-                'max:10',
+                'max:12',
                 'nullable'
             ],
             'user_actualiza' => [
                 'sometimes',
                 'string',
-                'max:10',
+                'max:12',
                 'nullable'
             ],
             'user_elimina' => [
                 'sometimes',
                 'string',
-                'max:10',
+                'max:12',
                 'nullable'
-            ]
+            ],
+            'estado' => [
+                'sometimes',
+                'boolean',
+                'nullable'
+            ],
         ];
     }
 }

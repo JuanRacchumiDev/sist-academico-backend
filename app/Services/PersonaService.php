@@ -34,23 +34,6 @@ class PersonaService implements IPersonaService {
     }
 
     /**
-     * Obtener todas las personas por grupo
-     * @param string $nombreGrupo
-     * @return Collection<int, Persona>
-     */
-    public function getAllPersonaByGrupo(string $nombreGrupo): Collection
-    {
-        // throw ValidationException::withMessages(['nombreGrupo' => $nombreGrupo]);
-
-        return $this->personaRepository->getAllByGrupo($nombreGrupo);
-    }
-
-    public function getAllPersonaByGrupoFiltered(string $nombreGrupoUrl, array $filters, int $perPage): LengthAwarePaginator
-    {
-        return $this->personaRepository->getAllByGrupoFiltered($nombreGrupoUrl, $filters, $perPage);
-    }
-
-    /**
      * Obtiene todos las personas con filtros aplicados
      * @param array<string, mixed> $filters
      * @param int $perPage
@@ -69,17 +52,6 @@ class PersonaService implements IPersonaService {
     public function getPersonaById(int $id): ?Persona
     {
         return $this->personaRepository->findById($id);
-    }
-
-    /**
-     * Obtiene una persona por idTipoDoc y numDoc
-     * @param int $idTipoDoc
-     * @param string $numDoc
-     * @return Persona|null
-     */
-    public function getPersonaByIdTipoDocAndNumDoc(int $idTipoDoc, string $numDoc): ?Persona
-    {
-        return $this->personaRepository->findByTipoDocAndNumDoc($idTipoDoc, $numDoc);
     }
 
     /**

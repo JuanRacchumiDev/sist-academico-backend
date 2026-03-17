@@ -13,20 +13,12 @@ class Matricula extends Model
     protected $guarded = ["id"];
 
     protected $fillable = [
-        "id_alumno",
-        "id_sede",
-        'id_formapago',
-        'id_estadopago',
-        "id_metodopago",
+        "id_persona",
         "id_estadomatricula",
-        'nombre_alumno',
-        'nombre_sede',
-        'nombre_formapago',
-        'nombre_estadopago',
-        'nombre_metodopago',
-        'nombre_estadomatricula',
         "fecha_matricula",
-        "pago_inicial",
+        "fecha_retiro",
+        "fecha_reserva",
+        "fecha_anula",
         "user_crea",
         "user_actualiza",
         "user_elimina",
@@ -45,19 +37,9 @@ class Matricula extends Model
         'estado' => 'boolean'
     ];
 
-    public function alumno(): BelongsTo
+    public function persona(): BelongsTo
     {
-        return $this->belongsTo(Persona::class, 'id_alumno', 'id');
-    }
-
-    public function sede(): BelongsTo
-    {
-        return $this->belongsTo(DetalleParametro::class, 'id_sede', 'codigo');
-    }
-
-    public function metodoPago(): BelongsTo
-    {
-        return $this->belongsTo(DetalleParametro::class, 'id_metodopago', 'codigo');
+        return $this->belongsTo(Persona::class, 'id_persona', 'id');
     }
 
     public function estadoMatricula(): BelongsTo
@@ -65,7 +47,7 @@ class Matricula extends Model
         return $this->belongsTo(DetalleParametro::class, 'id_estadomatricula', 'codigo');
     }
 
-    public function detalles()
+    public function detalles(): HasMany
     {
         return $this->hasMany(DetalleMatricula::class, 'id_matricula', 'id');
     }

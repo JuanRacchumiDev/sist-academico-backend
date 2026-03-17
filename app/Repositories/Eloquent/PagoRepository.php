@@ -12,7 +12,9 @@ use Illuminate\Support\Facades\Storage;
 class PagoRepository implements IPagoRepository {
 
     protected string $disk = "public";
-    protected string $path = "pdfs/matriculas/";
+    protected string $pathMatricula = "pdfs/matriculas/";
+    protected string $pathModulo = "pdfs/pago-modulo/";
+    protected string $pathOtros = "pdfs/otros/";
 
     public function getAll(?array $searchParams = null): Collection
     {
@@ -111,10 +113,69 @@ class PagoRepository implements IPagoRepository {
     {
         $mId = sprintf('%05d', $filters['id_matricula']);
         $aId = sprintf('%05d', $filters['id_alumno']);
-        return "{$this->path}recibo_matricula_{$mId}_alumno_{$aId}.pdf";
+
+        // Caso Pago de módulo
+        if (isset($filters['tipo']) && $filters['tipo'] === 'pago-modulo') {
+            $modNo = sprintf('%02d', $filters['numero_modulo']);
+            return "{$this->pathModulo}recibo_modulo_{$modNo}_mat_{$mId}_alu_{$aId}.pdf";
+        }
+
+        // Caso Pago de matrícula
+        if (isset($filters['tipo']) && $filters['tipo'] === 'matricula') {
+            return "{$this->pathMatricula}recibo_matricula_{$mId}_alumno_{$aId}.pdf";
+        }
+
+        // Caso Otros conceptos
+        return "{$this->pathOtros}recibo_pago_mat_{$mId}_alu_{$aId}.pdf";
     }
 
-    public function existsMatricula(array $filters): bool
+    public function getPDF(array $filters): string
+    {
+        return Storage::disk($this->disk)->get($this->getFilePath($filters));
+    }
+
+    public function getPagoModuloData(array $filters)
+    {
+        Log::info('Validate paremeters filters getPagoModuloData', ['filters' => $filters]);
+    
+        $idMatricula = $filters['id_matricula'];
+        $idAlumno = $filters['id_alumno'];
+        $numeroModulo = $filters['numero_modulo'];
+
+        Log::info('idAlumno getPagoModuloData', ['idAlumno' => $idAlumno]);
+        Log::info('idMatricula getPagoModuloData', ['idMatricula' => $idMatricula]);
+        Log::info('numeroModulo getPagoModuloData', ['numeroModulo' => $numeroModulo]);
+
+        $pagoData = DB::table('pago as p')
+            ->join('programa as p2', 'p.id_programa', '=', 'p2.id')
+            ->join('persona as p3', 'p3.id', '=', 'p.id_alumno')
+            ->join('detalle_parametro as dp', 'dp.codigo', '=', 'p.id_formapago')
+            ->join('detalle_parametro as dp2', 'dp2.codigo', '=', 'p.id_metodopago')
+            ->join('detalle_parametro as dp3', 'dp3.codigo', '=', 'p.id_estadopago')
+            ->select(
+                'p2.nombre as nombre_programa',
+                'p3.nombres',
+                'p3.apellido_paterno',
+                'p3.apellido_materno',
+                'p3.nombre_completo',
+                'p3.numero_documento',
+                'dp.nombre as nombre_formapago',
+                'dp2.nombre as nombre_metodopago',
+                'dp3.nombre as nombre_estadopago',
+                'p.*'
+            )
+            ->whereNotNull('p.id_programa')
+            ->where('p.id_matricula', $idMatricula)
+            ->where('p.id_alumno', $idAlumno)
+            ->where('p.numero_modulo', $numeroModulo)
+            ->first();
+
+        Log::info('pagoData getPagoModuloData', ['pagoData' => $pagoData]);
+
+        return $pagoData;
+    }
+
+    public function existsPDF(array $filters): bool
     {
         return Storage::disk($this->disk)->exists($this->getFilePath($filters));
     }
@@ -122,11 +183,6 @@ class PagoRepository implements IPagoRepository {
     public function savePDF(array $filters, string $pdfContent): void
     {
         Storage::disk($this->disk)->put($this->getFilePath($filters), $pdfContent);
-    }
-
-    public function getPDF(array $filters): string
-    {
-        return Storage::disk($this->disk)->get($this->getFilePath($filters));
     }
 
     public function findById(int $id): ?Pago

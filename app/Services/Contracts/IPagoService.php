@@ -23,6 +23,8 @@ interface IPagoService {
 
     public function getMatriculaPDF(array $filters): array;
 
+    public function getPagoModuloPDF(array $filters): array;
+
     /**
      * Obtiene un pago por ID
      * @param int $id

@@ -2,14 +2,16 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\DTOs\Matricula\MatriculaCreateDTO;
+use App\DTOs\Matricula\MatriculaUpdateDTO;
+use App\Http\Controllers\Controller;
+use App\Models\Matricula;
 use App\Services\Contracts\IMatriculaService;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
+use App\Services\MatriculaService;
 
 class MatriculaController extends Controller
 {
@@ -20,9 +22,6 @@ class MatriculaController extends Controller
         $this->matriculaService = $matriculaService;
     }
 
-    /**
-     * Display a listing of the resource.
-     */
     public function index(): JsonResponse
     {
         try {
@@ -39,16 +38,16 @@ class MatriculaController extends Controller
             return response()->json([
                 'result' => true,
                 'data' => $matriculas,
-                'message' => 'Listado de matrículas correctos'
+                'message' => 'Listado de matrículas correctas'
             ], 200);
         } catch (\Exception $e) {
-            Log::error("Error fetching matrículas: " . $e->getMessage());
-            
+            Log::error('Error fetching matrículas: ' . $e->getMessage());
+
             return response()->json([
                 'result' => false,
                 'message' => 'Error al obtener matrículas: ' . $e->getMessage()
             ], 500);
-        }   
+        }
     }
 
     public function getFilteredPaginate(Request $request): JsonResponse
@@ -102,6 +101,55 @@ class MatriculaController extends Controller
         }
     }
 
+    public function store(Request $request)
+    {
+        try {
+            $data = $request->all();
+
+            $filters = [
+                'id_persona' => $data['id_persona'],
+                'fecha_matricula' => $data['fecha_matricula']
+            ];
+
+            $matriculaExistente = $this->matriculaService->getAllMatriculas($filters)->first();
+
+            if ($matriculaExistente) {
+                return response()->json([
+                    'result' => true,
+                    'data' => $matriculaExistente->load('detalles'),
+                    'message' => 'La matrícula ya ha sido ingresada',
+                    'code' => 'PREVIOUSLY_REGISTERED'
+                ], 200);
+            }
+
+            $matriculaCreateDTO = MatriculaCreateDTO::from($data);
+
+            $matricula = $this->matriculaService->createMatricula($matriculaCreateDTO);
+
+            return response()->json([
+                'result' => true,
+                'data' => $matricula,
+                'message' => 'Matrícula registrada correctamente',
+                'code' => 'CORRECT_RECORDED'
+            ], 201);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'result' => false,
+                'message' => 'Validation error',
+                'errors' => $e->errors(),
+                'code' => 'INVALID_RECORD'
+            ], 422);
+        } catch (\Exception $e) {
+            Log::error("Error al crear el registro de persona: " . $e->getMessage());
+
+            return response()->json([
+                'result' => false,
+                'message' => 'Error al crear el registro: ' . $e->getMessage(),
+                'code' => 'INVALID_RECORD'
+            ], 500);
+        }
+    }
+
     /**
      * Display the specified resource.
      */
@@ -133,113 +181,21 @@ class MatriculaController extends Controller
         }
     }
 
-    public function getFicha(Request $request) {
+    public function update(int $id, MatriculaUpdateDTO $dto): JsonResponse
+    {
         try {
-            $filters = $request->only(['id_matricula']);
+            $matricula = $this->matriculaService->updateMatricula($id, $dto);
 
-            $response = $this->matriculaService->getFichaByFilters($filters);
-        
-            if (is_array($response)) {
-                return response()->json($response, 404);
-            }
-
-            return $response;
+            return response()->json([
+                'message' => 'Matrícula actualizada correctamente',
+                'data' => $matricula
+            ], 200);
         } catch (\Exception $e) {
+            Log::error("Error actualizando matrícula ID {$id}: " . $e->getMessage());
             return response()->json([
-                'result' => false,
-                'message' => 'Error al generar el PDF filtrado: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    public function getCertificado(Request $request) {
-        $request->validate([
-            'id_matricula' => 'required|integer|exists:matricula,id',
-            'id_programa' => 'required|integer|exists:programa,id',
-            'id_alumno' => 'required|integer|exists:persona,id'
-        ]);
-
-        $matriculaId = $request->input('id_matricula');
-        $programaId = $request->input('id_programa');
-        $alumnoId = $request->input('id_alumno');
-
-        $filters = [
-            'id_matricula' => $matriculaId,
-            'id_programa' => $programaId,
-            'id_alumno' => $alumnoId
-        ];
-
-        $result = $this->matriculaService->getCertificadoPDF($filters);
-
-        if ($result['status'] === 'error') {
-            return response($result['message'], 404);
-        }
-
-        // Devolver el archivo PDF como respuesta binaria
-        $filename = "certificado_{$matriculaId}.pdf";
-
-        return response($result['pdfContent'], 200)
-            ->header('Content-Type', 'application/pdf')
-            ->header('Content-Disposition', "inline; filename=\"{$filename}\"");
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request): JsonResponse {
-        try {
-            $data = $request->all();
-
-            $dto = MatriculaCreateDTO::from($data);
-
-            // return response()->json([
-            //     'success' => false,
-            //     'data' => $data,
-            //     'dto' => $dto,
-            //     'message' => 'Error de matrícula'
-            // ], 422);
-
-            $matricula = $this->matriculaService->createMatricula($dto);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Matrícula registrada exitosamente',
-                'data' => [
-                    'id' => $matricula->id,
-                    'id_alumno' => $matricula->id_alumno,
-                    'fecha_matricula' => $matricula->fecha_matricula
-                ]
-            ], 201);
-        } catch (ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation error',
-                'error' => $e->errors()
-            ], 422);
-        } catch (\Exception $e) {
-            Log::error("Error creating matrícula: " . $e->getMessage());
-            
-            return response()->json([
-                'success' => false,
-                'message' => 'Error al crear matrícula',
+                'message' => 'Error al procesar la actualización',
                 'error' => $e->getMessage()
             ], 500);
         }
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
     }
 }

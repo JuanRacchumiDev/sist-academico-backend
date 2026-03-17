@@ -7,18 +7,19 @@ use Spatie\LaravelData\Data;
 class CertificadoUpdateDTO extends Data
 {
     public function __construct(
-        public ?int $id_evento,
         public ?int $id_persona,
         public ?int $id_tipocertificado,
         public ?int $id_plantilla,
-        public ?string $path_codigo_qr,
+        public ?int $id_programa,
+        public ?string $codigo_verificacion,
+        public ?string $codigo_qr_path,
         public ?string $path_file,
-        public ?string $file_name,
+        public ?string $filename,
         public ?string $nombre_impresion,
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null,
-        public ?bool $estado = true,
+        public ?bool $estado
     ){}
 
     public static function rules(): array
@@ -26,11 +27,6 @@ class CertificadoUpdateDTO extends Data
         $certificadoId = request()->route('certificado');
 
         return [
-            'id_evento' => [
-                'sometimes',
-                'integer',
-                'exists:evento,id'
-            ],
             'id_persona' => [
                 'sometimes',
                 'integer',
@@ -46,46 +42,63 @@ class CertificadoUpdateDTO extends Data
                 'integer',
                 'exists:plantilla,id'
             ],
-            'codigo' => [
+            'id_programa' => [
+                'sometimes',
+                'integer',
+                'exists:programa,id'
+            ],
+            'codigo_verificacion' => [
                 'sometimes',
                 'string',
                 'max:12',
-                Rule::unique('certificado', 'codigo')->ignore($certificadoId)
+                Rule::unique('certificado', 'codigo_verificacion')->ignore($certificadoId)
             ],
-            'path_codigo_qr' => [
-                'required',
-                'string'
+            'codigo_qr_path' => [
+                'sometimes',
+                'string',
+                'max:350',
+                'nullable'
             ],
             'path_file' => [
-                'required',
-                'string'
+                'sometimes',
+                'string',
+                'max:350',
+                'nullable'
             ],
             'filename' => [
-                'required',
-                'string'
+                'sometimes',
+                'string',
+                'max:150',
+                'nullable'
             ],
             'nombre_impresion' => [
-                'required',
-                'string'
+                'sometimes',
+                'string',
+                'max:150',
+                'nullable'
             ],
             'user_crea' => [
                 'sometimes',
                 'string',
+                'max:12',
                 'nullable'
             ],
             'user_actualiza' => [
                 'sometimes',
                 'string',
+                'max:12',
                 'nullable'
             ],
             'user_elimina' => [
                 'sometimes',
                 'string',
+                'max:12',
                 'nullable'
             ],
             'estado' => [
-                'required',
-                'boolean'
+                'sometimes',
+                'boolean',
+                'nullable'
             ]
         ];
     }

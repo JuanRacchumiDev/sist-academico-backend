@@ -7,23 +7,72 @@ class PagoCreateDTO extends Data
 {
     public function __construct(
         public int $id_matricula,
-        public int $id_alumno,
-        public int $id_formapago,
-        public int $id_metodopago,
+        public int $id_modulo,
         public int $id_estadopago,
-        public string $concepto,
-        public string $fecha_pago,
-        public float $monto_efectivo = 0,
-        public float $monto_tarjeta = 0,
-        public float $monto_total,
-        public float $monto_pagado,
-        public float $monto_saldo = 0,
         public bool $estado = true,
-        public ?int $id_programa = null,
-        public ?string $nro_operacion = null,
-        public ?int $numero_modulo = null,
+        public ?string $fecha_pago = null,
+        public ?string $fecha_vencimiento = null,
+        public ?float $cantidad = null,
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
-        public ?string $user_elimina = null,
+        public ?string $user_elimina = null
     ){}
+
+    public static function rules(): array
+    {
+        return [
+            'id_matricula' => [
+                'required',
+                'integer',
+                'exists:matricula:id'
+            ],
+            'id_modulo' => [
+                'required',
+                'integer',
+                'exists:modulo:id'
+            ],
+            'id_estadopago' => [
+                'required',
+                'integer',
+                'exists:detalle_parametro,codigo'
+            ],
+            'fecha_pago' => [
+                'sometimes',
+                'string',
+                'nullable'
+            ],
+            'fecha_vencimiento' => [
+                'sometimes',
+                'string',
+                'nullable'
+            ],
+            'cantidad' => [
+                'sometimes',
+                'float',
+                'nullable'
+            ],
+            'user_crea' => [
+                'sometimes',
+                'string',
+                'max:12',
+                'nullable'
+            ],
+            'user_actualiza' => [
+                'sometimes',
+                'string',
+                'max:12',
+                'nullable'
+            ],
+            'user_elimina' => [
+                'sometimes',
+                'string',
+                'max:12',
+                'nullable'
+            ],
+            'estado' => [
+                'required',
+                'boolean'
+            ],
+        ];
+    }
 }

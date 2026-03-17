@@ -11,34 +11,35 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('nota', function(Blueprint $table) {
+        Schema::create('pago', function(Blueprint $table) {
             $table->id();
 
-            $table->unsignedBigInteger('id_alumno');
+            $table->unsignedBigInteger('id_matricula');
             $table->unsignedBigInteger('id_modulo');
-            // $table->unsignedBigInteger('id_docente');
+            $table->unsignedBigInteger('id_estadopago');
 
-            $table->decimal('valor_numerico', 10, 2);
-            $table->string('valor_letras', 50);
-            $table->string('descripcion', 100)->nullable();
-            $table->string('fecha_registro', 10);
+            $table->string('fecha_pago')->nullable();
+            $table->string('fecha_vencimiento')->nullable();
+            $table->decimal('cantidad', 10, 2)->nullable();
+
             $table->string('user_crea', 12)->nullable();
             $table->string('user_actualiza', 12)->nullable();
             $table->string('user_elimina', 12)->nullable();
             $table->boolean('estado')->default(true);
+
             $table->timestamps();
 
-            $table->foreign('id_alumno')
+            $table->foreign('id_matricula')
                 ->references('id')
-                ->on('persona');
+                ->on('matricula');
 
             $table->foreign('id_modulo')
                 ->references('id')
                 ->on('modulo');
 
-            // $table->foreign('id_docente')
-            //     ->references('id')
-            //     ->on('persona');
+            $table->foreign('id_estadopago')
+                ->references('codigo')
+                ->on('detalle_parametro');
         });
     }
 
@@ -47,17 +48,17 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('nota', function(Blueprint $table) {
-            $table->dropForeign('id_alumno');
-            $table->dropColumn('id_alumno');
+        Schema::table('pago', function(Blueprint $table) {
+            $table->dropForeign('id_matricula');
+            $table->dropColumn('id_matricula');
 
             $table->dropForeign('id_modulo');
             $table->dropColumn('id_modulo');
 
-            // $table->dropForeign('id_docente');
-            // $table->dropColumn('id_docente');
+            $table->dropForeign('id_estadopago');
+            $table->dropColumn('id_estadopago');
         });
 
-        Schema::dropIfExists('nota');
+        Schema::dropIfExists('pago');
     }
 };

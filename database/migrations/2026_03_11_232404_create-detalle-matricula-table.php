@@ -11,21 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('detalle_matricula', function(Blueprint $table) {
+        Schema::create('detalle_matricula', function (Blueprint $table) {
             $table->id();
-
+            
             $table->unsignedBigInteger('id_matricula');
             $table->unsignedBigInteger('id_programa');
-            // $table->unsignedBigInteger('id_alumno');
-
-            $table->string('nombre_programa', 100)->nullable();
-            // $table->string('nombre_alumno', 100)->nullable();
-            $table->decimal('promedio', 10, 2)->nullable();
 
             $table->string('user_crea', 12)->nullable();
             $table->string('user_actualiza', 12)->nullable();
             $table->string('user_elimina', 12)->nullable();
             $table->boolean('estado')->default(true);
+
             $table->timestamps();
 
             $table->foreign('id_matricula')
@@ -35,10 +31,6 @@ return new class extends Migration
             $table->foreign('id_programa')
                 ->references('id')
                 ->on('programa');
-
-            // $table->foreign('id_alumno')
-            //     ->references('id')
-            //     ->on('persona');
         });
     }
 
@@ -53,9 +45,6 @@ return new class extends Migration
 
             $table->dropForeign('id_programa');
             $table->dropColumn('id_programa');
-
-            $table->dropForeign('id_alumno');
-            $table->dropColumn('id_alumno');
         });
 
         Schema::dropIfExists('detalle_matricula');
