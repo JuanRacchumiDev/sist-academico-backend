@@ -9,13 +9,14 @@ class CertificadoCreateDTO extends Data
     public function __construct(
         public int $id_persona,
         public int $id_tipocertificado,
-        public string $path_file,
-        public string $filename,
-        public string $nombre_impresion,
+        public int $id_institucion,
         public bool $estado,
         public ?int $id_plantilla = null,
         public ?int $id_programa = null,
         public ?string $codigo_verificacion = null,
+        public ?string $path_file = null,
+        public ?string $filename = null,
+        public ?string $nombre_impresion = null,
         public ?string $codigo_qr_path = null,
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
@@ -45,6 +46,11 @@ class CertificadoCreateDTO extends Data
                 'integer',
                 'exists:detalle_parametro,codigo'
             ],
+            'id_institucion' => [
+                'required',
+                'integer',
+                'exists:institucion.id'
+            ],
             'id_plantilla' => [
                 'sometimes',
                 'integer',
@@ -72,19 +78,22 @@ class CertificadoCreateDTO extends Data
                 'nullable'
             ],
             'path_file' => [
-                'required',
+                'sometimes',
                 'string',
-                'max:350'
+                'max:350',
+                'nullable'
             ],
             'filename' => [
-                'required',
+                'sometimes',
                 'string',
-                'max:150'
+                'max:150',
+                'nullable'
             ],
             'nombre_impresion' => [
-                'required',
+                'sometimes',
                 'string',
-                'max:150'
+                'max:150',
+                'nullable'
             ],
             'user_crea' => [
                 'sometimes',

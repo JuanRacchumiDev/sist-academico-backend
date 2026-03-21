@@ -14,6 +14,7 @@ use Illuminate\Validation\ValidationException;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 
 class MatriculaService implements IMatriculaService {
     protected IMatriculaRepository $matriculaRepository;
@@ -55,14 +56,18 @@ class MatriculaService implements IMatriculaService {
     public function generateFichaPDF(int $id)
     {
         $matricula = $this->matriculaRepository->findById($id);
+        $institucion = $matricula->institucion;
+
+        $numeroFormateado = str_pad($matricula->id, 6, '0', STR_PAD_LEFT);
 
         // Definir la ruta: año/institucion/documento/ficha.php
-        $anio = \Carbon\Carbon::parse($matricula->fecha_matricula)->year;
-        $institucion = "peruinnova";
+        $anio = Carbon::parse($matricula->fecha_matricula)->year;
+        // $nombreIns = strtolower($dataInstitucion->nombre) ?? 'genérico';
+        $nombreIns = str($institucion->nombre)->slug();
         $documento = $matricula->persona->numero_documento;
 
-        $folderPath = "matriculas/{$anio}/{$institucion}/{$documento}";
-        $fileName = "ficha_matricula_{$matricula->id}.pdf";
+        $folderPath = "matriculas/{$anio}/{$nombreIns}/{$documento}";
+        $fileName = "ficha_matricula_{$numeroFormateado}.pdf";
         $fullPath = "{$folderPath}/{$fileName}";
 
         // Verificar si ya existe
@@ -74,21 +79,35 @@ class MatriculaService implements IMatriculaService {
         
         // Generar QR en Base64 para embeberlo en el HTML
         $qrData = route('programas.show', $matricula->id);
-        $qrCode = base64_encode(QrCode::format('svg')->size(100)->generate($qrData));
+        $qrCode = base64_encode(QrCode::format('svg')->size(100)->margin(0)->generate($qrData));
+
+        $logoPath = $institucion->logo_path
+            ? storage_path("app/public/".$institucion->logo_path)
+            : public_path("images/logo_default.png");
+
+        $logoBase64 = null;
+
+        if (file_exists($logoPath)) {
+            $type = pathinfo($logoPath, PATHINFO_EXTENSION);
+            $data = file_get_contents($logoPath);
+            $logoBase64 = "data:image/".$type.';base64,'.base64_encode($data);
+        }
 
         $data = [
             'matricula' => $matricula,
+            'numero_registro' => $numeroFormateado,
+            'institucion' => $institucion,
             'qrCode' => $qrCode,
             'fecha' => now()->format('d/m/Y H:i A'),
-            'logo' => public_path('images/logo_institucion.png')
+            'logo' => $logoBase64,
+            'periodo' => $this->getPeriodoAcademico()
         ];
 
-        $pdf = Pdf::loadView('pdf.ficha_matricula', $data);
-
-        $pdf->setPaper('a4', 'portrait');
+        $pdf = Pdf::loadView('pdf.ficha_matricula', $data)
+            ->setPaper('a4', 'portrait');
+            // ->setWarnings(false);
 
         Storage::disk('local')->put($fullPath, $pdf->output());
-
         return Storage::disk('local')->path($fullPath);
     }
 
@@ -167,5 +186,11 @@ class MatriculaService implements IMatriculaService {
 
             return $matricula->load('detalles');
         });
+    }
+
+    private function getPeriodoAcademico(): string
+    {
+        $mes = now()->month;
+        return now()->year.($mes <= 7 ? ' - I': ' - II');
     }
 }

@@ -12,6 +12,8 @@ use App\Repositories\Contracts\IProgramaRepository;
 use App\Repositories\Contracts\IMatriculaRepository;
 use App\Repositories\Contracts\IPagoRepository;
 use App\Repositories\Contracts\IModuloRepository;
+use App\Repositories\Contracts\IInstitucionRepository;
+use App\Repositories\Contracts\ICertificadoRepository;
 
 use App\Repositories\Eloquent\DetalleParametroRepository;
 use App\Repositories\Eloquent\EventoRepository;
@@ -23,6 +25,8 @@ use App\Repositories\Eloquent\ProgramaRepository;
 use App\Repositories\Eloquent\MatriculaRepository;
 use App\Repositories\Eloquent\PagoRepository;
 use App\Repositories\Eloquent\ModuloRepository;
+use App\Repositories\Eloquent\InstitucionRepository;
+use App\Repositories\Eloquent\CertificadoRepository;
 
 use App\Services\Contracts\IDetalleParametroService;
 use App\Services\Contracts\IParametroService;
@@ -35,6 +39,7 @@ use App\Services\Contracts\IMatriculaService;
 use App\Services\Contracts\IPagoService;
 use App\Services\Contracts\IModuloService;
 use App\Services\Contracts\IPersonaAPIService;
+use App\Services\Contracts\ICertificadoService;
 
 use App\Services\DetalleParametroService;
 use App\Services\EventoService;
@@ -47,6 +52,7 @@ use App\Services\MatriculaService;
 use App\Services\PagoService;
 use App\Services\ModuloService;
 use App\Services\PersonaAPIService;
+use App\Services\CertificadoService;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -117,6 +123,16 @@ class RepositoryServiceProvider extends ServiceProvider
             ModuloRepository::class
         );
 
+        $this->app->bind(
+            IInstitucionRepository::class,
+            InstitucionRepository::class
+        );
+
+        $this->app->bind(
+            ICertificadoRepository::class,
+            CertificadoRepository::class
+        );
+
         /* --------- servicios ----------- */
         // Enlazando el servicio de parámetro
         $this->app->bind(
@@ -182,6 +198,11 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(
             IPersonaAPIService::class,
             PersonaAPIService::class
+        );
+
+        $this->app->bind(
+            ICertificadoService::class,
+            CertificadoService::class
         );
     }
 

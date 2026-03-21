@@ -8,6 +8,7 @@ class MatriculaUpdateDTO extends Data
     public function __construct(
         public ?int $id_persona,
         public ?int $id_estadomatricula,
+        public ?int $id_institucion,
         public ?array $programas,
         public ?string $fecha_matricula,
         public ?bool $estado,
@@ -32,6 +33,12 @@ class MatriculaUpdateDTO extends Data
                 'sometimes',
                 'integer',
                 'exists:detalle_parametro,codigo',
+                'nullable'
+            ],
+            'id_institucion' => [
+                'sometimes',
+                'integer',
+                'exists:institucion,id',
                 'nullable'
             ],
             'programas' => [

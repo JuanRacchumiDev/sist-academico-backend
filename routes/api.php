@@ -100,6 +100,7 @@ Route::prefix('v1')->group(function() {
             Route::post('/', [CertificadoController::class, 'store'])->name('certificados.store');
             Route::get('/{id}', [CertificadoController::class, 'show'])->name('certificados.show');
             Route::patch('/{id}', [CertificadoController::class, 'update'])->name('certificados.update');
+            Route::delete('/{id}', [CertificadoController::class, 'destroy']);
         });
     });
 });

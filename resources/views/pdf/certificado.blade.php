@@ -1,148 +1,91 @@
-@php
-    use Carbon\Carbon;
-    $m = $matricula;
-@endphp
-
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <meta charset="utf-8">
-    <title>{{ $title }}</title>
+    <meta charset="UTF-8">
     <style>
-        @page { margin: 0; }
+        @page { margin: 0; } /* Sin márgenes para que el fondo cubra todo */
+        
         body {
-            font-family: 'Times New Roman', serif;
-            background-color: #fff;
             margin: 0;
             padding: 0;
+            font-family: 'Helvetica', sans-serif;
+            width: 100%;
+            height: 100%;
+            background-image: url("{{ $fondo }}");
+            background-size: cover;
+            background-repeat: no-repeat;
         }
-        .border-double {
-            margin: 30px;
-            padding: 40px;
-            border: 10px double #003366;
-            height: 900px;
+
+        /* Contenedor relativo para posicionar elementos */
+        .content {
+            position: relative;
+            width: 100%;
+            height: 100%;
         }
-        .header { text-align: center; margin-bottom: 40px; }
-        .header h1 { 
-            color: #003366; 
-            font-size: 32pt; 
-            margin: 0; 
-            letter-spacing: 3px;
-        }
-        .header h2 { font-size: 14pt; color: #666; font-style: italic; }
-        
-        .content { margin-top: 50px; line-height: 1.8; font-size: 13pt; text-align: justify; }
-        .student-name { 
-            display: block; 
-            text-align: center; 
-            font-size: 18pt; 
-            font-weight: bold; 
-            margin: 20px 0;
-            text-decoration: underline;
-        }
-        .program-box {
+
+        /* Estilo para el nombre del Alumno */
+        .alumno-name {
+            position: absolute;
+            top: 45%; /* Ajustar según tu diseño */
+            width: 100%;
             text-align: center;
-            background-color: #f9f9f9;
-            border: 1px solid #003366;
-            padding: 15px;
-            margin: 25px auto;
-            width: 85%;
+            font-size: 35px;
             font-weight: bold;
-            color: #cc0000;
-            font-size: 15pt;
+            color: #1a365d;
         }
-        .details-table {
+
+        /* Estilo para el nombre del Evento */
+        .evento-name {
+            position: absolute;
+            top: 58%;
             width: 80%;
-            margin: 30px auto;
-            border-collapse: collapse;
+            left: 10%;
+            text-align: center;
+            font-size: 22px;
+            color: #2d3748;
         }
-        .details-table th {
-            text-align: left;
-            background-color: #eee;
-            padding: 8px;
-            border: 1px solid #ccc;
-            width: 40%;
+
+        /* Fechas */
+        .fechas {
+            position: absolute;
+            top: 75%;
+            width: 100%;
+            text-align: center;
+            font-size: 14px;
+            color: #4a5568;
         }
-        .details-table td {
-            padding: 8px;
-            border: 1px solid #ccc;
+
+        /* QR de Validación */
+        .qr-code {
+            position: absolute;
+            bottom: 50px;
+            right: 50px;
         }
-        
-        .footer { margin-top: 60px; }
-        .signature-section {
-            float: right;
-            width: 300px;
+
+        .qr-text {
+            font-size: 8px;
+            color: #718096;
+            margin-top: 5px;
             text-align: center;
         }
-        .signature-line {
-            border-top: 1px solid #000;
-            margin-bottom: 5px;
-        }
-        .qr-section {
-            float: left;
-            width: 200px;
-            text-align: center;
-            font-size: 8pt;
-        }
-        .clearfix { clear: both; }
     </style>
 </head>
 <body>
-    <div class="border-double">
-        <div class="header">
-            <img src="{{ public_path('LOGO.jpg') }}" style="width: 80px; margin-bottom: 10px;">
-            <h1>{{ $title }}</h1>
-            <h2>Instituto Profesional de Educación y Desarrollo Empresarial</h2>
+    <div class="content">
+        <div class="alumno-name">{{ $certificado->persona->nombres }} {{ $certificado->persona->apellido_paterno }} {{ $certificado->persona->apellido_materno }}</div>
+        
+        <div class="evento-name">
+            Por haber participado y aprobado satisfactoriamente el programa de capacitación en:<br>
+            <strong>{{ $programa }}</strong>
         </div>
 
-        <div class="content">
-            <p style="text-align: center;">La Dirección Académica de <strong>IPEDE</strong> hace constar que:</p>
-            
-            <span class="student-name">{{ $m['nombre_completo'] }}</span>
-            
-            <p style="text-align: center;">Identificado(a) con DNI N° <strong>{{ $m['numero_documento'] }}</strong>, se encuentra debidamente registrado(a) y matriculado(a) en el programa de capacitación de:</p>
-
-            <div class="program-box">
-                "{{ $m['nombre_programa'] }}"
-            </div>
-
-            <table class="details-table">
-                @if($m['fecha_inicio'])
-                <tr>
-                    <th>Fecha de Inicio</th>
-                    <td>{{ Carbon::parse($m['fecha_inicio'])->format('d/m/Y') }}</td>
-                </tr>
-                @endif
-                @if($m['horas_academicas'])
-                <tr>
-                    <th>Horas Académicas</th>
-                    <td>{{ $m['horas_academicas'] }} Horas Lectivas</td>
-                </tr>
-                @endif
-                @if($m['modalidad'])
-                <tr>
-                    <th>Modalidad</th>
-                    <td>{{ $m['modalidad'] }}</td>
-                </tr>
-                @endif
-            </table>
-
-            <p style="margin-top: 30px;">Se expide la presente a solicitud del interesado, para los fines que estime convenientes, con fecha de registro de matrícula {{ Carbon::parse($m['fecha_matricula'])->format('d/m/Y') }}.</p>
+        <div class="fechas">
+            Realizado del {{ $fecha_inicio }} al {{ $fecha_fin }}
         </div>
 
-        <div class="footer">
-            <div class="qr-section">
-                <img src="data:image/svg+xml;base64,{{ $qrCode }}" width="90">
-                <p>Verificación Digital<br>{{ $validationUrl }}</p>
-            </div>
-            
-            <div class="signature-section">
-                <div style="height: 80px;"></div>
-                <div class="signature-line"></div>
-                <strong>DIRECCIÓN ACADÉMICA</strong><br>
-                IPEDE
-            </div>
-            <div class="clearfix"></div>
+        <div class="qr-code">
+            <img src="data:image/svg+xml;base64,{{ $qrCode }}" width="90">
+            <div class="qr-text">VALIDAR CERTIFICADO</div>
         </div>
     </div>
 </body>

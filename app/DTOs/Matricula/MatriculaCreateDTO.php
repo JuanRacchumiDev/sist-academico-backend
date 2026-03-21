@@ -11,6 +11,7 @@ class MatriculaCreateDTO extends Data
         public array $programas,
         public string $fecha_matricula,
         public bool $estado,
+        public ?int $id_institucion = null,
         public ?string $fecha_retiro = null,
         public ?string $fecha_reserva = null,
         public ?string $fecha_anula = null,
@@ -31,6 +32,11 @@ class MatriculaCreateDTO extends Data
                 'required',
                 'integer',
                 'exists:detalle_parametro,codigo'
+            ],
+            'id_institucion' => [
+                'sometimes',
+                'integer',
+                'exists:institucion,id'
             ],
             'programas' => [
                 'required',

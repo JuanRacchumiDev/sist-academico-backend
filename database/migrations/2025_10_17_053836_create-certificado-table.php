@@ -16,15 +16,16 @@ return new class extends Migration
 
             $table->unsignedBigInteger('id_persona');
             $table->unsignedBigInteger('id_tipocertificado');
+            $table->unsignedBigInteger('id_institucion');
             $table->unsignedBigInteger('id_plantilla')->nullable();
             $table->unsignedBigInteger('id_programa')->nullable();
-            $table->unsignedBigInteger('id_institucion')->nullable();
-
-            $table->string('codigo_verificacion', 12)->nullable();
+            
+            $table->string('codigo_verificacion', 12)->unique()->nullable();
             $table->string('codigo_qr_path', 350)->nullable();
-            $table->string('path_file', 350);
-            $table->string('filename', 150);
-            $table->string('nombre_impresion', 150);
+            $table->string('path_file', 350)->nullable();
+            $table->string('filename', 150)->nullable();
+            $table->string('nombre_impresion', 150)->nullable();
+            
             $table->string('user_crea', 12)->nullable();
             $table->string('user_actualiza', 12)->nullable();
             $table->string('user_elimina', 12)->nullable();

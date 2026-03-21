@@ -14,6 +14,7 @@ class MatriculaRepository implements IMatriculaRepository {
         $query = Matricula::with([
             'persona',
             'estadoMatricula',
+            'institucion',
             'detalles'
         ]);
 
@@ -33,6 +34,7 @@ class MatriculaRepository implements IMatriculaRepository {
         $query = Matricula::with([
             'persona',
             'estadoMatricula',
+            'institucion',
             'detalles'
         ]);
 
@@ -53,6 +55,7 @@ class MatriculaRepository implements IMatriculaRepository {
         return Matricula::with([
             'persona',
             'estadoMatricula',
+            'institucion',
             'detalles.programa.tipoPrograma',
             'detalles.programa.categoriaPrograma'
         ])->findOrFail($id);
@@ -113,6 +116,10 @@ class MatriculaRepository implements IMatriculaRepository {
 
         if (isset($filters['id_estadomatricula'])) {
             $query->where('id_estadomatricula', $filters['id_estadomatricula']);
+        }
+
+        if (isset($filters['id_institucion'])) {
+            $query->where('id_institucion', $filters['id_institucion']);
         }
 
         if (isset($filters['fecha_matricula'])) {

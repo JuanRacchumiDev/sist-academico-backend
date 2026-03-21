@@ -9,6 +9,7 @@ use App\Repositories\Contracts\ICertificadoRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Storage;
 
 class CertificadoRepository implements ICertificadoRepository {
     public function getAllFiltered(array $filters, int $perPage): LengthAwarePaginator
@@ -65,5 +66,16 @@ class CertificadoRepository implements ICertificadoRepository {
         $certificado->update($data);
 
         return $certificado;
+    }
+
+    public function delete(int $id): bool
+    {
+        $certificado = $this->findById($id);
+
+        if (!$certificado) return false;
+
+        Storage::disk('local')->delete([$certificado->path_file.'/'.$certificado->filename, $certificado->codigo_qr_path]);
+    
+        return $certificado->delete();
     }
 }

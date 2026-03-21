@@ -3,178 +3,220 @@
 <head>
     <meta charset="UTF-8">
     <style>
-        /* Configuraciones de página */
-        @page { margin: 1.5cm; }
-        
+        @page { margin: 0.8cm 1.2cm; }
+
         body {
-            font-family: 'Helvetica', 'Arial', sans-serif;
-            color: #2d3748;
-            font-size: 11px;
-            line-height: 1.4;
+            font-family: 'Helvetica', Arial, sans-serif;
+            color: #1a202c;
+            font-size: 10px;
             margin: 0;
-            padding: 0;
+            line-height: 1.4;
         }
 
-        /* Colores Institucionales */
-        .text-primary { color: #1a365d; }
-        .bg-primary { background-color: #1a365d; color: white; }
-        .border-bottom { border-bottom: 2px solid #1a365d; }
-
-        /* Encabezado Estilo Vertical Profesional */
-        .header-table { width: 100%; border-bottom: 3px solid #1a365d; margin-bottom: 20px; padding-bottom: 10px; }
-        .logo-container { width: 20%; }
-        .institution-details { width: 50%; padding-left: 15px; }
-        .doc-info { width: 30%; text-align: right; }
+        .text-primary { color: {{ $institucion->color_primario ?? '#1a365d' }}; }
+        .border-primary { border-color: {{ $institucion->color_primario ?? '#1a365d' }}; }
         
-        .institution-details h1 { margin: 0; font-size: 18px; color: #1a365d; text-transform: uppercase; }
-        .institution-details p { margin: 2px 0; font-size: 9px; color: #718096; }
+        .logo-container { 
+            width: 130px; /* Tamaño aumentado para el logo */
+            vertical-align: middle; 
+        }
 
-        /* Bloques de Información */
+        .logo-img {
+            max-width: 150px;
+            max-height: 130px;
+            display: block;
+        }
+
+        .inst-details { padding-left: 15px; vertical-align: middle; }
+        .inst-details h1 { 
+            margin: 0; 
+            font-size: 17px; 
+            text-transform: uppercase; 
+            color: {{ $institucion->color_primario ?? '#1a365d' }};
+            letter-spacing: 0.5px;
+        }
+        .inst-details p { margin: 2px 0; font-size: 8.5px; color: #4a5568; }
+
+        .doc-card {
+            width: 200px;
+            border: 2px solid {{ $institucion->color_primario ?? '#1a365d' }};
+            border-radius: 6px;
+            text-align: center;
+            padding: 12px;
+            background-color: #f8fafc;
+        }
+
         .section-header {
-            background-color: #edf2f7;
+            background-color: #f1f5f9;
+            border-left: 5px solid {{ $institucion->color_primario ?? '#1a365d' }};
             padding: 6px 10px;
             font-weight: bold;
-            font-size: 12px;
+            font-size: 11px;
             text-transform: uppercase;
-            margin-top: 20px;
-            margin-bottom: 10px;
-            border-left: 4px solid #1a365d;
+            margin: 15px 0 8px 0;
         }
 
-        .data-table { width: 100%; margin-bottom: 15px; }
-        .data-table td { padding: 5px; vertical-align: top; }
-        .label { font-weight: bold; color: #4a5568; width: 30%; }
-        .value { color: #2d3748; border-bottom: 1px solid #e2e8f0; }
+        /* Layout */
+        .header-table { width: 100%; border-collapse: collapse; margin-bottom: 25px; }
+        .header-table td { vertical-align: middle; }
+        
+        .inst-info h1 { margin: 0; font-size: 18px; text-transform: uppercase; color: {{ $institucion->color_primario ?? '#1a365d' }}; }
+        .inst-info p { margin: 2px 0; font-size: 9px; color: #4a5568; }
 
-        /* Tabla de Programas Académicos */
-        .programs-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .programs-table th {
-            background-color: #1a365d;
-            color: white;
-            padding: 8px;
+        .doc-box { 
+            border: 1.5px solid #e2e8f0; 
+            border-radius: 6px; 
+            text-align: center; 
+            padding: 10px;
+            background-color: #fcfcfc;
+        }
+
+        .section-title {
+            background-color: #f7fafc;
+            border-left: 4px solid {{ $institucion->color_primario ?? '#1a365d' }};
+            padding: 6px 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin: 15px 0 10px 0;
+        }
+
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table td { padding: 6px; border-bottom: 1px solid #f1f5f9; }
+        .label { font-weight: bold; color: #64748b; width: 22%; }
+        
+        /* Tabla de cursos */
+        .items-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .items-table th { 
+            background-color: {{ $institucion->color_primario ?? '#1a365d' }}; 
+            color: white; 
+            padding: 10px 8px;
             text-align: left;
-            font-size: 10px;
+            font-size: 9px;
             text-transform: uppercase;
         }
-        .programs-table td {
-            padding: 8px;
-            border-bottom: 1px solid #e2e8f0;
-            font-size: 10px;
-        }
-        .programs-table tr:nth-child(even) { background-color: #f8fafc; }
-
-        /* Etiquetas (Badges) para Tipos */
+        .items-table td { padding: 10px 8px; border-bottom: 1px solid #e2e8f0; }
+        
         .badge {
+            /* background-color: #ebf4ff;
+            color: #2b6cb0;
+            padding: 2px 5px; */
+            background-color: #e0e7ff;
+            color: #4338ca;
             padding: 2px 6px;
             border-radius: 4px;
-            font-size: 9px;
-            background-color: #e2e8f0;
-            color: #2d3748;
+            font-size: 8px;
             font-weight: bold;
         }
 
-        /* Footer y QR */
-        .footer { position: fixed; bottom: 0; width: 100%; font-size: 9px; color: #a0aec0; border-top: 1px solid #e2e8f0; padding-top: 5px; }
-        .qr-section { position: absolute; bottom: 40px; right: 0; text-align: center; width: 120px; }
-        .qr-section img { margin-bottom: 5px; }
-        
-        .signature-box { margin-top: 50px; width: 200px; border-top: 1px solid #2d3748; text-align: center; padding-top: 5px; }
+        .footer-table { width: 100%; margin-top: 60px; }
+        .signature-line { border-top: 1px solid #2d3748; width: 200px; margin: 0 auto; padding-top: 5px; }
+
+        .signature-box { 
+            border-top: 1px solid #1a202c; 
+            width: 220px; 
+            margin: 0 auto; 
+            padding-top: 6px; 
+            text-align: center; 
+        }
     </style>
 </head>
 <body>
-
     <table class="header-table">
         <tr>
             <td class="logo-container">
-                <img src="{{ public_path('images/logo.png') }}" alt="Logo" style="height: 70px;">
+                @if($logo)
+                    <img src="{{ $logo }}" class="logo-img">
+                @else
+                    <div style="width: 100px; height: 50px; background: #eee; text-align: center; line-height: 50px;">LOGO</div>
+                @endif
             </td>
-            <td class="institution-details">
-                <h1>{{ config('app.name', 'INSTITUTO SUPERIOR') }}</h1>
-                <p>Centro de Formación Profesional Especializada</p>
-                <p>RUC: 20XXXXXXXXX | Tel: (01) XXX-XXXX</p>
-                <p>Web: www.institucion.edu.pe</p>
+            <td lass="inst-details">
+                <h1>{{ $institucion->nombre }}</h1>
+                <p><strong>RUC:</strong> {{ $institucion->ruc }}</p>
+                <p>{{ $institucion->ubicacion }}</p>
+                <p><strong>Contacto:</strong> {{ $institucion->telefono_contacto }} | <strong>Web:</strong> {{ strtolower($institucion->sigla) }}.edu.pe</p>
             </td>
-            <td class="doc-info">
-                <h2 style="margin:0; font-size: 14px; color: #1a365d;">CONSTANCIA DE MATRÍCULA</h2>
-                <p style="margin:5px 0; font-weight: bold;">N° Registro: {{ str_pad($matricula->id, 8, '0', STR_PAD_LEFT) }}</p>
-                <p style="margin:0; font-size: 9px;">Fecha Emisión: {{ now()->format('d/m/Y H:i') }}</p>
+            <td align="right">
+                <div class="doc-card">
+                    <div class="text-primary" style="font-weight: bold; font-size: 11px; letter-spacing: 1px;">CONSTANCIA DE MATRÍCULA</div>
+                    <div style="font-size: 16px; margin: 6px 0; font-weight: bold;">N° {{ $numero_registro }}</div>
+                    <div style="font-size: 8px; color: #94a3b8;">Fecha: {{ $fecha }}</div>
+                </div>
             </td>
         </tr>
     </table>
 
-    <div class="section-header">Información del Estudiante</div>
+    <div class="section-header">Información del alumno</div>
     <table class="data-table">
         <tr>
-            <td class="label">Apellidos y Nombres:</td>
-            <td class="value" colspan="3">{{ $matricula->persona->apellido_paterno }} {{ $matricula->persona->apellido_materno }} {{ $matricula->persona->nombres }}</td>
+            <td class="label">Apellidos y nombres:</td>
+            <td colspan="3" style="font-size: 11px; font-weight: bold;">
+                {{ $matricula->persona->apellido_paterno }} {{ $matricula->persona->apellido_materno }}, {{ $matricula->persona->nombres }}
+            </td>
         </tr>
         <tr>
             <td class="label">Documento Identidad:</td>
-            <td class="value">{{ $matricula->persona->numero_documento }}</td>
-            <td class="label" style="padding-left: 20px;">Fecha de Matrícula:</td>
-            <td class="value">{{ \Carbon\Carbon::parse($matricula->fecha_matricula)->format('d/m/Y') }}</td>
+            <td width="30%">{{ $matricula->persona->numero_documento }}</td>
+            <td class="label">Fecha Matrícula:</td>
+            <td>{{ \Carbon\Carbon::parse($matricula->fecha_matricula)->format('d/m/Y') }}</td>
         </tr>
         <tr>
-            <td class="label">Estado Matrícula:</td>
-            <td class="value">{{ $matricula->estadoMatricula->nombre ?? 'REGISTRADO' }}</td>
-            <td class="label" style="padding-left: 20px;">Ciclo Académico:</td>
-            <td class="value">{{ now()->year }} - II</td>
+            <td class="label">Estado de matrícula:</td>
+            <td><strong class="text-primary">{{ $matricula->estadoMatricula->nombre ?? 'PROCESADO' }}</strong></td>
+            <td class="label">Periodo Académico:</td>
+            <td>{{ $periodo }}</td>
         </tr>
     </table>
 
-    <div class="section-header">Programas Académicos Inscritos</div>
-    <table class="programs-table">
+    <div class="section-header">Programas y cursos inscritos</div>
+    <table class="items-table">
         <thead>
             <tr>
-                <th style="width: 10%;">Código</th>
-                <th style="width: 45%;">Nombre del Programa</th>
-                <th style="width: 25%;">Tipo / Categoría</th>
-                <th style="width: 20%; text-align: center;">Modalidad</th>
+                <th width="12%">Código</th>
+                <th width="50%">Programa Académica</th>
+                <th width="23%">Tipo de programa</th>
+                <th width="15%" style="text-align: center;">Modalidad</th>
             </tr>
         </thead>
         <tbody>
             @foreach($matricula->detalles as $detalle)
             <tr>
-                <td>{{ $detalle->programa->sigla ?? 'PROG-'.$detalle->id_programa }}</td>
+                <td style="font-weight: bold;">{{ $detalle->programa->sigla ?? 'ESP-'.$detalle->id_programa }}</td>
                 <td>
-                    <div style="font-weight: bold;">{{ $detalle->programa->titulo }}</div>
-                    <div style="font-size: 8px; color: #718096;">Duración: {{ $detalle->programa->duracion }} | Créditos: {{ $detalle->programa->creditos }}</div>
+                    <div style="font-weight: bold; font-size: 10.5px;">{{ $detalle->programa->titulo }}</div>
+                    <div style="font-size: 8px; color: #64748b; margin-top: 2px;">
+                        Carga Horaria: {{ $detalle->programa->horas_academicas ?? '0' }} hrs. | Créditos: {{ $detalle->programa->creditos }}
+                    </div>
                 </td>
                 <td>
-                    <span class="badge">{{ $detalle->programa->tipoPrograma->nombre ?? 'N/A' }}</span>
-                    <br>
-                    <small style="color: #718096;">{{ $detalle->programa->categoriaPrograma->nombre ?? '' }}</small>
+                    <span class="badge">{{ $detalle->programa->tipoPrograma->nombre ?? 'GENERAL' }}</span>
                 </td>
-                <td style="text-align: center;">{{ $detalle->programa->modalidad }}</td>
+                <td style="text-align: center; font-weight: bold;">{{ $detalle->programa->modalidad }}</td>
             </tr>
             @endforeach
         </tbody>
     </table>
 
-    <div style="margin-top: 40px;">
-        <table width="100%">
-            <tr>
-                <td width="50%">
-                    <div class="signature-box">
-                        <p style="font-size: 10px; margin: 0;">Firma del Estudiante</p>
-                        <p style="font-size: 8px; color: #718096;">DNI: __________________</p>
-                    </div>
-                </td>
-                <td width="50%" align="right">
-                    <div style="text-align: center; display: inline-block;">
-                        <img src="data:image/svg+xml;base64,{{ $qrCode }}" width="90">
-                        <p style="font-size: 8px; color: #718096; margin-top: 5px;">Documento Verificado digitalmente</p>
-                    </div>
-                </td>
-            </tr>
-        </table>
-    </div>
+    <table class="footer-table">
+        <tr>
+            <td width="50%" style="vertical-align: bottom;">
+                <div class="signature-box">
+                    <span style="font-size: 10px; font-weight: bold;">Firma del Estudiante</span><br>
+                    <span style="font-size: 8px; color: #64748b;">DNI: {{ $matricula->persona->numero_documento }}</span>
+                </div>
+            </td>
+            <td width="50%" align="right">
+                <div style="display: inline-block; text-align: center;">
+                    <img src="data:image/svg+xml;base64,{{ $qrCode }}" width="100">
+                    <div style="font-size: 7px; color: #94a3b8; margin-top: 4px; text-transform: uppercase;">Validación Digital Institucional</div>
+                </div>
+            </td>
+        </tr>
+    </table>
 
-    <div class="footer">
-        Este documento es una constancia oficial de matrícula. Cualquier enmendadura invalida su contenido.
-        <br>
-        Generado por Sistema de Gestión Académica - {{ now()->year }}
+    <div style="position: fixed; bottom: 0; width: 100%; text-align: center; font-size: 8px; color: #94a3b8; border-top: 1px solid #f1f5f9; padding-top: 8px;">
+        Esta ficha representa un compromiso académico entre el alumno y {{ $institucion->nombre }}. <br>
+        Generado por SGA - Sistema de Gestión Académica © {{ now()->year }}
     </div>
-
 </body>
 </html>
