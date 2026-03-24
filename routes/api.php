@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\PersonaController;
 use App\Http\Controllers\Api\PlantillaController;
 use App\Http\Controllers\Api\ProgramaController;
 use App\Http\Controllers\Api\CertificadoController;
+use App\Http\Controllers\Api\AdjuntoController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function() {
@@ -101,6 +102,13 @@ Route::prefix('v1')->group(function() {
             Route::get('/{id}', [CertificadoController::class, 'show'])->name('certificados.show');
             Route::patch('/{id}', [CertificadoController::class, 'update'])->name('certificados.update');
             Route::delete('/{id}', [CertificadoController::class, 'destroy']);
+        });
+
+        Route::prefix('adjuntos')->group(function() {
+            Route::get('/paginate', [AdjuntoController::class, 'getFilteredPaginate'])->name('adjuntos.paginate');
+            Route::get('/', [AdjuntoController::class, 'index'])->name('adjuntos');
+            Route::get('/{id}', [AdjuntoController::class, 'show'])->name('adjuntos.show');
+            Route::post('/', [AdjuntoController::class, 'store'])->name('adjuntos.store');
         });
     });
 });

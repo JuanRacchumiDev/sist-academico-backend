@@ -48,7 +48,7 @@ return new class extends Migration
 
             $table->foreign('id_institucion')
                 ->references('id')
-                ->on('modulo');
+                ->on('institucion');
         });
     }
 
