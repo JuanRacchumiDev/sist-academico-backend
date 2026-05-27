@@ -7,7 +7,8 @@ use App\Models\Persona;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
-interface IPersonaRepository {
+interface IPersonaRepository
+{
     /**
      * Obtener todas las personas
      * @param array<string, mixed>|null $searchParams
@@ -22,6 +23,14 @@ interface IPersonaRepository {
      * @return LengthAwarePaginator
      */
     public function getAllFiltered(array $filters, int $perPage): LengthAwarePaginator;
+
+    /**
+     * Obtiene personas por grupo con un límite opcional
+     * @param array $filters
+     * @param int|null $limit
+     * @return Collection<int, Persona>
+     */
+    public function getByGrupo(array $filters, ?int $limit = null): Collection;
 
     /**
      * Obtener una persona por ID

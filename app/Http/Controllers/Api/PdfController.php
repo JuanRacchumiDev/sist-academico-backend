@@ -93,8 +93,8 @@ class PdfController extends Controller
             ]
         ];
 
-        $pdf = Pdf::loadView('pdfs.generateFicha', $data);
-        
+        $pdf = Pdf::loadView('pdf.generateFicha', $data);
+
         return $pdf->download('ficha_0001.pdf');
     }
 }

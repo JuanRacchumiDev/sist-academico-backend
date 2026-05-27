@@ -6,9 +6,11 @@ use Spatie\LaravelData\Data;
 class PagoUpdateDTO extends Data
 {
     public function __construct(
-        public ?int $id_matricula,
-        public ?int $id_modulo,
-        public ?int $id_estadopago,
+        public ?int $id_matricula = null,
+        public ?int $id_modulo = null,
+        public ?int $id_estadopago = null,
+        public ?int $id_formapago = null,
+        public ?string $concepto = null,
         public ?int $id_institucion,
         public ?bool $estado = true,
         public ?string $fecha_pago = null,
@@ -38,6 +40,17 @@ class PagoUpdateDTO extends Data
                 'sometimes',
                 'integer',
                 'exists:detalle_parametro,codigo',
+                'nullable'
+            ],
+            'id_formapago' => [
+                'sometimes',
+                'integer',
+                'exists:detalle_parametro,codigo',
+                'nullable'
+            ],
+            'concepto' => [
+                'sometimes',
+                'string',
                 'nullable'
             ],
             'id_institucion' => [

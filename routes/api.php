@@ -12,28 +12,30 @@ use App\Http\Controllers\Api\PlantillaController;
 use App\Http\Controllers\Api\ProgramaController;
 use App\Http\Controllers\Api\CertificadoController;
 use App\Http\Controllers\Api\AdjuntoController;
+use App\Http\Controllers\Api\InstitucionController;
+use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('v1')->group(function() {
-    Route::get('test', function() {
+Route::prefix('v1')->group(function () {
+    Route::get('test', function () {
         return response()->json([
             'success' => true,
             'message' => 'Acceso correcto al enrutador de la API'
         ]);
     });
 
-    Route::prefix('personas')->group(function() {
+    Route::prefix('personas')->group(function () {
         Route::get('consultar-documento/{tipoDocumento}/{numeroDocumento}', [PersonaController::class, 'consultarDocumento'])->name('personas.consultarDocumento');
     });
 
     Route::get('/generate-ficha-pdf', [PdfController::class, 'fichaTest'])->name('generate.pdf.test');
 
-    Route::prefix('auth')->group(function() {
-        Route::post('login', [AuthController::class, 'login'])->name('login');
+    Route::prefix('auth')->group(function () {
+        Route::post('login', [AuthController::class, 'validateUnique'])->name('login');
     });
 
-    Route::middleware('auth:api')->group(function() {
-        Route::prefix('auth')->group(function() {
+    Route::middleware('auth:api')->group(function () {
+        Route::prefix('auth')->group(function () {
             Route::post('logout', [AuthController::class, 'logout'])->name('logout');
             Route::post('refresh', [AuthController::class, 'refresh'])->name('refresh');
             Route::get('authenticated', [AuthController::class, 'authenticated'])->name('authenticated');
@@ -41,7 +43,7 @@ Route::prefix('v1')->group(function() {
 
         Route::apiResource('parametros', ParametroController::class);
 
-        Route::prefix('catalogos')->group(function() {
+        Route::prefix('catalogos')->group(function () {
             Route::get('/', [DetalleParametroController::class, 'getFiltered'])->name('catalogos.all');
             Route::get('/{clase}/{nParDetCodigo}', [DetalleParametroController::class, 'show'])->name('catalogos.show');
             Route::get('/{clase}', [DetalleParametroController::class, 'getFilteredPaginate'])->name('catalogos.paginate');
@@ -49,8 +51,10 @@ Route::prefix('v1')->group(function() {
             Route::patch('/{clase}/{nParDetCodigo}', [DetalleParametroController::class, 'update'])->name('catalogos.update');
         });
 
-        Route::prefix('personas')->group(function() {
+        Route::prefix('personas')->group(function () {
             Route::get('/', [PersonaController::class, 'index'])->name('personas.index');
+            Route::get('/grupo/{grupo}/paginate', [PersonaController::class, 'getFilteredPaginate'])->name('personas.paginate');
+            Route::get('/grupo/{grupo}', [PersonaController::class, 'getFiltered'])->name('personas');
             Route::get('/{id}', [PersonaController::class, 'show'])->name('personas.show');
             Route::post('/store-api', [PersonaController::class, 'storeApi'])->name('personas.storeApi');
             Route::post('/', [PersonaController::class, 'store'])->name('personas.store');
@@ -62,32 +66,38 @@ Route::prefix('v1')->group(function() {
             Route::post('/', [PlantillaController::class, 'store'])->name('plantillas.store');
         });
 
-        Route::prefix('programas')->group(function() {
+        Route::prefix('programas')->group(function () {
             Route::get('/paginate', [ProgramaController::class, 'getFilteredPaginate'])->name('programas.paginate');
             Route::get('/{programa}/descargar-plan', [ProgramaController::class, 'downloadPlan'])->name('programas.descargarplan');
             Route::get('/{id}', [ProgramaController::class, 'show'])->name('programas.show');
             Route::get('/', [ProgramaController::class, 'index'])->name('programas');
             Route::post('/', [ProgramaController::class, 'store'])->name('programas.store');
+            Route::patch('/{id}', [ProgramaController::class, 'update'])->name('programas.update');
         });
 
-        Route::prefix('modulos')->group(function() {
+        Route::prefix('modulos')->group(function () {
             Route::get('/paginate', [ModuloController::class, 'getFilteredPaginate'])->name('modulos.paginate');
             Route::get('/{id}', [ModuloController::class, 'show'])->name('modulos.show');
             Route::get('/', [ModuloController::class, 'index'])->name('modulos');
             Route::post('/', [ModuloController::class, 'store'])->name('modulos.store');
         });
 
-        Route::prefix('matriculas')->group(function() {
-            Route::get('/paginate', [MatriculaController::class, 'getFilteredPaginate'])->name('programas.paginate');
-            Route::get('/{id}', [MatriculaController::class, 'show'])->name('programas.show');
+        Route::prefix('matriculas')->group(function () {
+            Route::get('/certificado', [MatriculaController::class, 'downloadCertificado'])->name('matriculas.certificado');
+            Route::get('/paginate', [MatriculaController::class, 'getFilteredPaginate'])->name('matriculas.paginate');
+            Route::get('/{id}', [MatriculaController::class, 'show'])->name('matriculas.show');
             Route::get('/{id}/pdf', [MatriculaController::class, 'downloadFicha'])->name('matriculas.pdf');
-            Route::get('/', [MatriculaController::class, 'index'])->name('programas');
-            Route::post('/', [MatriculaController::class, 'store'])->name('programas.store');
-            Route::patch('/{id}', [MatriculaController::class, 'update'])->name('programas.update');
-            Route::delete('/{id}/pdf', [MatriculaController::class, 'regenerateFicha'])->name('programas.delete');
+            Route::get('/', [MatriculaController::class, 'index'])->name('matriculas');
+            Route::post('/', [MatriculaController::class, 'store'])->name('matriculas.store');
+            Route::patch('/{id}', [MatriculaController::class, 'update'])->name('matriculas.update');
+            Route::delete('/{id}/pdf', [MatriculaController::class, 'regenerateFicha'])->name('matriculas.delete');
         });
 
-        Route::prefix('pagos')->group(function() {
+        Route::prefix('instituciones')->group(function () {
+            Route::get('/', [InstitucionController::class, 'index'])->name('instituciones');
+        });
+
+        Route::prefix('pagos')->group(function () {
             Route::get('/paginate', [PagoController::class, 'getFilteredPaginate'])->name('pagos.paginate');
             Route::get('/matricula', [PagoController::class, 'getMatricula'])->name('pagos.matricula');
             Route::get('/modulo', [PagoController::class, 'getPagoModulo'])->name('pagos.modulo');
@@ -96,7 +106,7 @@ Route::prefix('v1')->group(function() {
             Route::post('/', [PagoController::class, 'store'])->name('pagos.store');
         });
 
-        Route::prefix('certificados')->group(function() {
+        Route::prefix('certificados')->group(function () {
             Route::get('/', [CertificadoController::class, 'index'])->name('certificados');
             Route::post('/', [CertificadoController::class, 'store'])->name('certificados.store');
             Route::get('/{id}', [CertificadoController::class, 'show'])->name('certificados.show');
@@ -104,11 +114,19 @@ Route::prefix('v1')->group(function() {
             Route::delete('/{id}', [CertificadoController::class, 'destroy']);
         });
 
-        Route::prefix('adjuntos')->group(function() {
+        Route::prefix('adjuntos')->group(function () {
             Route::get('/paginate', [AdjuntoController::class, 'getFilteredPaginate'])->name('adjuntos.paginate');
             Route::get('/', [AdjuntoController::class, 'index'])->name('adjuntos');
             Route::get('/{id}', [AdjuntoController::class, 'show'])->name('adjuntos.show');
             Route::post('/', [AdjuntoController::class, 'store'])->name('adjuntos.store');
+        });
+
+        Route::prefix('usuarios')->group(function () {
+            Route::get('/paginate', [UserController::class, 'getFilteredPaginate'])->name('users.paginate');
+            Route::get('/', [UserController::class, 'index'])->name('users.index');
+            Route::get('/{id}', [UserController::class, 'show'])->name('users.show');
+            Route::get('/validate', [UserController::class, 'validate'])->name('users.validate');
+            Route::post('/', [UserController::class, 'store'])->name('users.store');
         });
     });
 });

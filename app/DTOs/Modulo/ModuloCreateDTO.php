@@ -22,15 +22,14 @@ class ModuloCreateDTO extends Data {
     {
         return [
             'id_programa' => [
-                'sometimes',
+                'required',
                 'integer',
-                'exists:programa:id',
-                'nullable'
+                'exists:programa,id'
             ],
             'id_institucion' => [
                 'sometimes',
                 'integer',
-                'exists:institucion:id',
+                'exists:institucion,id',
                 'nullable'
             ],
             'titulo' => [

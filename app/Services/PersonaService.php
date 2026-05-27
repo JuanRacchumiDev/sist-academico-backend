@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services;
 
 use App\DTOs\Persona\PersonaCreateDTO;
@@ -8,12 +9,11 @@ use Illuminate\Support\Facades\DB;
 use App\Repositories\Contracts\IPersonaRepository;
 use App\Repositories\Contracts\IDetalleParametroRepository;
 use App\Services\Contracts\IPersonaService;
-use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Validation\ValidationException;
 
-class PersonaService implements IPersonaService {
+class PersonaService implements IPersonaService
+{
     protected IPersonaRepository $personaRepository;
     protected IDetalleParametroRepository $detalleRepository;
 
@@ -38,10 +38,25 @@ class PersonaService implements IPersonaService {
      * @param array<string, mixed> $filters
      * @param int $perPage
      * @return LengthAwarePaginator
-     */ 
+     */
     public function getAllPersonasWithFilters(array $filters, int $perPage): LengthAwarePaginator
     {
         return $this->personaRepository->getAllFiltered($filters, $perPage);
+    }
+
+    public function getAllPersonasForSearch(array $filters): Collection
+    {
+        $searchTerm = $filters['search'] ?? '';
+
+        // Si hay búsqueda, debe tener al menos 3 caracteres
+        if (!empty($searchTerm) && strlen($searchTerm) < 3) {
+            return new Collection();
+        }
+
+        // Si no hay búsqueda, limitamos a 50 registros
+        $limit = empty($searchTerm) ? 50 : null;
+
+        return $this->personaRepository->getByGrupo($filters, $limit);
     }
 
     /**
@@ -61,7 +76,7 @@ class PersonaService implements IPersonaService {
      */
     public function createPersona(PersonaCreateDTO $personaCreateDTO): Persona
     {
-        return DB::transaction(function() use ($personaCreateDTO) {
+        return DB::transaction(function () use ($personaCreateDTO) {
             $dataToCreate = $personaCreateDTO->toArray();
 
             // Obtener el nombre de grupo
@@ -95,7 +110,7 @@ class PersonaService implements IPersonaService {
      * @return Persona|null
      */
     public function updatePersona(int $id, PersonaUpdateDTO $personaUpdateDTO): ?Persona
-    {   
+    {
         $data = array_filter($personaUpdateDTO->toArray(), fn($value) => !is_null($value));
 
         return $this->personaRepository->update($id, $data);

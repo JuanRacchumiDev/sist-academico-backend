@@ -57,13 +57,13 @@ class UserController extends Controller
         }
     }
 
-    public function getAllWithFilters(Request $request): JsonResponse
+    public function getFilteredPaginate(Request $request): JsonResponse
     {
         try {
             $filters = $request->only(['name', 'email', 'nPerfilId', 'bEstado']);
             $perPage = $request->input('per_page', 10);
 
-            $users = $this->userService->getAllUsersWithFilters($filters, $perPage);
+            $users = $this->userService->getAllUsers($filters, $perPage);
 
             if ($users->isEmpty()) {
                 return response()->json([
@@ -169,7 +169,7 @@ class UserController extends Controller
                 ...$request->all()
             ]);
 
-            $user = $this->userService->updateUser($userUpdateDTO);
+            $user = $this->userService->updateUser($id, $userUpdateDTO);
             
             if (!$user) {
                 return response()->json([
@@ -202,27 +202,27 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(int $id): Response|JsonResponse
-    {
-        try {
-            if (!$this->userService->deleteUser($id)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Usuario no encontrado'
-                ], 404);
-            }
+    // public function destroy(int $id): Response|JsonResponse
+    // {
+    //     try {
+    //         if (!$this->userService->deleteUser($id)) {
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'message' => 'Usuario no encontrado'
+    //             ], 404);
+    //         }
             
-            return response()->json([
-                'success' => true,
-                'message' => 'Usuario eliminado correctamente'
-            ], 200);
-        } catch (\Exception $e) {
-            Log::error("Error al eliminar al usuario (ID: {$id}): " . $e->getMessage());
+    //         return response()->json([
+    //             'success' => true,
+    //             'message' => 'Usuario eliminado correctamente'
+    //         ], 200);
+    //     } catch (\Exception $e) {
+    //         Log::error("Error al eliminar al usuario (ID: {$id}): " . $e->getMessage());
             
-            return response()->json([
-                'success' => false,
-                'message' => 'Error al eliminar el usuario: ' . $e->getMessage()
-            ], 500);
-        }
-    }
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Error al eliminar el usuario: ' . $e->getMessage()
+    //         ], 500);
+    //     }
+    // }
 }

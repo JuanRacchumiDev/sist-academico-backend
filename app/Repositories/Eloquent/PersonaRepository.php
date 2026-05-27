@@ -8,9 +8,10 @@ use App\Models\Persona;
 use App\Repositories\Contracts\IPersonaRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Validation\ValidationException;
+use Override;
 
-class PersonaRepository implements IPersonaRepository {
+class PersonaRepository implements IPersonaRepository
+{
     /**
      * Obtiene todas las personas
      * @param array<string, mixed>|null $searchParams
@@ -18,7 +19,7 @@ class PersonaRepository implements IPersonaRepository {
      */
     public function getAll(?array $searchParams = null): Collection
     {
-        $query = Persona::with(['tipoDocumento','grupos','matriculas']);
+        $query = Persona::with(['tipoDocumento', 'grupos', 'matriculas']);
 
         $this->applyFilters($query, $searchParams ?? []);
 
@@ -38,6 +39,19 @@ class PersonaRepository implements IPersonaRepository {
         $this->applyFilters($query, $filters);
 
         return $query->orderBy('apellido_paterno', 'ASC')->paginate($perPage);
+    }
+
+    public function getByGrupo(array $filters, ?int $limit = null): Collection
+    {
+        $query = Persona::with(['tipoDocumento', 'grupos', 'matriculas']);
+
+        $this->applyFilters($query, $filters);
+
+        if ($limit) {
+            $query->limit($limit);
+        }
+
+        return $query->orderBy('apellido_paterno', 'ASC')->get();
     }
 
     /**
@@ -131,7 +145,7 @@ class PersonaRepository implements IPersonaRepository {
             'provincia'         => $dto->provincia,
             'distrito'          => $dto->distrito,
             'direccion'         => $dto->direccion,
-            'direccion_completa'=> $dto->direccion_completa,
+            'direccion_completa' => $dto->direccion_completa,
             'ubigeo_reniec'     => $dto->ubigeo_reniec,
             'ubigeo'            => $dto->ubigeo, // El código de ubigeo final
             'fecha_nacimiento'  => $dto->fecha_nacimiento, // Ya transformado a YYYY-MM-DD
@@ -142,7 +156,7 @@ class PersonaRepository implements IPersonaRepository {
 
         $persona->fill($dataToUpdate);
         $persona->save();
-        
+
         return $persona;
     }
 
@@ -161,7 +175,7 @@ class PersonaRepository implements IPersonaRepository {
         }
 
         if (isset($filters['grupo'])) {
-            $query->whereHas('grupos', function($q) use ($filters) {
+            $query->whereHas('grupos', function ($q) use ($filters) {
                 $q->where('nombre_url', $filters['grupo']);
             });
         }
@@ -170,10 +184,9 @@ class PersonaRepository implements IPersonaRepository {
             $search = '%' . strtolower($filters['search']) . '%';
             $query->where(function ($q) use ($search) {
                 $q->whereRaw('LOWER(numero_documento) LIKE ?', [$search])
-                  ->orWhereRaw('LOWER(nombre_completo) LIKE ?', [$search])
-                  ->orWhereRaw('LOWER(email) LIKE ?', [$search]);
+                    ->orWhereRaw('LOWER(nombre_completo) LIKE ?', [$search])
+                    ->orWhereRaw('LOWER(email) LIKE ?', [$search]);
             });
         }
     }
 }
-

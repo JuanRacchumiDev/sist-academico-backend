@@ -28,6 +28,8 @@ interface IModuloService {
      */
     public function getAllModulosByPrograma(int $idPrograma): Collection;
 
+    public function createModulosBatch(int $idPrograma, array $dtos): Collection;
+
     /**
      * Obtiene un módulo por ID
      * @param int $id

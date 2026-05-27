@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Repositories\Contracts;
 
 use App\Models\Matricula;
@@ -21,6 +22,14 @@ interface IMatriculaRepository
      * @return LengthAwarePaginator
      */
     public function getAllFiltered(array $filters, int $perPage): LengthAwarePaginator;
+
+    /**
+     * Obtiene un certificado por matrícula
+     * @param int $idMatricula
+     * @param int $idPrograma
+     * @return object
+     */
+    public function getCertificado(int $idMatricula, int $idPrograma): ?object;
 
     /**
      * Obtener una matrícula por ID

@@ -17,7 +17,7 @@ class ParametroSeeder extends Seeder
         $now = Carbon::now();
 
         DB::table('parametro')->truncate();
-        
+
         DB::table('parametro')->insert([
             [
                 'clase' => 1000,
@@ -112,6 +112,14 @@ class ParametroSeeder extends Seeder
                 'nombre' => 'Estado pago',
                 'nombre_url' => 'estado-pago',
                 'descripcion' => 'Distintos estados de pago',
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'clase' => 1012,
+                'nombre' => 'Forma pago',
+                'nombre_url' => 'forma-pago',
+                'descripcion' => 'Distintas formas de pago',
                 'created_at' => $now,
                 'updated_at' => $now
             ]

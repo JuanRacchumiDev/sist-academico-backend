@@ -9,9 +9,9 @@ use App\Models\Matricula;
 use App\Services\Contracts\IMatriculaService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
-use App\Services\MatriculaService;
 
 class MatriculaController extends Controller
 {
@@ -61,7 +61,7 @@ class MatriculaController extends Controller
 
             $perPage = $request->input('per_page', 10);
 
-            $filters = array_map(function($value) {
+            $filters = array_map(function ($value) {
                 if ($value === 'true') return true;
                 if ($value === 'false') return false;
                 return $value;
@@ -92,7 +92,7 @@ class MatriculaController extends Controller
             ], 200);
         } catch (\Exception $e) {
             Log::error("Error filtering matrículas: " . $e->getMessage());
-            
+
             return response()->json([
                 'result' => false,
                 'message' => 'Error al obtener matrículas.',
@@ -116,6 +116,34 @@ class MatriculaController extends Controller
         } catch (\Exception $e) {
             Log::error("Error al obtener PDF: " . $e->getMessage());
             return response()->json(['message' => 'Error al procesar el archivo'], 500);
+        }
+    }
+
+    public function downloadCertificado(Request $request)
+    {
+        try {
+            $request->validate([
+                'id_matricula' => 'required|integer',
+                'id_programa'  => 'required|integer'
+            ]);
+
+            $idMatricula = (int) $request->query('id_matricula');
+            $idPrograma  = (int) $request->query('id_programa');
+
+            $pdfContent = $this->matriculaService->generateCertificadoPDF($idMatricula, $idPrograma);
+
+            $filename = "certificado_mat_{$idMatricula}_prog_{$idPrograma}.pdf";
+
+            return new Response($pdfContent, 200, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="' . $filename . '"',
+            ]);
+        } catch (\Exception $e) {
+            Log::error("Error al generar certificado: " . $e->getMessage());
+            return response()->json([
+                'result' => false,
+                'message' => $e->getMessage()
+            ], 404);
         }
     }
 
@@ -155,6 +183,9 @@ class MatriculaController extends Controller
                 ], 200);
             }
 
+            $data['id_formapago'] = $data['id_formapago_matricula'];
+            $data['concepto_pago'] = "PAGO DE MATRÍCULA";
+
             $matriculaCreateDTO = MatriculaCreateDTO::from($data);
 
             $matricula = $this->matriculaService->createMatricula($matriculaCreateDTO);
@@ -189,8 +220,8 @@ class MatriculaController extends Controller
     public function show(string $id): JsonResponse
     {
         try {
-            $matricula = $this->matriculaService->getMatriculaById($id);
-            
+            $matricula = $this->matriculaService->getMatriculaById((int)$id);
+
             if (!$matricula) {
                 return response()->json([
                     'result' => false,
@@ -198,7 +229,7 @@ class MatriculaController extends Controller
                     'data' => []
                 ], 404);
             }
-            
+
             return response()->json([
                 'result' => true,
                 'data' => $matricula,
@@ -206,7 +237,7 @@ class MatriculaController extends Controller
             ], 200);
         } catch (\Exception $e) {
             Log::error("Error fetching matrícula (id: {$id}): " . $e->getMessage());
-            
+
             return response()->json([
                 'result' => false,
                 'message' => 'Error al obtener la matrícula: ' . $e->getMessage()

@@ -21,16 +21,7 @@ class ProgramaRepository implements IProgramaRepository {
             'detalleModulos'
         ]);
 
-        if ($searchParams) {
-            $query->where(function($q) use ($searchParams) {
-                if (isset($searchParams['search'])) {
-                    $search = '%'.strtolower($searchParams['search']).'%';
-
-                    $q->whereRaw('LOWER(nombre) LIKE ?', [$search])
-                        ->orWhereRaw('LOWER(sigla) LIKE ?', [$search]);
-                }
-            });
-        }
+        $this->applyFilters($query, $searchParams ?? []);
 
         return $query->get();
     }
@@ -50,23 +41,9 @@ class ProgramaRepository implements IProgramaRepository {
             'detalleModulos'
         ]);
 
-        if (isset($filters['estado'])) {
-            $query->where('estado', (bool)$filters['estado']);
-        }
+        $this->applyFilters($query, $filters);
 
-        // Aplicar búsqueda por texto
-        if (isset($filters['search'])) {
-            $search = '%'.strtolower($filters['search']).'%';
-
-            $query->where(function ($q) use ($search) {
-                $q->whereRaw('LOWER(nombre) LIKE ?', [$search])
-                    ->orWhereRaw('LOWER(sigla) LIKE ?', [$search]);
-            });
-        }
-
-        $query->orderBy('id', 'desc');
-
-        return $query->paginate($perPage);
+        return $query->orderBy('titulo', 'ASC')->paginate($perPage);
     }
 
     /**
@@ -81,7 +58,7 @@ class ProgramaRepository implements IProgramaRepository {
             'tipoPrograma',
             'categoriaPrograma',
             'detalleModulos'
-        ])->find($id);
+        ])->findOrFail($id);
     }
 
     /**
@@ -105,12 +82,13 @@ class ProgramaRepository implements IProgramaRepository {
     {
         $programa = $this->findById($id);
 
-        if ($programa) {
-            $programa->update($data);
-            return $programa;
+        if (!$programa) {
+            return null;
         }
 
-        return null;
+        $programa->update($data);
+
+        return $programa;
     }
 
     /**
@@ -122,10 +100,36 @@ class ProgramaRepository implements IProgramaRepository {
     {
         $programa = $this->findById($id);
 
-        if ($programa) {
-            return $programa->delete();
+        return $programa ? $programa->delete() : false;
+    }
+
+    private function applyFilters($query, array $filters): void
+    {
+        if (isset($filters['id_segmento'])) {
+            $query->where('id_segmento', $filters['id_segmento']);
         }
 
-        return false;
+        if (isset($filters['id_tipoprograma'])) {
+            $query->where('id_tipoprograma', $filters['id_tipoprograma']);
+        }
+
+        if (isset($filters['id_categoriaprograma'])) {
+            $query->where('id_categoriaprograma', $filters['id_categoriaprograma']);
+        }
+
+        if (isset($filters['id_institucion'])) {
+            $query->where('id_institucion', $filters['id_institucion']);
+        }
+
+        if (isset($filters['titulo'])) {
+            $search = '%'.strtolower($filters['titulo']).'%';
+            $query->where(function($q) use ($search) {
+                $q->whereRaw('LOWER(titulo) LIKE ?', [$search]);
+            });
+        }
+
+        if (isset($filters['modalidad'])) {
+            $query->where('modalidad', $filters['modalidad']);
+        }
     }
 }

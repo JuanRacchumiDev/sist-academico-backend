@@ -11,17 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pago', function(Blueprint $table) {
+        Schema::create('pago', function (Blueprint $table) {
             $table->id();
 
             $table->unsignedBigInteger('id_matricula');
-            $table->unsignedBigInteger('id_modulo');
-            $table->unsignedBigInteger('id_estadopago');
+            $table->unsignedBigInteger('id_modulo')->nullable();
+            $table->unsignedBigInteger('id_estadopago')->nullable();
+            $table->unsignedBigInteger('id_formapago');
             $table->unsignedBigInteger('id_institucion');
 
+            $table->string('concepto', 200);
+            $table->string('numero_operacion', 20)->nullable();
             $table->string('fecha_pago')->nullable();
             $table->string('fecha_vencimiento')->nullable();
-            $table->decimal('cantidad', 10, 2)->nullable();
+            $table->decimal('cantidad_efectivo', 10, 2)->nullable();
+            $table->decimal('cantidad_operacion', 10, 2)->nullable();
 
             $table->string('user_crea', 12)->nullable();
             $table->string('user_actualiza', 12)->nullable();
@@ -42,6 +46,10 @@ return new class extends Migration
                 ->references('codigo')
                 ->on('detalle_parametro');
 
+            $table->foreign('id_formapago')
+                ->references('codigo')
+                ->on('detalle_parametro');
+
             $table->foreign('id_institucion')
                 ->references('id')
                 ->on('institucion');
@@ -53,7 +61,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('pago', function(Blueprint $table) {
+        Schema::table('pago', function (Blueprint $table) {
             $table->dropForeign('id_matricula');
             $table->dropColumn('id_matricula');
 
@@ -62,6 +70,9 @@ return new class extends Migration
 
             $table->dropForeign('id_estadopago');
             $table->dropColumn('id_estadopago');
+
+            $table->dropForeign('id_formapago');
+            $table->dropColumn('id_formapago');
 
             $table->dropForeign('id_institucion');
             $table->dropColumn('id_institucion');

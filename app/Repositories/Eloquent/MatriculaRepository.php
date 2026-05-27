@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Repositories\Eloquent;
 
 use App\Models\{Matricula, DetalleMatricula, Pago, Programa};
@@ -7,15 +8,18 @@ use App\DTOs\Matricula\MatriculaCreateDTO;
 use Illuminate\Support\Facades\{DB, Log, Storage};
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Override;
 
-class MatriculaRepository implements IMatriculaRepository {
+class MatriculaRepository implements IMatriculaRepository
+{
     public function getAll(?array $searchParams = null): Collection
     {
         $query = Matricula::with([
             'persona',
             'estadoMatricula',
             'institucion',
-            'detalles'
+            'detalles.programa.tipoPrograma',
+            'detalles.programa.categoriaPrograma'
         ]);
 
         $this->applyFilters($query, $searchParams ?? []);
@@ -35,14 +39,42 @@ class MatriculaRepository implements IMatriculaRepository {
             'persona',
             'estadoMatricula',
             'institucion',
-            'detalles'
+            'detalles.programa.tipoPrograma',
+            'detalles.programa.categoriaPrograma'
         ]);
 
         $this->applyFilters($query, $filters);
 
         $query->orderBy('fecha_matricula', 'DESC');
-        
+
         return $query->paginate($perPage);
+    }
+
+    /**
+     * Obtiene un certificado por matrícula
+     * @param int $idMatricula
+     * @param int $idPrograma
+     * @return object
+     */
+    public function getCertificado(int $idMatricula, int $idPrograma): ?object
+    {
+        return DB::table('matricula as m')
+            ->join('detalle_matricula as dm', 'dm.id_matricula', '=', 'm.id')
+            ->join('programa as p', 'p.id', '=', 'dm.id_programa')
+            ->join('persona as p2', 'p2.id', '=', 'm.id_persona')
+            ->join('detalle_parametro as dp', 'dp.codigo', '=', 'p.id_tipoprograma')
+            ->select([
+                'dm.id_matricula',
+                'p2.nombre_completo as nombre_alumno',
+                'p.titulo as titulo_programa',
+                'dp.nombre as nombre_tipoprograma',
+                'p.numero_modulos',
+                'p.fecha_inicio',
+                'p.fecha_final'
+            ])
+            ->where('dm.id_matricula', $idMatricula)
+            ->where('dm.id_programa', $idPrograma)
+            ->first();
     }
 
     /**

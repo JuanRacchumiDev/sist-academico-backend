@@ -108,21 +108,47 @@ class ModuloController extends Controller
     public function store(Request $request)
     {
         try {
-            $data = $request->all();
+            $request->validate([
+                'id_programa' => 'required|exists:programa,id',
+                'modulos' => 'required|array|min:1',
+            ]);
 
-            if (isset($data['titulo'])) {
-                $data['titulo_url'] = Str::slug($data['titulo']);
-            }
+            $idPrograma = $request->input('id_programa');
+            $modulosInput = $request->input('modulos');
 
-            $moduloCreateDTO = ModuloCreateDTO::from($data);
-            
-            $modulo = $this->moduloService->createModulo($moduloCreateDTO);
-            
+            $dtos = array_map(function ($item) use ($idPrograma) {
+                $item['id_programa'] = $idPrograma;
+                $item['titulo_url'] = Str::slug($item['titulo']);
+                $item['estado'] = $item['estado'] ?? true;
+                // Asignamos un orden temporal para pasar la validación si fuera necesaria
+                $item['orden'] = $item['orden'] ?? 0; 
+                
+                return ModuloCreateDTO::from($item);
+            }, $modulosInput);
+
+            $creados = $this->moduloService->createModulosBatch($idPrograma, $dtos);
+
             return response()->json([
                 'result' => true,
-                'data' => $modulo,
-                'message' => 'Módulo registrado correctamente'
+                'data' => $creados,
+                'message' => count($creados) . ' módulos registrados correctamente'
             ], 201);
+
+            // $data = $request->all();
+
+            // if (isset($data['titulo'])) {
+            //     $data['titulo_url'] = Str::slug($data['titulo']);
+            // }
+
+            // $moduloCreateDTO = ModuloCreateDTO::from($data);
+            
+            // $modulo = $this->moduloService->createModulo($moduloCreateDTO);
+            
+            // return response()->json([
+            //     'result' => true,
+            //     'data' => $modulo,
+            //     'message' => 'Módulo registrado correctamente'
+            // ], 201);
         } catch (ValidationException $e) {
             return response()->json([
                 'result' => false,

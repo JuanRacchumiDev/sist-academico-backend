@@ -45,13 +45,67 @@ class PersonaController extends Controller
                     'last_page' => $personas->lastPage()
                 ]
             ], 200);
-
         } catch (\Exception $e) {
             Log::error("Error fetching personas: " . $e->getMessage());
-            
+
             return response()->json([
                 'result' => false,
                 'message' => 'Error al obtener personas: ' . $e->getMessage(),
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function getFiltered(string $grupo, Request $request): JsonResponse
+    {
+        try {
+            $filters = $request->only(['search']);
+            $filters['grupo'] = $grupo;
+
+            $personas = $this->personaService->getAllPersonasForSearch($filters);
+
+            return response()->json([
+                'result' => true,
+                'data' => $personas,
+                'count' => $personas->count(),
+                'message' => $personas->isEmpty() ? 'No se encontraron resultados para los criterios ingresados' : 'Listado obtenido correctamente'
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error("Error en getFiltered personas: " . $e->getMessage());
+            return response()->json([
+                'result' => false,
+                'message' => 'Error al procesar la solicituds',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function getFilteredPaginate(string $grupo, Request $request): JsonResponse
+    {
+        try {
+            $filters = $request->only(['search', 'id_tipodocumento', 'estado', 'numero_documento']);
+            $filters['grupo'] = $grupo;
+
+            $perPage = (int)$request->input('limit', 10);
+
+            $personas = $this->personaService->getAllPersonasWithFilters($filters, $perPage);
+
+            return response()->json([
+                'result' => true,
+                'data' => $personas->items(),
+                'message' => $personas->isEmpty() ? 'No se encontraron personas en este grupo' : 'Listado por grupo obtenido correctamente',
+                'pagination' => [
+                    'total' => $personas->total(),
+                    'per_page' => $personas->perPage(),
+                    'current_page' => $personas->currentPage(),
+                    'last_page' => $personas->lastPage()
+                ]
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error("Error fetching personas by grupo: " . $e->getMessage());
+            return response()->json([
+                'result' => false,
+                'message' => 'Error al obtener personas del grupo',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -109,7 +163,8 @@ class PersonaController extends Controller
         }
     }
 
-    public function storeApi(Request $request) {
+    public function storeApi(Request $request)
+    {
         $request->validate([
             'tipo_documento' => 'required|string|max:10',
             'numero_documento' => 'required|string:max:15',
@@ -141,7 +196,7 @@ class PersonaController extends Controller
 
     public function consultarDocumento(string $tipoDocumento, string $numeroDocumento)
     {
-        $persona = $this->personaAPIService->query($tipoDocumento,$numeroDocumento);
+        $persona = $this->personaAPIService->query($tipoDocumento, $numeroDocumento);
 
         return response()->json([
             'success' => true,
@@ -171,7 +226,6 @@ class PersonaController extends Controller
                 'message' => 'Persona obtenida exitosamente',
                 'data' => $persona
             ], 200);
-
         } catch (\Exception $e) {
             Log::error("Error fetching detalle persona: " . $e->getMessage());
 
@@ -218,10 +272,10 @@ class PersonaController extends Controller
                 'errors' => $e->errors()
             ], 422);
         } catch (\Exception $e) {
-            $message = 'Error al actualizar el detalle:' . $e->getMessage();
+            $message = 'Error al actualizar la persona:' . $e->getMessage();
 
-            Log::error("Error updating detalle persona: " . $e->getMessage());
-            
+            Log::error("Error updating persona: " . $e->getMessage());
+
             return response()->json([
                 'result' => false,
                 'message' => $message

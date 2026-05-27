@@ -22,18 +22,26 @@ class AuthController extends Controller
         $this->userService = $userService;
     }
 
-    public function login(Request $request): JsonResponse
+    public function validateUnique(Request $request): JsonResponse
     {
-        Log::info('Login Request Data', $request->all());
-        $credenciales = $request->only('email', 'password');
+        $credenciales = $request->only(['email', 'password']);
+        
+        $email = $credenciales['email'];
+        
+        $filters = ['email' => $email];
+
+        Log::info('Validate filters', $filters);
 
         try {
-            $usuario = $this->userService->getUserByEmail($request->email);
+            $usuario = $this->userService->getUserByParams($filters);
+        
+            Log::info('Validate usuario', $usuario ? $usuario->toArray() : []);
 
             if (!$usuario) {
                 return response()->json([
-                    'result' => false, 
-                    'error' => 'Usuario no encontrado. Verifique sus credenciales'
+                    'success' => false,
+                    'data' => [],
+                    'message' => 'Usuario no encontrado. Verifique sus credenciales'
                 ], 401);
             }
 
@@ -43,15 +51,60 @@ class AuthController extends Controller
                     'error' => 'Contraseña incorrecta. Verifique sus credenciales'
                 ], 401);
             }
-
+            
             return $this->respondWithToken($token, $usuario);
+            
+            // return response()->json([
+            //     'success' => true,
+            //     'data' => $user,
+            //     'message' => 'Usuario encontrado correctamente'
+            // ], 200);
+        } catch (\Exception $e) {
+            Log::error("Error fetching usuario: " . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener el usuario: ' . $e->getMessage()
+            ], 500);
         } catch (JWTException $e) {
+            Log::error("Error al crear token: " . $e->getMessage());
             return response()->json([
                 'result' => false,
-                'error' => 'No se puede crear el token'
+                'error' => 'No se puede crear el token de acceso'
             ], 500);
         }
     }
+
+    // public function login(Request $request): JsonResponse
+    // {
+    //     Log::info('Login Request Data', $request->all());
+    //     $credenciales = $request->only('email', 'password');
+
+    //     try {
+    //         $usuario = $this->userService->getUserByEmail($request->email);
+
+    //         if (!$usuario) {
+    //             return response()->json([
+    //                 'result' => false, 
+    //                 'error' => 'Usuario no encontrado. Verifique sus credenciales'
+    //             ], 401);
+    //         }
+
+    //         if (!$token = JWTAuth::attempt($credenciales)) {
+    //             return response()->json([
+    //                 'result' => false,
+    //                 'error' => 'Contraseña incorrecta. Verifique sus credenciales'
+    //             ], 401);
+    //         }
+
+    //         return $this->respondWithToken($token, $usuario);
+    //     } catch (JWTException $e) {
+    //         return response()->json([
+    //             'result' => false,
+    //             'error' => 'No se puede crear el token'
+    //         ], 500);
+    //     }
+    // }
 
     public function logout(): JsonResponse
     {

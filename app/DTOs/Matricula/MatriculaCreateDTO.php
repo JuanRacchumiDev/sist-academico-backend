@@ -1,4 +1,5 @@
 <?php
+
 namespace App\DTOs\Matricula;
 
 use Spatie\LaravelData\Data;
@@ -8,17 +9,27 @@ class MatriculaCreateDTO extends Data
     public function __construct(
         public int $id_persona,
         public int $id_estadomatricula,
+        public int $id_institucion,
+
         public array $programas,
         public string $fecha_matricula,
         public bool $estado,
-        public ?int $id_institucion = null,
+
+        public int $id_formapago,
+        public string $concepto_pago,
+        public ?int $id_modulo_pago = null,
+        public ?int $id_estadopago = null,
+        public ?string $numero_operacion = null,
+        public ?float $cantidad_efectivo = null,
+        public ?float $cantidad_operacion = null,
+
         public ?string $fecha_retiro = null,
         public ?string $fecha_reserva = null,
         public ?string $fecha_anula = null,
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null,
-    ){}
+    ) {}
 
     public static function rules(): array
     {
@@ -34,7 +45,7 @@ class MatriculaCreateDTO extends Data
                 'exists:detalle_parametro,codigo'
             ],
             'id_institucion' => [
-                'sometimes',
+                'required',
                 'integer',
                 'exists:institucion,id'
             ],
@@ -87,5 +98,5 @@ class MatriculaCreateDTO extends Data
                 'boolean'
             ]
         ];
-    } 
+    }
 }

@@ -81,7 +81,6 @@ class PagoService implements IPagoService {
 
         $qrContent = json_encode([
             'idPago' => $pagoMatricula->id,
-            'alumno' => $pagoMatricula->nombre_completo,
             'fechaPago' => $pagoMatricula->fecha_pago,
             'conceptoPago' => $pagoMatricula->concepto,
             'montoTotal' => $pagoMatricula->monto_total,

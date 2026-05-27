@@ -240,8 +240,38 @@ class DetalleParametroSeeder extends Seeder
         DB::table('detalle_parametro')->insert([
             [
                 'parametro_clase' => 1004,
-                'nombre' => 'MOYOBAMBA',
-                'nombre_url' => 'moyobamba',
+                'nombre' => 'IPEA',
+                'nombre_url' => 'ipea',
+                'longitud' => null,
+                'en_persona' => false,
+                'en_empresa' => false,
+                'compra' => false,
+                'venta' => false,
+                'created_at' => $now,
+                'updated_at' => $now
+            ]
+        ]);
+
+        DB::table('detalle_parametro')->insert([
+            [
+                'parametro_clase' => 1004,
+                'nombre' => 'PERUINNOVA',
+                'nombre_url' => 'peruinnova',
+                'longitud' => null,
+                'en_persona' => false,
+                'en_empresa' => false,
+                'compra' => false,
+                'venta' => false,
+                'created_at' => $now,
+                'updated_at' => $now
+            ]
+        ]);
+
+        DB::table('detalle_parametro')->insert([
+            [
+                'parametro_clase' => 1004,
+                'nombre' => 'PERUAGRO',
+                'nombre_url' => 'peruagro',
                 'longitud' => null,
                 'en_persona' => false,
                 'en_empresa' => false,
@@ -424,8 +454,8 @@ class DetalleParametroSeeder extends Seeder
         DB::table('detalle_parametro')->insert([
             [
                 'parametro_clase' => 1008,
-                'nombre' => 'BN-CAPACITA',
-                'nombre_url' => 'bn-capacita',
+                'nombre' => 'BN-PERUINNOVA',
+                'nombre_url' => 'bn-peruinnova',
                 'valor' => '1111-2222-3333',
                 'abreviatura' => null,
                 'longitud' => null,
@@ -438,8 +468,8 @@ class DetalleParametroSeeder extends Seeder
             ],
             [
                 'parametro_clase' => 1008,
-                'nombre' => 'BCP-CAPACITA',
-                'nombre_url' => 'bcp-capacita',
+                'nombre' => 'BCP-PERUINNOVA',
+                'nombre_url' => 'bcp-peruinnova',
                 'valor' => '4444-5555-6666',
                 'abreviatura' => null,
                 'longitud' => null,
@@ -522,7 +552,7 @@ class DetalleParametroSeeder extends Seeder
                 'updated_at' => $now
             ],
             [
-                'parametro_clase' => 1010,
+                'parametro_clase' => 1011,
                 'nombre' => 'Atrasado',
                 'nombre_url' => 'atrasado',
                 'abreviatura' => null,
@@ -533,8 +563,72 @@ class DetalleParametroSeeder extends Seeder
                 'venta' => false,
                 'created_at' => $now,
                 'updated_at' => $now
+            ],
+            [
+                'parametro_clase' => 1012,
+                'nombre' => 'Transferencia',
+                'nombre_url' => 'transferencia',
+                'abreviatura' => null,
+                'longitud' => null,
+                'en_persona' => false,
+                'en_empresa' => false,
+                'compra' => false,
+                'venta' => false,
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'parametro_clase' => 1012,
+                'nombre' => 'Efectivo',
+                'nombre_url' => 'efectivo',
+                'abreviatura' => null,
+                'longitud' => null,
+                'en_persona' => false,
+                'en_empresa' => false,
+                'compra' => false,
+                'venta' => false,
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'parametro_clase' => 1012,
+                'nombre' => 'Yape',
+                'nombre_url' => 'yape',
+                'abreviatura' => null,
+                'longitud' => null,
+                'en_persona' => false,
+                'en_empresa' => false,
+                'compra' => false,
+                'venta' => false,
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'parametro_clase' => 1012,
+                'nombre' => 'Plin',
+                'nombre_url' => 'plin',
+                'abreviatura' => null,
+                'longitud' => null,
+                'en_persona' => false,
+                'en_empresa' => false,
+                'compra' => false,
+                'venta' => false,
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'parametro_clase' => 1012,
+                'nombre' => 'Mixto',
+                'nombre_url' => 'mixto',
+                'abreviatura' => null,
+                'longitud' => null,
+                'en_persona' => false,
+                'en_empresa' => false,
+                'compra' => false,
+                'venta' => false,
+                'created_at' => $now,
+                'updated_at' => $now
             ]
         ]);
-
     }
 }

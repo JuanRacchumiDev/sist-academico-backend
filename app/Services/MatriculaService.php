@@ -1,10 +1,13 @@
 <?php
+
 namespace App\Services;
 
 use App\DTOs\Matricula\MatriculaCreateDTO;
 use App\DTOs\Matricula\MatriculaUpdateDTO;
+use App\DTOs\Pago\PagoCreateDTO;
 use App\Models\Matricula;
 use App\Repositories\Contracts\IMatriculaRepository;
+use App\Repositories\Contracts\IPagoRepository;
 use App\Services\Contracts\IMatriculaService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
@@ -15,12 +18,19 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
+use Override;
 
-class MatriculaService implements IMatriculaService {
+class MatriculaService implements IMatriculaService
+{
     protected IMatriculaRepository $matriculaRepository;
+    protected IPagoRepository $pagoRepository;
 
-    public function __construct(IMatriculaRepository $matriculaRepository) {
+    public function __construct(
+        IMatriculaRepository $matriculaRepository,
+        IPagoRepository $pagoRepository
+    ) {
         $this->matriculaRepository = $matriculaRepository;
+        $this->pagoRepository = $pagoRepository;
     }
 
     /**
@@ -28,7 +38,8 @@ class MatriculaService implements IMatriculaService {
      * @param array<string, mixed>|null $searchParams
      * @return Collection<int, Matricula>
      */
-    public function getAllMatriculas(?array $searchParams = null): Collection {
+    public function getAllMatriculas(?array $searchParams = null): Collection
+    {
         return $this->matriculaRepository->getAll($searchParams);
     }
 
@@ -37,7 +48,7 @@ class MatriculaService implements IMatriculaService {
      * @param array<string, mixed> $filters
      * @param int $perPage
      * @return LengthAwarePaginator
-     */ 
+     */
     public function getAllMatriculasWithFilters(array $filters, int $perPage): LengthAwarePaginator
     {
         return $this->matriculaRepository->getAllFiltered($filters, $perPage);
@@ -76,13 +87,13 @@ class MatriculaService implements IMatriculaService {
         }
 
         // Si no existe, generarlo
-        
+
         // Generar QR en Base64 para embeberlo en el HTML
         $qrData = route('programas.show', $matricula->id);
         $qrCode = base64_encode(QrCode::format('svg')->size(100)->margin(0)->generate($qrData));
 
         $logoPath = $institucion->logo_path
-            ? storage_path("app/public/".$institucion->logo_path)
+            ? storage_path("app/public/" . $institucion->logo_path)
             : public_path("images/logo_default.png");
 
         $logoBase64 = null;
@@ -90,7 +101,7 @@ class MatriculaService implements IMatriculaService {
         if (file_exists($logoPath)) {
             $type = pathinfo($logoPath, PATHINFO_EXTENSION);
             $data = file_get_contents($logoPath);
-            $logoBase64 = "data:image/".$type.';base64,'.base64_encode($data);
+            $logoBase64 = "data:image/" . $type . ';base64,' . base64_encode($data);
         }
 
         $data = [
@@ -105,10 +116,32 @@ class MatriculaService implements IMatriculaService {
 
         $pdf = Pdf::loadView('pdf.ficha_matricula', $data)
             ->setPaper('a4', 'portrait');
-            // ->setWarnings(false);
+        // ->setWarnings(false);
 
         Storage::disk('local')->put($fullPath, $pdf->output());
         return Storage::disk('local')->path($fullPath);
+    }
+
+    public function generateCertificadoPDF(int $idMatricula, int $idPrograma)
+    {
+        $data = $this->matriculaRepository->getCertificado($idMatricula, $idPrograma);
+
+        if (!$data) {
+            throw new Exception("No se encontraron registros válidos para generar el certificado.");
+        }
+
+        // Formatear fechas de manera profesional
+        Carbon::setLocale("es");
+
+        $data->fecha_inicio_letras = Carbon::parse($data->fecha_inicio)->translatedFormat('d \d\e F \d\e Y');
+        $data->fecha_final_letras = Carbon::parse($data->fecha_final)->translatedFormat('d \d\e F \d\e Y');
+        $data->fecha_emision = Carbon::now()->translatedFormat('d \d\e F \d\e Y');
+
+        // Cargar vista blade y pasar los datos orientados de forma horizontal (landscape)
+        $pdf = Pdf::loadView('pdf.certificado', ['info' => $data])
+            ->setPaper('a4', 'landscape');
+
+        return $pdf->output();
     }
 
     public function deleteFichaPDF(int $id): bool
@@ -136,38 +169,79 @@ class MatriculaService implements IMatriculaService {
      */
     public function createMatricula(MatriculaCreateDTO $matriculaCreateDTO): Matricula
     {
-        return DB::transaction(function() use ($matriculaCreateDTO) {
-            $matricutaData = $matriculaCreateDTO->toArray();
+        return DB::transaction(function () use ($matriculaCreateDTO) {
+            $dataCabecera = [
+                'id_persona' => $matriculaCreateDTO->id_persona,
+                'id_estadomatricula' => $matriculaCreateDTO->id_estadomatricula,
+                'id_institucion' => $matriculaCreateDTO->id_institucion,
+                'fecha_matricula' => $matriculaCreateDTO->fecha_matricula,
+                'estado' => $matriculaCreateDTO->estado,
+                'user_crea' => $matriculaCreateDTO->user_crea
+            ];
 
-            // Extraemos los ids de los programas
-            $programasIds = $matricutaData['programas'] ?? [];
-
-            // Quitamos 'programas' del array original
-            unset($matricutaData['programas']);
-
-            // Filtrar nulos
-            $dataCabecera = array_filter($matricutaData, fn($value) => !is_null($value));
-
-            // Crear la matrícula
+            // Crear la matrícula usando el repositorio Eloquent original
             /** @var Matricula $matricula */
             $matricula = $this->matriculaRepository->create($dataCabecera);
 
-            // Crear el detalle de la matrícula
-            foreach($programasIds as $idPrograma) {
+            foreach ($matriculaCreateDTO->programas as $idPrograma) {
                 $matricula->detalles()->create([
                     'id_programa' => $idPrograma,
-                    'user_crea'   => $dataCabecera['user_crea'] ?? null,
-                    'estado'      => true
+                    'user_crea' => $matriculaCreateDTO->user_crea,
+                    'estado' => true
                 ]);
             }
 
-            return $matricula->load('detalles.programa');
+            $pagoDTO = PagoCreateDTO::from([
+                'id_matricula'       => $matricula->id,
+                'id_modulo'          => $matriculaCreateDTO->id_modulo_pago,
+                'id_estadopago'      => $matriculaCreateDTO->id_estadopago,
+                'id_formapago'       => $matriculaCreateDTO->id_formapago,
+                'id_institucion'     => $matriculaCreateDTO->id_institucion,
+                'concepto'           => $matriculaCreateDTO->concepto_pago,
+                'numero_operacion'   => $matriculaCreateDTO->numero_operacion,
+                'fecha_pago'         => $matriculaCreateDTO->fecha_matricula, // Se asume pago el mismo día
+                'fecha_vencimiento'  => null,
+                'cantidad_efectivo'  => $matriculaCreateDTO->cantidad_efectivo,
+                'cantidad_operacion' => $matriculaCreateDTO->cantidad_operacion,
+                'user_crea'          => $matriculaCreateDTO->user_crea,
+                'estado'             => true
+            ]);
+
+            $this->pagoRepository->create($pagoDTO->toArray());
+
+            return $matricula->load(['detalles.programa']);
         });
+        // return DB::transaction(function () use ($matriculaCreateDTO) {
+        //     $matricutaData = $matriculaCreateDTO->toArray();
+
+        //     // Extraemos los ids de los programas
+        //     $programasIds = $matricutaData['programas'] ?? [];
+
+        //     // Quitamos 'programas' del array original
+        //     unset($matricutaData['programas']);
+
+        //     // Filtrar nulos
+        //     $dataCabecera = array_filter($matricutaData, fn($value) => !is_null($value));
+
+        //     // Crear la matrícula
+        //     $matricula = $this->matriculaRepository->create($dataCabecera);
+
+        //     // Crear el detalle de la matrícula
+        //     foreach ($programasIds as $idPrograma) {
+        //         $matricula->detalles()->create([
+        //             'id_programa' => $idPrograma,
+        //             'user_crea'   => $dataCabecera['user_crea'] ?? null,
+        //             'estado'      => true
+        //         ]);
+        //     }
+
+        //     return $matricula->load('detalles.programa');
+        // });
     }
 
     public function updateMatricula(int $id, MatriculaUpdateDTO $dto): ?Matricula
     {
-        return DB::transaction(function() use ($id, $dto) {
+        return DB::transaction(function () use ($id, $dto) {
             $data = array_filter($dto->toArray(), fn($v) => !is_null($v));
 
             $matricula = $this->matriculaRepository->update($id, $data);
@@ -175,7 +249,7 @@ class MatriculaService implements IMatriculaService {
             if (isset($data['programas'])) {
                 $matricula->detalles()->delete();
 
-                foreach($data['programas'] as $programaId) {
+                foreach ($data['programas'] as $programaId) {
                     $matricula->detalles()->create([
                         'id_programa' => $programaId,
                         'user_crea' => $data['user_actualiza'] ?? null,
@@ -191,6 +265,6 @@ class MatriculaService implements IMatriculaService {
     private function getPeriodoAcademico(): string
     {
         $mes = now()->month;
-        return now()->year.($mes <= 7 ? ' - I': ' - II');
+        return now()->year . ($mes <= 7 ? ' - I' : ' - II');
     }
 }

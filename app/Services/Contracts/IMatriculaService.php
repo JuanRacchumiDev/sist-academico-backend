@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services\Contracts;
 
 use App\DTOs\Matricula\MatriculaCreateDTO;
@@ -7,14 +8,15 @@ use App\Models\Matricula;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 
-interface IMatriculaService {
+interface IMatriculaService
+{
     /**
      * Obtener todas las matrículas
      * @param array<string, mixed>|null $searchParams
      * @return Collection<int, Matricula>
      */
     public function getAllMatriculas(?array $searchParams = null): Collection;
-    
+
     /**
      * Obtiene todas las matrículas con filtros aplicados
      * @param array<string, mixed> $filters
@@ -22,7 +24,7 @@ interface IMatriculaService {
      * @return LengthAwarePaginator<Matricula>
      */
     public function getAllMatriculasWithFilters(array $filters, int $perPage): LengthAwarePaginator;
-    
+
     /**
      * Obtiene una matrícula por ID
      * @param int $id
@@ -30,10 +32,21 @@ interface IMatriculaService {
      */
     public function getMatriculaById(int $id): ?Matricula;
 
+    /**
+     * Obtiene una ficha en formato PDF por ID
+     * @param int $id
+     */
     public function generateFichaPDF(int $id);
 
+    public function generateCertificadoPDF(int $idMatricula, int $idPrograma);
+
+    /**
+     * Elimina una ficha por ID
+     * @param int $id
+     * @return bool
+     */
     public function deleteFichaPDF(int $id): bool;
-    
+
     /**
      * Crear una nueva matrícula
      * @param MatriculaCreateDTO $matriculaCreateDTO

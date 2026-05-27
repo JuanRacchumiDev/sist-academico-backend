@@ -15,7 +15,10 @@ class Pago extends Model
         'id_matricula',
         'id_modulo',
         'id_estadopago',
+        'id_formapago',
         'id_institucion',
+        'concepto',
+        'numero_operacion',
         'fecha_pago',
         'fecha_vencimiento',
         'cantidad',
@@ -34,7 +37,8 @@ class Pago extends Model
     ];
 
     protected $casts = [
-        'estado' => 'boolean'
+        'estado' => 'boolean',
+        'cantidad' => 'float'
     ];
 
     /**
@@ -54,6 +58,11 @@ class Pago extends Model
     public function estadoPago(): BelongsTo
     {
         return $this->belongsTo(DetalleParametro::class, 'id_estadopago', 'codigo');
+    }
+
+    public function formaPago(): BelongsTo
+    {
+        return $this->belongsTo(DetalleParametro::class, 'id_formapago', 'codigo');
     }
 
     public function institucion(): BelongsTo

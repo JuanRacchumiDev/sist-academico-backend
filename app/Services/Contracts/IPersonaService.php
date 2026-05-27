@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services\Contracts;
 
 use App\DTOs\Persona\PersonaCreateDTO;
@@ -7,7 +8,8 @@ use App\Models\Persona;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 
-interface IPersonaService {
+interface IPersonaService
+{
     /**
      * Obtener todas las personas
      * @param array<string, mixed>|null $searchParams
@@ -22,6 +24,8 @@ interface IPersonaService {
      * @return LengthAwarePaginator<Persona>
      */
     public function getAllPersonasWithFilters(array $filters, int $perPage): LengthAwarePaginator;
+
+    public function getAllPersonasForSearch(array $filters): Collection;
 
     /**
      * Obtiene una persona por ID

@@ -2,6 +2,7 @@
 namespace App\Services\Contracts;
 
 use App\DTOs\Programa\ProgramaCreateDTO;
+use App\DTOs\Programa\ProgramaUpdateDTO;
 use App\Models\Programa;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
@@ -34,4 +35,12 @@ interface IProgramaService {
      * @return Programa
      */
     public function createPrograma(ProgramaCreateDTO $programaCreateDTO): Programa;
+
+    /**
+     * Actualiza un programa existente
+     * @param int $id
+     * @param ProgramaUpdateDTO $programaUpdateDTO
+     * @return Programa|null
+     */
+    public function updatePrograma(int $id, ProgramaUpdateDTO $programaUpdateDTO): ?Programa;
 }
