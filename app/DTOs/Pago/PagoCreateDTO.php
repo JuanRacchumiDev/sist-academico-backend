@@ -17,6 +17,7 @@ class PagoCreateDTO extends Data
         public ?int $id_modulo = null,
         public ?int $id_estadopago = null,
 
+        public ?int $numero_modulo = null,
         public ?string $numero_operacion = null,
         public ?string $fecha_pago = null,
         public ?string $fecha_vencimiento = null,
@@ -36,6 +37,16 @@ class PagoCreateDTO extends Data
                 'integer',
                 'exists:matricula:id'
             ],
+            'id_formapago' => [
+                'required',
+                'integer',
+                'exists:detalle_parametro,codigo'
+            ],
+            'id_institucion' => [
+                'required',
+                'integer',
+                'exists:institucion,id'
+            ],
             'id_modulo' => [
                 'sometimes',
                 'integer',
@@ -48,20 +59,18 @@ class PagoCreateDTO extends Data
                 'exists:detalle_parametro,codigo',
                 'nullable',
             ],
-            'id_formapago' => [
-                'required',
-                'integer',
-                'exists:detalle_parametro,codigo'
-            ],
-            'id_institucion' => [
-                'required',
-                'integer',
-                'exists:institucion,id'
-            ],
             'concepto' => [
                 'required',
                 'string',
                 'max:200'
+            ],
+            'numero_modulo' => [
+                'sometimes',
+                'integer'
+            ],
+            'numero_operacion' => [
+                'sometimes',
+                'string'
             ],
             'fecha_pago' => [
                 'sometimes',

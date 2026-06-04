@@ -21,6 +21,7 @@ return new class extends Migration
             $table->unsignedBigInteger('id_institucion');
 
             $table->string('concepto', 200);
+            $table->integer('numero_modulo')->nullable();
             $table->string('numero_operacion', 20)->nullable();
             $table->string('fecha_pago')->nullable();
             $table->string('fecha_vencimiento')->nullable();

@@ -83,7 +83,10 @@ Route::prefix('v1')->group(function () {
         });
 
         Route::prefix('matriculas')->group(function () {
+            Route::get('{id}/modulos-por-pagar', [MatriculaController::class, 'getModulosPorPagar'])->name('matriculas.modulosporpagar');
+            Route::get('{id}/modulos-pagados', [MatriculaController::class, 'getModulosPagados'])->name('matriculas.modulospagados');
             Route::get('/certificado', [MatriculaController::class, 'downloadCertificado'])->name('matriculas.certificado');
+            Route::get('/cronograma-pagos', [MatriculaController::class, 'downloadCronograma'])->name('matriculas.cronogramapagos');
             Route::get('/paginate', [MatriculaController::class, 'getFilteredPaginate'])->name('matriculas.paginate');
             Route::get('/{id}', [MatriculaController::class, 'show'])->name('matriculas.show');
             Route::get('/{id}/pdf', [MatriculaController::class, 'downloadFicha'])->name('matriculas.pdf');

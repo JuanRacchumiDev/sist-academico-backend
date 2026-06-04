@@ -11,12 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('matricula', function(Blueprint $table) {
+        Schema::create('matricula', function (Blueprint $table) {
             $table->id();
 
             $table->unsignedBigInteger('id_persona');
             $table->unsignedBigInteger('id_estadomatricula');
             $table->unsignedBigInteger('id_institucion');
+
+            $table->integer('numero_modulos');
 
             $table->string('fecha_matricula', 10);
             $table->string('fecha_retiro', 10)->nullable();
@@ -49,7 +51,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('matricula', function(Blueprint $table) {
+        Schema::table('matricula', function (Blueprint $table) {
             $table->dropForeign('id_persona');
             $table->dropColumn('id_persona');
 

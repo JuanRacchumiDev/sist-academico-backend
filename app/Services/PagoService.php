@@ -1,40 +1,37 @@
 <?php
+
 namespace App\Services;
 
 use App\DTOs\Pago\PagoCreateDTO;
 use App\Models\Pago;
 use App\Repositories\Contracts\IPagoRepository;
+use App\Repositories\Contracts\IMatriculaRepository;
 use App\Services\Contracts\IPagoService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Barryvdh\DomPDF\Facade\Pdf;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Support\Facades\Log;
+use Override;
 
-class PagoService implements IPagoService {
+class PagoService implements IPagoService
+{
     protected IPagoRepository $pagoRepository;
+    protected IMatriculaRepository $matriculaRepository;
 
-    public function __construct(IPagoRepository $pagoRepository)
-    {
+    public function __construct(
+        IPagoRepository $pagoRepository,
+        IMatriculaRepository $matriculaRepository
+    ) {
         $this->pagoRepository = $pagoRepository;
+        $this->matriculaRepository = $matriculaRepository;
     }
 
-    /**
-     * Obtener todos los pagos
-     * @param array<string, mixed>|null $searchParams
-     * @return Collection<int, Pago>
-     */
     public function getAllPagos(?array $searchParams = null): Collection
     {
         return $this->pagoRepository->getAll($searchParams);
     }
 
-    /**
-     * Obtiene todos los pagos con filtros aplicados
-     * @param array<string, mixed> $filters
-     * @param int $perPage
-     * @return LengthAwarePaginator
-     */ 
     public function getAllPagosWithFilters(array $filters, int $perPage): LengthAwarePaginator
     {
         return $this->pagoRepository->getAllFiltered($filters, $perPage);
@@ -137,7 +134,7 @@ class PagoService implements IPagoService {
         ];
 
         $qrContent = url("/verificar/recibo-modulo/{$pagoModulo->id}");
-        
+
         // Usamos format('svg') para mejor calidad en el PDF
         $qrCode = base64_encode(QrCode::format('svg')->size(90)->generate($qrContent));
 
@@ -158,24 +155,13 @@ class PagoService implements IPagoService {
             'status' => 'success',
             'message' => 'Recibo de pago generado y guardado exitosamente'
         ];
-
     }
 
-    /**
-     * Obtiene un pago por ID
-     * @param int $id
-     * @return Pago|null
-     */
     public function getPagoById(int $id): ?Pago
     {
         return $this->pagoRepository->findById($id);
     }
 
-    /**
-     * Crear una nuevo pago
-     * @param PagoCreateDTO $pagoCreateDTO
-     * @return Pago
-     */
     public function createPago(PagoCreateDTO $pagoCreateDTO): Pago
     {
         $data = array_filter($pagoCreateDTO->toArray(), fn($value) => !is_null($value));

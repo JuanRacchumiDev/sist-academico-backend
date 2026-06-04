@@ -5,13 +5,13 @@ namespace App\Http\Controllers\Api;
 use App\DTOs\Matricula\MatriculaCreateDTO;
 use App\DTOs\Matricula\MatriculaUpdateDTO;
 use App\Http\Controllers\Controller;
-use App\Models\Matricula;
 use App\Services\Contracts\IMatriculaService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Auth;
 
 class MatriculaController extends Controller
 {
@@ -101,6 +101,86 @@ class MatriculaController extends Controller
         }
     }
 
+    public function getModulosPorPagar(string $id): JsonResponse
+    {
+        try {
+            $responseService = $this->matriculaService->getModulosPorPagar((int)$id);
+
+            if (!$responseService['status']) {
+                return response()->json([
+                    'result' => false,
+                    'data' => [],
+                    'message' => $responseService['message']
+                ], $responseService['code'] ?? 404);
+            }
+
+            $detalle = $responseService['detalle'];
+
+            // Comprobamos si la colección de módulos está vacía
+            if (count($detalle['modulos']) === 0) {
+                return response()->json([
+                    'result' => true,
+                    'data' => $detalle,
+                    'message' => 'No se encontraron módulos pendientes o registrados para esta matrícula'
+                ], 200);
+            }
+
+            return response()->json([
+                'result' => true,
+                'data' => $detalle,
+                'message' => 'Resultados encontrados correctamente'
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error("Error filtering módulos: " . $e->getMessage());
+
+            return response()->json([
+                'result' => false,
+                'message' => 'Error al obtener módulos.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function getModulosPagados(string $id): JsonResponse
+    {
+        try {
+            $responseService = $this->matriculaService->getModulosPagados((int)$id);
+
+            if (!$responseService['status']) {
+                return response()->json([
+                    'result' => false,
+                    'data' => [],
+                    'message' => $responseService['message']
+                ], $responseService['code'] ?? 404);
+            }
+
+            $detalle = $responseService['detalle'];
+
+            // Comprobamos si la colección de módulos está vacía
+            if (count($detalle['modulos']) === 0) {
+                return response()->json([
+                    'result' => true,
+                    'data' => $detalle,
+                    'message' => 'No se encontraron módulos pagados para esta matrícula'
+                ], 200);
+            }
+
+            return response()->json([
+                'result' => true,
+                'data' => $detalle,
+                'message' => 'Módulos pagados encontrados correctamente'
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error("Error filtering módulos: " . $e->getMessage());
+
+            return response()->json([
+                'result' => false,
+                'message' => 'Error al obtener módulos.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function downloadFicha(int $id)
     {
         try {
@@ -147,6 +227,32 @@ class MatriculaController extends Controller
         }
     }
 
+    public function downloadCronograma(Request $request)
+    {
+        try {
+            $request->validate([
+                'id_matricula' => 'required|integer'
+            ]);
+
+            $idMatricula = (int) $request->query('id_matricula');
+
+            $pdfContent = $this->matriculaService->generarCronogramaPagos($idMatricula);
+
+            $filename = "cronograma_pagos_matricula_{$idMatricula}.pdf";
+
+            return new Response($pdfContent, 200, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="' . $filename . '"',
+            ]);
+        } catch (\Exception $e) {
+            Log::error("Error al generar cronograma de pagos: " . $e->getMessage());
+            return response()->json([
+                'result' => false,
+                'message' => $e->getMessage()
+            ], 404);
+        }
+    }
+
     public function regenerateFicha(int $id)
     {
         try {
@@ -167,6 +273,9 @@ class MatriculaController extends Controller
         try {
             $data = $request->all();
 
+            $usuarioAutenticado = Auth::user();
+            $username = $usuarioAutenticado ? ($usuarioAutenticado->name) : 'systemapi';
+
             $filters = [
                 'id_persona' => $data['id_persona'],
                 'fecha_matricula' => $data['fecha_matricula']
@@ -185,6 +294,7 @@ class MatriculaController extends Controller
 
             $data['id_formapago'] = $data['id_formapago_matricula'];
             $data['concepto_pago'] = "PAGO DE MATRÍCULA";
+            $data['user_crea'] = $username;
 
             $matriculaCreateDTO = MatriculaCreateDTO::from($data);
 
@@ -248,6 +358,10 @@ class MatriculaController extends Controller
     public function update(int $id, MatriculaUpdateDTO $dto): JsonResponse
     {
         try {
+            $usuarioAutenticado = Auth::user();
+            $username = $usuarioAutenticado ? ($usuarioAutenticado->name) : 'systemapi';
+            $dto->user_actualiza = $username;
+
             $matricula = $this->matriculaService->updateMatricula($id, $dto);
 
             return response()->json([

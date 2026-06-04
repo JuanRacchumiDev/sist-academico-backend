@@ -16,6 +16,7 @@ class Matricula extends Model
         "id_persona",
         "id_estadomatricula",
         "id_institucion",
+        'numero_modulos',
         "fecha_matricula",
         "fecha_retiro",
         "fecha_reserva",

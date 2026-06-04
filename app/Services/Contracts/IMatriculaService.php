@@ -40,6 +40,12 @@ interface IMatriculaService
 
     public function generateCertificadoPDF(int $idMatricula, int $idPrograma);
 
+    public function getModulosPorPagar(int $idMatricula): array;
+
+    public function getModulosPagados(int $idMatricula): array;
+
+    public function generarCronogramaPagos(int $idMatricula);
+
     /**
      * Elimina una ficha por ID
      * @param int $id

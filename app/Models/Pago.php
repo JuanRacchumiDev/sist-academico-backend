@@ -13,15 +13,17 @@ class Pago extends Model
 
     protected $fillable = [
         'id_matricula',
-        'id_modulo',
+        // 'id_modulo',
         'id_estadopago',
         'id_formapago',
         'id_institucion',
         'concepto',
+        'numero_modulo',
         'numero_operacion',
         'fecha_pago',
         'fecha_vencimiento',
-        'cantidad',
+        'cantidad_efectivo',
+        'cantidad_operacion',
         'user_crea',
         'user_actualiza',
         'user_elimina',
@@ -41,19 +43,15 @@ class Pago extends Model
         'cantidad' => 'float'
     ];
 
-    /**
-     * Obtener la matrícula
-     * @return BelongsTo<Matricula, $this>
-     */
     public function matricula(): BelongsTo
     {
         return $this->belongsTo(Matricula::class, 'id_matricula', 'id');
     }
 
-    public function modulo(): BelongsTo
-    {
-        return $this->belongsTo(Modulo::class, 'id_modulo', 'id');
-    }
+    // public function modulo(): BelongsTo
+    // {
+    //     return $this->belongsTo(Modulo::class, 'id_modulo', 'id');
+    // }
 
     public function estadoPago(): BelongsTo
     {

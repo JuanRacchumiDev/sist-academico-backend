@@ -10,13 +10,14 @@ class MatriculaCreateDTO extends Data
         public int $id_persona,
         public int $id_estadomatricula,
         public int $id_institucion,
-
-        public array $programas,
+        public int $numero_modulos,
         public string $fecha_matricula,
-        public bool $estado,
 
         public int $id_formapago,
         public string $concepto_pago,
+        public array $programas,
+        public bool $estado,
+
         public ?int $id_modulo_pago = null,
         public ?int $id_estadopago = null,
         public ?string $numero_operacion = null,
@@ -48,6 +49,10 @@ class MatriculaCreateDTO extends Data
                 'required',
                 'integer',
                 'exists:institucion,id'
+            ],
+            'numero_modulos' => [
+                'required',
+                'integer'
             ],
             'programas' => [
                 'required',

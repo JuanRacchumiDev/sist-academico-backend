@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 
 class PagoController extends Controller
 {
@@ -42,7 +43,7 @@ class PagoController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error("Error fetching eventos: " . $e->getMessage());
-            
+
             return response()->json([
                 'result' => false,
                 'message' => 'Error al obtener eventos: ' . $e->getMessage()
@@ -61,7 +62,7 @@ class PagoController extends Controller
 
             $perPage = $request->input('per_page', 10);
 
-            $filters = array_map(function($value) {
+            $filters = array_map(function ($value) {
                 if ($value === 'true') return true;
                 if ($value === 'false') return false;
                 return $value;
@@ -92,7 +93,7 @@ class PagoController extends Controller
             ], 200);
         } catch (\Exception $e) {
             Log::error("Error filtering pagos: " . $e->getMessage());
-            
+
             return response()->json([
                 'result' => false,
                 'message' => 'Error al obtener pagos.',
@@ -101,7 +102,8 @@ class PagoController extends Controller
         }
     }
 
-    public function getMatricula(Request $request) {
+    public function getMatricula(Request $request)
+    {
         $request->validate([
             'id_alumno' => 'required|integer|exists:persona,id',
             'id_matricula' => 'required|integer|exists:matricula,id',
@@ -131,7 +133,8 @@ class PagoController extends Controller
             ->header('Content-Disposition', "inline; filename=\"{$filename}\"");
     }
 
-    public function getPagoModulo(Request $request) {
+    public function getPagoModulo(Request $request)
+    {
         $request->validate([
             'id_alumno' => 'required|integer|exists:persona,id',
             'id_matricula' => 'required|integer|exists:matricula,id',
@@ -175,6 +178,10 @@ class PagoController extends Controller
         try {
             $data = $request->all();
 
+            $usuarioAutenticado = Auth::user();
+            $username = $usuarioAutenticado ? ($usuarioAutenticado->name) : 'systemapi';
+            $data['user_crea'] = $username;
+
             $pagoCreateDTO = PagoCreateDTO::from($data);
 
             $pago = $this->pagoService->createPago($pagoCreateDTO);
@@ -192,7 +199,7 @@ class PagoController extends Controller
             ], 422);
         } catch (\Exception $e) {
             Log::error("Error creating pago: " . $e->getMessage());
-            
+
             return response()->json([
                 'result' => false,
                 'message' => 'Error al crear pago: ' . $e->getMessage()
@@ -223,7 +230,7 @@ class PagoController extends Controller
             ], 200);
         } catch (\Exception $e) {
             Log::error("Error fetching pago (id: {$id}): " . $e->getMessage());
-            
+
             return response()->json([
                 'result' => false,
                 'message' => 'Error al obtener el pago: ' . $e->getMessage()

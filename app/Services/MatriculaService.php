@@ -5,6 +5,7 @@ namespace App\Services;
 use App\DTOs\Matricula\MatriculaCreateDTO;
 use App\DTOs\Matricula\MatriculaUpdateDTO;
 use App\DTOs\Pago\PagoCreateDTO;
+use App\Helpers\ItemPagoHelper;
 use App\Models\Matricula;
 use App\Repositories\Contracts\IMatriculaRepository;
 use App\Repositories\Contracts\IPagoRepository;
@@ -18,6 +19,7 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 use Override;
 
 class MatriculaService implements IMatriculaService
@@ -144,6 +146,149 @@ class MatriculaService implements IMatriculaService
         return $pdf->output();
     }
 
+    public function getModulosPorPagar(int $idMatricula): array
+    {
+        $matricula = $this->matriculaRepository->findById($idMatricula);
+
+        if (!$matricula) {
+            return [
+                'status' => false,
+                'message' => 'La matrícula especificada no existe',
+                'detalle' => null,
+                'code' => 404
+            ];
+        }
+
+        $modulos = $this->pagoRepository->getModulosPorPagar($idMatricula, $matricula->numero_modulos);
+
+        return [
+            'status' => true,
+            'message' => 'Módulos por pagar encontrados',
+            'detalle' => [
+                'matricula_id' => $idMatricula,
+                'total_modulos' => $matricula->numero_modulos,
+                'modulos' => $modulos
+            ],
+            'code' => 200
+        ];
+    }
+
+    public function getModulosPagados(int $idMatricula): array
+    {
+        $matricula = $this->matriculaRepository->findById($idMatricula);
+
+        if (!$matricula) {
+            return [
+                'status' => false,
+                'message' => 'La matrícula especificada no existe',
+                'detalle' => null,
+                'code' => 404
+            ];
+        }
+
+        $modulosPagados = $this->pagoRepository->getModulosPagados($idMatricula);
+
+        return [
+            'status' => true,
+            'message' => 'Módulos pagados encontrados',
+            'detalle' => [
+                'matricula_id' => $idMatricula,
+                'modulos' => $modulosPagados
+            ],
+            'code' => 200
+        ];
+    }
+
+    public function generarCronogramaPagos(int $idMatricula)
+    {
+        $matricula = $this->matriculaRepository->findById($idMatricula);
+
+        if (!$matricula) {
+            return [
+                'status' => false,
+                'message' => 'La matrícula especificada no existe',
+                'detalle' => null,
+                'code' => 404
+            ];
+        }
+
+        // $institucion = $matricula->institucion;
+
+        // $numeroFormateado = str_pad($matricula->id, 6, '0', STR_PAD_LEFT);
+
+        // $anio = Carbon::parse($matricula->fecha_matricula)->year;
+        // $nombreIns = str($institucion->nombre)->slug();
+        // $documento = $matricula->persona->numero_documento;
+
+        // $folderPath = "matriculas/{$anio}/{$nombreIns}/{$documento}";
+        // $fileName = "cronograma_pagos_matricula_{$numeroFormateado}.pdf";
+        // $fullPath = "{$folderPath}/{$fileName}";
+
+        // Log::info('Iniciando proceso de PDF de cronograma de pagos', ['folderPath' => $folderPath, 'fileName' => $fileName, 'fullPath' => $fullPath]);
+
+        // Verificar si ya existe
+        // if (Storage::disk("local")->exists($fullPath)) {
+        //     return Storage::disk("local")->path($fullPath);
+        // }
+
+        // Log::info('se creó archivo en directorio', ['fullPath' => $fullPath]);
+
+        $pagosReales = $this->pagoRepository->getPagosByMatricula($idMatricula);
+
+        Log::info('Obteniendo pagos reales', ['pagosReales' => $pagosReales]);
+
+        $cronograma = [];
+
+        $totalModulos = $matricula->numero_modulos;
+
+        // Log::info('Obteniendo total módulos', ['totalModulos' => $totalModulos]);
+
+        for ($i = 1; $i <= $totalModulos; $i++) {
+            $pagoEfectuado = $pagosReales->firstWhere('numero_modulo', $i);
+
+            $fechaVencimiento = ItemPagoHelper::calcularFechaVencimiento($matricula->fecha_matricula, $i);
+
+            if ($pagoEfectuado) {
+                $cronograma[] = [
+                    'numero_modulo' => $i,
+                    'fecha_vencimiento' => $fechaVencimiento,
+                    'estado' => 'PAGADO',
+                    'monto' => ($pagoEfectuado->cantidad_efectivo ?? 0) + ($pagoEfectuado->cantidad_operacion ?? 0),
+                    'fecha_pago' => $pagoEfectuado->fecha_pago,
+                    'referencia' => $pagoEfectuado->numero_operacion ?? 'Efectivo',
+                    'forma_pago' => $pagoEfectuado->formaPago->nombre ?? 'N/A'
+                ];
+            } else {
+                $cronograma[] = [
+                    'numero_modulo' => $i,
+                    'fecha_vencimiento' => $fechaVencimiento,
+                    'estado' => 'PENDIENTE',
+                    'monto' => 0.00,
+                    'fecha_pago' => '---',
+                    'referencia' => '---',
+                    'forma_pago' => '---'
+                ];
+            }
+        }
+
+        $dataPdf = [
+            'matricula' => $matricula,
+            'cronograma' => $cronograma,
+            'fecha_emision' => now()->format('d/m/Y H:i')
+        ];
+
+        Log::info('Evaluando variable dataPdf', ['dataPdf' => $dataPdf]);
+
+        $pdf = Pdf::loadView('pdf.cronograma_pagos', $dataPdf)
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->output();
+
+        // Storage::disk('local')->put($fullPath, $pdf->output());
+
+        // return Storage::disk('local')->path($fullPath);
+    }
+
     public function deleteFichaPDF(int $id): bool
     {
         $matricula = $this->matriculaRepository->findById($id);
@@ -174,6 +319,7 @@ class MatriculaService implements IMatriculaService
                 'id_persona' => $matriculaCreateDTO->id_persona,
                 'id_estadomatricula' => $matriculaCreateDTO->id_estadomatricula,
                 'id_institucion' => $matriculaCreateDTO->id_institucion,
+                'numero_modulos' => $matriculaCreateDTO->numero_modulos,
                 'fecha_matricula' => $matriculaCreateDTO->fecha_matricula,
                 'estado' => $matriculaCreateDTO->estado,
                 'user_crea' => $matriculaCreateDTO->user_crea
@@ -211,32 +357,6 @@ class MatriculaService implements IMatriculaService
 
             return $matricula->load(['detalles.programa']);
         });
-        // return DB::transaction(function () use ($matriculaCreateDTO) {
-        //     $matricutaData = $matriculaCreateDTO->toArray();
-
-        //     // Extraemos los ids de los programas
-        //     $programasIds = $matricutaData['programas'] ?? [];
-
-        //     // Quitamos 'programas' del array original
-        //     unset($matricutaData['programas']);
-
-        //     // Filtrar nulos
-        //     $dataCabecera = array_filter($matricutaData, fn($value) => !is_null($value));
-
-        //     // Crear la matrícula
-        //     $matricula = $this->matriculaRepository->create($dataCabecera);
-
-        //     // Crear el detalle de la matrícula
-        //     foreach ($programasIds as $idPrograma) {
-        //         $matricula->detalles()->create([
-        //             'id_programa' => $idPrograma,
-        //             'user_crea'   => $dataCabecera['user_crea'] ?? null,
-        //             'estado'      => true
-        //         ]);
-        //     }
-
-        //     return $matricula->load('detalles.programa');
-        // });
     }
 
     public function updateMatricula(int $id, MatriculaUpdateDTO $dto): ?Matricula

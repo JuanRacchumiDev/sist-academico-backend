@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Repositories\Eloquent;
 
 use App\Models\Pago;
@@ -8,9 +9,10 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Override;
 
-class PagoRepository implements IPagoRepository {
-
+class PagoRepository implements IPagoRepository
+{
     protected string $disk = "public";
     protected string $pathMatricula = "pdfs/matriculas/";
     protected string $pathModulo = "pdfs/pago-modulo/";
@@ -19,17 +21,17 @@ class PagoRepository implements IPagoRepository {
     public function getAll(?array $searchParams = null): Collection
     {
         $query = Pago::with([
-            'matricula',
-            'modulo',
+            'matricula.persona',
+            // 'modulo',
             'estadoPago',
             'formaPago',
             'institucion'
         ]);
 
         if ($searchParams) {
-            $query->where(function($q) use ($searchParams) {
+            $query->where(function ($q) use ($searchParams) {
                 if (isset($searchParams['search'])) {
-                    $search = '%'.strtolower($searchParams['search']).'%';
+                    $search = '%' . strtolower($searchParams['search']) . '%';
 
                     $q->whereRaw('LOWER(concepto) LIKE ?', [$search]);
                 }
@@ -42,8 +44,8 @@ class PagoRepository implements IPagoRepository {
     public function getAllFiltered(array $filters, int $perPage): LengthAwarePaginator
     {
         $query = Pago::with([
-            'matricula',
-            'modulo',
+            'matricula.persona',
+            // 'modulo',
             'estadoPago',
             'formaPago',
             'institucion'
@@ -55,7 +57,7 @@ class PagoRepository implements IPagoRepository {
 
         // Aplicar búsqueda por texto
         if (isset($filters['search'])) {
-            $search = '%'.strtolower($filters['search']).'%';
+            $search = '%' . strtolower($filters['search']) . '%';
 
             $query->where(function ($q) use ($search) {
                 $q->whereRaw('LOWER(concepto) LIKE ?', [$search]);
@@ -122,11 +124,11 @@ class PagoRepository implements IPagoRepository {
     public function getPagoModuloData(array $filters)
     {
         Log::info('Validate paremeters filters getPagoModuloData', ['filters' => $filters]);
-    
+
         $idMatricula = $filters['id_matricula'];
 
         Log::info('idMatricula getPagoModuloData', ['idMatricula' => $idMatricula]);
-        
+
         $pagoData = DB::table('pago as p')
             ->join('programa as p2', 'p.id_programa', '=', 'p2.id')
             ->join('detalle_parametro as dp', 'dp.codigo', '=', 'p.id_formapago')
@@ -146,6 +148,61 @@ class PagoRepository implements IPagoRepository {
         return $pagoData;
     }
 
+    public function getModulosPorPagar(int $idMatricula, int $totalModulos)
+    {
+        $modulosData = DB::select(
+            "
+            SELECT 
+                serie.modulo AS numero_modulo,
+                false AS pagado,
+                p.id AS id_pago
+            FROM public.matricula m
+            CROSS JOIN LATERAL generate_series(1, m.numero_modulos) AS serie(modulo)
+            LEFT JOIN public.pago p ON p.id_matricula = m.id 
+                AND p.numero_modulo = serie.modulo
+                AND p.estado = true
+            WHERE m.id = ?         
+            AND m.estado = true    
+            AND p.id IS NULL       
+            ORDER BY serie.modulo ASC
+            ",
+            [$idMatricula]
+        );
+
+        return $modulosData;
+    }
+
+    #[Override]
+    public function getModulosPagados(int $idMatricula)
+    {
+        $modulosData = DB::select(
+            "
+            SELECT
+                pg.id, pg.id_formapago, pg.numero_modulo,
+                pg.concepto, pg.numero_operacion, pg.fecha_pago,
+                pg.cantidad_efectivo, pg.cantidad_operacion,
+                dp.nombre as nombre_formapago
+            FROM
+                pago pg INNER JOIN detalle_parametro dp
+                ON dp.codigo = pg.id_formapago
+            WHERE pg.id_matricula = ? AND pg.numero_modulo IS NOT NULL
+            ORDER BY pg.numero_modulo ASC
+            ",
+            [$idMatricula]
+        );
+
+        return $modulosData;
+    }
+
+    public function getPagosByMatricula(int $idMatricula)
+    {
+        return Pago::with(['formaPago', 'estadoPago'])
+            ->where('id_matricula', $idMatricula)
+            ->where('estado', true)
+            ->orderBy('numero_modulo', 'ASC')
+            ->get();
+    }
+
     public function existsPDF(array $filters): bool
     {
         return Storage::disk($this->disk)->exists($this->getFilePath($filters));
@@ -159,8 +216,8 @@ class PagoRepository implements IPagoRepository {
     public function findById(int $id): ?Pago
     {
         return Pago::with([
-            'matricula',
-            'modulo',
+            'matricula.persona',
+            // 'modulo',
             'estadoPago',
             'formaPago',
             'institucion'
@@ -192,6 +249,6 @@ class PagoRepository implements IPagoRepository {
             return $pago->delete();
         }
 
-        return false;   
+        return false;
     }
 }

@@ -90,7 +90,7 @@ class MatriculaRepository implements IMatriculaRepository
             'institucion',
             'detalles.programa.tipoPrograma',
             'detalles.programa.categoriaPrograma'
-        ])->findOrFail($id);
+        ])->find($id);
     }
 
     /**
