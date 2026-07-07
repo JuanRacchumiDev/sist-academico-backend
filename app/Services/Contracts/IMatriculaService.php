@@ -33,6 +33,14 @@ interface IMatriculaService
     public function getMatriculaById(int $id): ?Matricula;
 
     /**
+     * Verifica si una persona ya cuenta con una matrícula en una fecha determinada
+     * @param int $idPersona
+     * @param string $fechaMatricula
+     * @return Matricula|null
+     */
+    public function getMatriculaByPersonaAndFecha(int $idPersona, string $fechaMatricula): ?Matricula;
+
+    /**
      * Obtiene una ficha en formato PDF por ID
      * @param int $id
      */

@@ -1,20 +1,21 @@
 <?php
+
 namespace App\Services;
 
 use App\DTOs\User\UserCreateDTO;
 use App\DTOs\User\UserUpdateDTO;
 use App\Models\User;
-use App\Repositories\Contracts\IPersonaRepository;
 use App\Repositories\Contracts\IUserRepository;
-use App\Repositories\Contracts\IDetalleParametroRepository;
 use App\Services\Contracts\IUserService;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\DB;
+use App\Mail\UserWelcomeMail;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Log;
 
-class UserService implements IUserService {
+class UserService implements IUserService
+{
     protected IUserRepository $userRepository;
 
     public function __construct(IUserRepository $userRepository)
@@ -24,7 +25,12 @@ class UserService implements IUserService {
 
     public function getAllUsers(array $filters = [], int $perPage = 10)
     {
-        return $this->userRepository->get($filters, $perPage);
+        return $this->userRepository->getAll($filters, $perPage);
+    }
+
+    public function getAllUsersWithFilters(array $filters, int $perPage): LengthAwarePaginator
+    {
+        return $this->userRepository->getAllFiltered($filters, $perPage);
     }
 
     public function getUserById(int $id): ?User
@@ -33,7 +39,7 @@ class UserService implements IUserService {
 
         return $this->userRepository->findOne($filters);
     }
-    
+
     public function getUserByParams(array $filters = [])
     {
         return $this->userRepository->findOne($filters);
@@ -41,10 +47,28 @@ class UserService implements IUserService {
 
     public function createUser(UserCreateDTO $userCreateDTO): User
     {
-        return DB::transaction(function() use ($userCreateDTO) {
-            $dtoData = $userCreateDTO->toArray();
-            $data = array_filter($dtoData, fn($value) => !is_null($value));
-            return $this->userRepository->create($data);
+        return DB::transaction(function () use ($userCreateDTO) {
+            // Extraemos la contraseña directamente de la propiedad del DTO
+            $temporaryPassword = $userCreateDTO->password;
+
+            Log::info('Iniciando creación de usuario', [
+                'dto_password' => $temporaryPassword
+            ]);
+
+            // Convertimos el DTO a array
+            $data = $userCreateDTO->toArray();
+
+            Log::info('data nuevo usuario', ['data' => $data]);
+
+            // Pasamos los datos al repositorio
+            $user = $this->userRepository->create($data);
+
+            Log::info('nuevo usuario', ['user' => $user]);
+
+            // Enviamos el correo electrónico
+            Mail::to($user->email)->send(new UserWelcomeMail($user, $temporaryPassword));
+
+            return $user;
         });
     }
 

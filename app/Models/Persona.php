@@ -70,7 +70,13 @@ class Persona extends Model
         )->withTimestamps();
     }
 
-    public function matriculas(): HasMany {
+    public function matriculas(): HasMany
+    {
         return $this->hasMany(Matricula::class, 'id_persona', 'id');
+    }
+
+    public function certificados(): HasMany
+    {
+        return $this->hasMany(Certificado::class, 'id_persona', 'id');
     }
 }

@@ -1,12 +1,14 @@
 <?php
+
 namespace App\Services\Contracts;
 
 use App\Models\Persona;
 
-interface IPersonaAPIService {
+interface IPersonaAPIService
+{
     public function query(string $tipoDocumento, string $numeroDocumento): array;
 
-    public function queryAndRegister(string $tipoDocumento, string $numeroDocumento, string $nombreGrupo): Persona;
+    public function queryAndRegister(string $tipoDocumento, string $numeroDocumento, string $nombreGrupo, string $userCrea): Persona;
 
     public function callAPI(string $numeroDocumento): array;
 }

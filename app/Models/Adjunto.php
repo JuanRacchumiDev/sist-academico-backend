@@ -38,6 +38,8 @@ class Adjunto extends Model
         'updated_at'
     ];
 
+    protected $appends = ['nombre_archivo', 'ruta_enlace'];
+
     public function programa(): BelongsTo
     {
         return $this->belongsTo(Programa::class, 'id_programa', 'id');
@@ -51,5 +53,27 @@ class Adjunto extends Model
     public function institucion(): BelongsTo
     {
         return $this->belongsTo(Institucion::class, 'id_institucion', 'id');
+    }
+
+    /**
+     * Accessor para mapear el originalname al estándar del frontend
+     */
+    public function getNombreArchivoAttribute(): string
+    {
+        return $this->originalname ?? $this->titulo ?? 'Archivo Adjunto';
+    }
+
+    /**
+     * Accessor para estructurar la URL absoluta de descarga
+     */
+    public function getRutaEnlaceAttribute(): string
+    {
+        // Si almacenas URLs completas (S3, etc.), retorna directamente el filepath
+        if (filter_var($this->filepath, FILTER_VALIDATE_URL)) {
+            return $this->filepath;
+        }
+
+        // Si usas el storage local de Laravel, generas la URL pública correspondiente
+        return asset('storage/' . $this->filepath);
     }
 }

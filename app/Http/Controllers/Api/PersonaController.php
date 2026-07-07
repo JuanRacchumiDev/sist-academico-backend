@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Auth;
 
 class PersonaController extends Controller
 {
@@ -135,6 +136,10 @@ class PersonaController extends Controller
                 ], 200);
             }
 
+            $usuarioAutenticado = Auth::user();
+            $username = $usuarioAutenticado ? ($usuarioAutenticado->name) : 'systemapi';
+            $data['user_crea'] = $username;
+
             $personaCreateDTO = PersonaCreateDTO::from($data);
 
             $persona = $this->personaService->createPersona($personaCreateDTO);
@@ -173,11 +178,18 @@ class PersonaController extends Controller
 
         $data = $request->all();
 
+        $usuarioAutenticado = Auth::user();
+        $username = $usuarioAutenticado ? ($usuarioAutenticado->name) : 'systemapi';
+        $data['user_crea'] = $username;
+
+        Log::info('Validando data desde API DNI', ['data' => $data]);
+
         try {
             $persona = $this->personaAPIService->queryAndRegister(
                 $data['tipo_documento'],
                 $data['numero_documento'],
-                $data['nombre_grupo']
+                $data['nombre_grupo'],
+                $data['user_crea']
             );
 
             return response()->json([
@@ -243,6 +255,10 @@ class PersonaController extends Controller
     {
         try {
             $data = $request->all();
+
+            $usuarioAutenticado = Auth::user();
+            $username = $usuarioAutenticado ? ($usuarioAutenticado->name) : 'systemapi';
+            $data['user_actualiza'] = $username;
 
             // Validando y transformado el DTO en un solo paso
             $personaUpdateDTO = PersonaUpdateDTO::from([

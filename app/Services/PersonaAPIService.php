@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services;
 
 use App\Repositories\Contracts\IPersonaRepository;
@@ -11,15 +12,15 @@ use Exception;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Log;
 
-class PersonaAPIService implements IPersonaAPIService{
+class PersonaAPIService implements IPersonaAPIService
+{
     protected IPersonaRepository $personaRepository;
     protected IDetalleParametroRepository $detalleRepository;
 
     public function __construct(
         IPersonaRepository $personaRepository,
         IDetalleParametroRepository $detalleRepository
-        )
-    {
+    ) {
         $this->personaRepository = $personaRepository;
         $this->detalleRepository = $detalleRepository;
     }
@@ -27,7 +28,7 @@ class PersonaAPIService implements IPersonaAPIService{
     public function query(string $tipoDocumento, string $numeroDocumento): array
     {
         if ($tipoDocumento !== 'DNI') {
-             throw new Exception("La API de Factiliza solo soporta consultas DNI.");
+            throw new Exception("La API de Factiliza solo soporta consultas DNI.");
         }
 
         $response = $this->callAPI($numeroDocumento);
@@ -38,21 +39,22 @@ class PersonaAPIService implements IPersonaAPIService{
     public function queryAndRegister(
         string $tipoDocumento,
         string $numeroDocumento,
-        string $nombreGrupo
-        ): Persona
-    {
+        string $nombreGrupo,
+        string $userCrea
+    ): Persona {
         if ($tipoDocumento !== 'DNI') {
-             throw new Exception("La API de Factiliza solo soporta consultas DNI.");
+            throw new Exception("La API de Factiliza solo soporta consultas DNI.");
         }
 
         $response = $this->callAPI($numeroDocumento);
+        $response['user_crea'] = $userCrea;
 
         Log::debug('PersonaAPIService: Respuesta de callAPI recibida.', ['api_response_data' => $response]);
 
         // Crear DTO a partir de la respuesta
         try {
             // Aquí usamos el DTO para mapear y validar los datos de la respuesta
-            $dto = PersonaAPIDTO::fromAPIResponse($response, $tipoDocumento);
+            $dto = PersonaAPIDTO::fromAPIResponse($response);
 
             Log::info('PersonaAPIService: DTO creado con éxito.', ['dto_data' => (array) $dto]);
 
@@ -60,30 +62,42 @@ class PersonaAPIService implements IPersonaAPIService{
             if ($nombreGrupo) {
                 $dto = $dto->withNombreGrupo($nombreGrupo); // <-- USAR UN NUEVO MÉTODO DEL DTO
             }
-            
         } catch (Exception $e) {
             Log::error('PersonaAPIService: Error al procesar DTO desde la API.', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            
+
             // Manejo de errores de mapeo/validación del DTO
             throw new Exception("Error al procesar la respuesta de la API externa: " . $e->getMessage());
         }
 
         $persona = $this->personaRepository->updateOrCreateFromAPI($dto);
 
+        Log::info('Obteniendo data persona', ['persona' => $persona]);
+
         // Obtener el nombre del grupo
         $nombreGrupo = $dto->nombre_grupo;
 
+        Log::info('Obteniendo data nombreGrupo', ['nombreGrupo' => $nombreGrupo]);
+
+        // Obtener el usuario creador
+        $userCrea = $dto->user_crea ?? 'systemapi';
+
+        Log::info('Obteniendo data userCrea', ['userCrea' => $userCrea]);
+
         // Obteniendo grupo
         $grupo = $this->detalleRepository->findByNombreUrl($nombreGrupo);
+
+        Log::info('Obteniendo detalle de grupo', ['grupo' => $grupo]);
 
         // Adjuntar el grupo (si existe el código)
         if ($grupo) {
             $codigoGrupo = $grupo->codigo;
 
-            $persona->grupos()->attach($codigoGrupo);
+            $persona->grupos()->attach($codigoGrupo, [
+                'user_crea' => $userCrea
+            ]);
         }
 
         return $persona;
@@ -96,11 +110,11 @@ class PersonaAPIService implements IPersonaAPIService{
         $token = config('services.factiliza.token');
 
         if (!$token) {
-             throw new Exception("FACTILIZA_API_TOKEN no está configurado en el archivo .env.");
+            throw new Exception("FACTILIZA_API_TOKEN no está configurado en el archivo .env.");
         }
 
         $url = "{$apiBaseUrl}/dni/info/{$numeroDocumento}";
-        
+
         try {
             $response = Http::withHeaders([
                 'Authorization' => "Bearer {$token}",

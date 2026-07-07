@@ -12,6 +12,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 
 class ParametroController extends Controller
 {
@@ -19,7 +20,7 @@ class ParametroController extends Controller
 
     public function __construct(IParametroService $parametroService)
     {
-        $this->parametroService = $parametroService;        
+        $this->parametroService = $parametroService;
     }
 
 
@@ -35,7 +36,7 @@ class ParametroController extends Controller
                 return response()->json([
                     'succes' => true,
                     'data' => [],
-                    'message' => 'No se encontraron parámetros' 
+                    'message' => 'No se encontraron parámetros'
                 ], 200);
             }
 
@@ -46,7 +47,7 @@ class ParametroController extends Controller
             ], 200);
         } catch (\Exception $e) {
             Log::error("Error fetching parámetros: " . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error al obtener parámetros: ' . $e->getMessage()
@@ -61,15 +62,19 @@ class ParametroController extends Controller
     {
         try {
             $data = $request->all();
-            
+
             if (isset($data['nombre'])) {
                 $data['nombre_url'] = Str::slug($data['nombre']);
             }
 
+            $usuarioAutenticado = Auth::user();
+            $username = $usuarioAutenticado ? ($usuarioAutenticado->name) : 'systemapi';
+            $data['user_crea'] = $username;
+
             $parametroCreateDTO = ParametroCreateDTO::from($data);
-            
+
             $parametro = $this->parametroService->createParametro($parametroCreateDTO);
-            
+
             return response()->json([
                 'success' => true,
                 'data' => $parametro,
@@ -83,7 +88,7 @@ class ParametroController extends Controller
             ], 422);
         } catch (\Exception $e) {
             Log::error("Error creating parametro: " . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error al crear parámetro : ' . $e->getMessage()
@@ -98,14 +103,14 @@ class ParametroController extends Controller
     {
         try {
             $parametro = $this->parametroService->getParametroByClase($clase);
-            
+
             if (!$parametro) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Parámetro no encontrado'
                 ], 404);
             }
-            
+
             return response()->json([
                 'success' => true,
                 'data' => $parametro,
@@ -113,7 +118,7 @@ class ParametroController extends Controller
             ], 200);
         } catch (\Exception $e) {
             Log::error("Error fetching parámetro (clase: {$clase}): " . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error al obtener el parámetro: ' . $e->getMessage()
@@ -127,17 +132,23 @@ class ParametroController extends Controller
     public function update(int $clase, Request $request): JsonResponse
     {
         try {
-            $parametroUpdateDTO = ParametroUpdateDTO::from($request->all());
-            
+            $data = $request->all();
+
+            $usuarioAutenticado = Auth::user();
+            $username = $usuarioAutenticado ? ($usuarioAutenticado->name) : 'systemapi';
+            $data['user_actualiza'] = $username;
+
+            $parametroUpdateDTO = ParametroUpdateDTO::from();
+
             $parametro = $this->parametroService->updateParametro($clase, $parametroUpdateDTO);
-            
+
             if (!$parametro) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Parámetro no encontrado o no se pudo actualizar'
                 ], 404);
             }
-            
+
             return response()->json([
                 'success' => true,
                 'data' => $parametro,
@@ -164,7 +175,7 @@ class ParametroController extends Controller
      */
     public function destroy(int $clase): Response|JsonResponse
     {
-         try {
+        try {
             if (!$this->parametroService->deleteParametro($clase)) {
                 return response()->json([
                     'success' => false,
@@ -176,10 +187,9 @@ class ParametroController extends Controller
                 'success' => true,
                 'message' => 'Parámetro eliminado correctamente'
             ], 200);
-
         } catch (\Exception $e) {
             Log::error("Error al eliminar el parámetro (clase: {$clase}): " . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error al eliminar el parámetro: ' . $e->getMessage()

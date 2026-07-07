@@ -11,6 +11,7 @@ use App\Repositories\Contracts\IDetalleParametroRepository;
 use App\Services\Contracts\IPersonaService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Log;
 
 class PersonaService implements IPersonaService
 {
@@ -77,10 +78,17 @@ class PersonaService implements IPersonaService
     public function createPersona(PersonaCreateDTO $personaCreateDTO): Persona
     {
         return DB::transaction(function () use ($personaCreateDTO) {
-            $dataToCreate = $personaCreateDTO->toArray();
+            Log::info('Evaluando variable $personaCreateDTO', ['personaCreateDTO' => $personaCreateDTO]);
 
-            // Obtener el nombre de grupo
+            $dataToCreate = $personaCreateDTO->toArray();
+            Log::info('Evaluando variable $dataToCreate', ['dataToCreate' => $dataToCreate]);
+
+            // Obtener el nombre de grupo y usuario creador
             $nombreGrupo = $personaCreateDTO->nombre_grupo;
+            $userCrea = $personaCreateDTO->user_crea ?? 'systemapi';
+
+            Log::info('Evaluando variable $nombreGrupo', ['nombreGrupo' => $nombreGrupo]);
+            Log::info('Evaluando variable $userCrea', ['userCrea' => $userCrea]);
 
             // Filtrar nulos
             $data = array_filter($dataToCreate, fn($value) => !is_null($value));
@@ -96,7 +104,9 @@ class PersonaService implements IPersonaService
             if ($grupo) {
                 $codigoGrupo = $grupo->codigo;
 
-                $persona->grupos()->attach($codigoGrupo);
+                $persona->grupos()->attach($codigoGrupo, [
+                    'user_crea' => $userCrea
+                ]);
             }
 
             return $persona;

@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 
 class DetalleParametroController extends Controller
 {
@@ -31,7 +32,7 @@ class DetalleParametroController extends Controller
         try {
             $filters = $request->only(['parametro_clase', 'en_persona', 'en_empresa', 'visible', 'estado']);
 
-            $filters = array_map(function($value) {
+            $filters = array_map(function ($value) {
                 if ($value === 'true') return true;
                 if ($value === 'false') return false;
                 return $value;
@@ -54,7 +55,7 @@ class DetalleParametroController extends Controller
             ], 200);
         } catch (\Exception $e) {
             Log::error("Error filtering catálogos: " . $e->getMessage());
-            
+
             return response()->json([
                 'result' => false,
                 'message' => 'Error al obtener catálogos filtrados.',
@@ -71,12 +72,14 @@ class DetalleParametroController extends Controller
     public function getFilteredPaginate(Request $request): JsonResponse
     {
         try {
-            $filters = $request->only([
-                'parametro_clase',
-                'en_persona',
-                'en_empresa',
-                'visible',
-                'estado']
+            $filters = $request->only(
+                [
+                    'parametro_clase',
+                    'en_persona',
+                    'en_empresa',
+                    'visible',
+                    'estado'
+                ]
             );
 
             if ($request->has('search')) {
@@ -85,7 +88,7 @@ class DetalleParametroController extends Controller
 
             $perPage = $request->input('per_page', 10);
 
-            $filters = array_map(function($value) {
+            $filters = array_map(function ($value) {
                 if ($value === 'true') return true;
                 if ($value === 'false') return false;
                 return $value;
@@ -116,7 +119,7 @@ class DetalleParametroController extends Controller
             ], 200);
         } catch (\Exception $e) {
             Log::error("Error filtering catálogos: " . $e->getMessage());
-            
+
             return response()->json([
                 'result' => false,
                 'message' => 'Error al obtener catálogos filtrados.',
@@ -131,7 +134,7 @@ class DetalleParametroController extends Controller
     public function index(string $clase): JsonResponse
     {
         try {
-            $paramClase = config('params.clases.'.$clase);
+            $paramClase = config('params.clases.' . $clase);
 
             if (is_null($paramClase)) {
                 return response()->json([
@@ -155,7 +158,6 @@ class DetalleParametroController extends Controller
                 'data' => $detalles,
                 'message' => 'Listado de registros obtenido correctamente'
             ], 200);
-
         } catch (\Exception $e) {
             Log::error("Error fetching detalles para la clase '{$clase}': " . $e->getMessage());
 
@@ -172,7 +174,7 @@ class DetalleParametroController extends Controller
     public function store(string $clase, Request $request): JsonResponse
     {
         try {
-            $paramClase = config('params.clases.'.$clase);
+            $paramClase = config('params.clases.' . $clase);
 
             if (is_null($paramClase)) {
                 return response()->json([
@@ -183,7 +185,7 @@ class DetalleParametroController extends Controller
             }
 
             $data = $request->all();
-            
+
             $data['parametro_clase'] = $paramClase;
 
             if (isset($data['nombre'])) {
@@ -204,6 +206,10 @@ class DetalleParametroController extends Controller
                     'code' => 'PREVIOUSLY_REGISTERED'
                 ], 200);
             }
+
+            $usuarioAutenticado = Auth::user();
+            $username = $usuarioAutenticado ? ($usuarioAutenticado->name) : 'systemapi';
+            $data['user_crea'] = $username;
 
             $detalleCreateDTO = DetalleParametroCreateDTO::from($data);
 
@@ -239,10 +245,10 @@ class DetalleParametroController extends Controller
     public function show(string $clase, string $codigo): JsonResponse
     {
         try {
-            $paramClase = config('params.clases.'.$clase);
+            $paramClase = config('params.clases.' . $clase);
 
             $detalle = $this->detalleParametroService->getByClaseAndCodigo($paramClase, (int)$codigo);
-            
+
             if (!$detalle) {
                 return response()->json([
                     'result' => false,
@@ -250,7 +256,7 @@ class DetalleParametroController extends Controller
                     'data' => []
                 ], 404);
             }
-            
+
             return response()->json([
                 'result' => true,
                 'data' => $detalle,
@@ -272,7 +278,7 @@ class DetalleParametroController extends Controller
     public function update(string $clase, string $codigo, Request $request): JsonResponse
     {
         try {
-            $paramClase = config('params.clases.'.$clase);
+            $paramClase = config('params.clases.' . $clase);
 
             if (is_null($paramClase)) {
                 return response()->json([
@@ -283,7 +289,7 @@ class DetalleParametroController extends Controller
             }
 
             $data = $request->all();
-            
+
             $data['parametro_clase'] = $paramClase;
 
             if (isset($data['nombre'])) {
@@ -305,11 +311,15 @@ class DetalleParametroController extends Controller
                 ], 200);
             }
 
+            $usuarioAutenticado = Auth::user();
+            $username = $usuarioAutenticado ? ($usuarioAutenticado->name) : 'systemapi';
+            $data['user_actualiza'] = $username;
+
             // Usamos el DTO para manejar la validación y mapear la data
             $detalleUpdateDTO = DetalleParametroUpdateDTO::from($data);
-            
+
             $detalle = $this->detalleParametroService->updateDetalle((int)$codigo, $detalleUpdateDTO);
-            
+
             if (!$detalle) {
                 return response()->json([
                     'result' => false,
@@ -318,7 +328,7 @@ class DetalleParametroController extends Controller
                     'code' => 'REGISTER_NOT_FOUND'
                 ], 404);
             }
-            
+
             return response()->json([
                 'result' => true,
                 'data' => $detalle,
@@ -335,7 +345,7 @@ class DetalleParametroController extends Controller
             $message = 'Error al actualizar el detalle:' . $e->getMessage();
 
             Log::error("Error updating detalle (codigo: {$codigo}): " . $e->getMessage());
-            
+
             return response()->json([
                 'result' => false,
                 'message' => $message

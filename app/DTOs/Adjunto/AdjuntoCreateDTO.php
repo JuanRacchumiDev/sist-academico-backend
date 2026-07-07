@@ -1,4 +1,5 @@
 <?php
+
 namespace App\DTOs\Adjunto;
 
 use Illuminate\Validation\Rule;
@@ -8,15 +9,15 @@ class AdjuntoCreateDTO extends Data
 {
     public function __construct(
         public string $titulo,
-        public string $titulo_url,
-        public string $filename,
-        public string $originalname,
-        public string $filepath,
-        public string $mimetype,
-        public int $size,
-        public bool $es_descargable,
-        public bool $es_visible,
-        public bool $estado,
+        public ?string $titulo_url = null,
+        public ?string $filename = null,
+        public ?string $originalname = null,
+        public ?string $filepath = null,
+        public ?string $mimetype = null,
+        public ?int $size = null,
+        public bool $es_descargable = true,
+        public bool $es_visible = true,
+        public bool $estado = true,
         public ?int $id_programa = null,
         public ?int $id_modulo = null,
         public ?int $id_institucion = null,
@@ -24,11 +25,13 @@ class AdjuntoCreateDTO extends Data
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null,
-    ){}
+    ) {}
 
     public static function withDefaults(): array
     {
         return [
+            'es_descargable' => true,
+            'es_visible' => true,
             'estado' => true
         ];
     }
@@ -60,7 +63,7 @@ class AdjuntoCreateDTO extends Data
                 'max:100'
             ],
             'titulo_url' => [
-                'required',
+                'sometimes',
                 'string',
                 'max:120'
             ],
@@ -70,36 +73,41 @@ class AdjuntoCreateDTO extends Data
                 'max:150',
                 'nullable'
             ],
-            'filename' => [
+            'file' => [
                 'required',
+                'file',
+                'max:10240'
+            ],
+            'filename' => [
+                'sometimes',
                 'string',
                 'max:120'
             ],
             'originalname' => [
-                'required',
+                'sometimes',
                 'string',
                 'max:180'
             ],
             'filepath' => [
-                'required',
+                'sometimes',
                 'string',
                 'max:150'
             ],
             'mimetype' => [
-                'required',
+                'sometimes',
                 'string',
-                'max:20'
+                'max:40'
             ],
             'size' => [
-                'required',
+                'sometimes',
                 'integer'
             ],
             'es_descargable' => [
-                'required',
+                'sometimes',
                 'boolean'
             ],
             'es_visible' => [
-                'required',
+                'sometimes',
                 'boolean'
             ],
             'user_crea' => [
@@ -121,9 +129,9 @@ class AdjuntoCreateDTO extends Data
                 'nullable'
             ],
             'estado' => [
-                'required',
+                'sometimes',
                 'boolean'
             ]
         ];
-    } 
+    }
 }

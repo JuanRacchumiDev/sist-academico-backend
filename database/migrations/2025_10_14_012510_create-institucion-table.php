@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('institucion', function(Blueprint $table) {
+        Schema::create('institucion', function (Blueprint $table) {
             $table->id();
 
             $table->string('nombre', 60);
@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('firma_digital')->nullable();
             $table->string('color_primario')->nullable();
 
+            $table->boolean('es_cliente')->default(false);
             $table->string('user_crea', 12)->nullable();
             $table->string('user_actualiza', 12)->nullable();
             $table->string('user_elimina', 12)->nullable();

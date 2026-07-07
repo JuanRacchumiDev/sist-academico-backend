@@ -22,6 +22,7 @@ class Institucion extends Model
         'firma_digital',
         'color_primario',
 
+        'es_cliente',
         'user_crea',
         'user_actualiza',
         'user_elimina',

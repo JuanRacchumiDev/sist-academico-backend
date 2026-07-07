@@ -8,7 +8,6 @@ use App\Models\Persona;
 use App\Repositories\Contracts\IPersonaRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
-use Override;
 
 class PersonaRepository implements IPersonaRepository
 {
@@ -19,7 +18,7 @@ class PersonaRepository implements IPersonaRepository
      */
     public function getAll(?array $searchParams = null): Collection
     {
-        $query = Persona::with(['tipoDocumento', 'grupos', 'matriculas']);
+        $query = Persona::with($this->getEagerLoads());
 
         $this->applyFilters($query, $searchParams ?? []);
 
@@ -34,7 +33,7 @@ class PersonaRepository implements IPersonaRepository
      */
     public function getAllFiltered(array $filters, int $perPage): LengthAwarePaginator
     {
-        $query = Persona::with(['tipoDocumento', 'grupos', 'matriculas']);
+        $query = Persona::with($this->getEagerLoads());
 
         $this->applyFilters($query, $filters);
 
@@ -43,7 +42,7 @@ class PersonaRepository implements IPersonaRepository
 
     public function getByGrupo(array $filters, ?int $limit = null): Collection
     {
-        $query = Persona::with(['tipoDocumento', 'grupos', 'matriculas']);
+        $query = Persona::with($this->getEagerLoads());
 
         $this->applyFilters($query, $filters);
 
@@ -61,7 +60,7 @@ class PersonaRepository implements IPersonaRepository
      */
     public function findById(int $id): ?Persona
     {
-        return Persona::with(['tipoDocumento', 'grupos', 'matriculas'])->findOrFail($id);
+        return Persona::with($this->getEagerLoads())->findOrFail($id);
     }
 
     /**
@@ -74,13 +73,21 @@ class PersonaRepository implements IPersonaRepository
         // Crear el registro de persona
         $persona = Persona::create($data);
 
+        // Obteniendo el código de la clase grupo
+        $clase = config('params.clases.grupo');
+
         if (isset($data['nombre_grupo'])) {
             $grupo = DetalleParametro::where('nombre_url', $data['nombre_grupo'])
-                ->where('parametro_clase', 1007)
+                ->where('parametro_clase', $clase)
                 ->first();
 
             if ($grupo) {
-                $persona->grupos()->attach($grupo->codigo, ['user_crea' => $data['user_crea'] ?? null]);
+                $persona->grupos()->attach(
+                    $grupo->codigo,
+                    [
+                        'user_crea' => $data['user_crea'] ?? 'systemapi'
+                    ]
+                );
             }
         }
 
@@ -152,6 +159,9 @@ class PersonaRepository implements IPersonaRepository
             'estado_civil'      => $dto->estado_civil,
             'sexo'              => $dto->sexo,
             'origen'            => $dto->origen,
+            'user_crea'         => $dto->user_crea ?? null,
+            'user_actualiza'    => $dto->user_actualiza ?? null,
+            'user_elimina'      => $dto->user_elimina ?? null
         ];
 
         $persona->fill($dataToUpdate);
@@ -188,5 +198,21 @@ class PersonaRepository implements IPersonaRepository
                     ->orWhereRaw('LOWER(email) LIKE ?', [$search]);
             });
         }
+    }
+
+    private function getEagerLoads(): array
+    {
+        return [
+            'tipoDocumento',
+            'grupos',
+            'matriculas.estadoMatricula',
+            'matriculas.institucion',
+            'matriculas.detalles.programa' => function ($query) {
+                $query->with(['tipoPrograma', 'adjuntos' => function ($q) {
+                    $q->where('estado', true)->where('es_descargable', true);
+                }]);
+            },
+            'certificados'
+        ];
     }
 }

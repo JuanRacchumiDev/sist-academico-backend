@@ -1,4 +1,5 @@
 <?php
+
 namespace App\DTOs\Persona;
 
 use Illuminate\Validation\Rule;
@@ -16,7 +17,7 @@ class PersonaCreateDTO extends Data
         public string $sexo,
         public string $origen,
         public string $nombre_grupo,
-        public bool $estado, 
+        public bool $estado,
         public ?string $departamento = null,
         public ?string $provincia = null,
         public ?string $distrito = null,
@@ -33,17 +34,7 @@ class PersonaCreateDTO extends Data
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null
-    ){}
-
-    /**
-     * Define los valores por defecto para los campos opcionales/booleanos
-     */
-    // public static function withDefaults(): array
-    // {
-    //     return [
-    //         'origen' => 'WEB'
-    //     ];
-    // }
+    ) {}
 
     public static function rules(): array
     {
@@ -158,7 +149,7 @@ class PersonaCreateDTO extends Data
                 'string',
                 'max:100',
                 'nullable'
-            ],           
+            ],
             'sexo' => [
                 'required',
                 'string',

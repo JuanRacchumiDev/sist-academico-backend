@@ -53,19 +53,13 @@ class MatriculaController extends Controller
     public function getFilteredPaginate(Request $request): JsonResponse
     {
         try {
-            $filters = [];
-
-            if ($request->has('search')) {
-                $filters['search'] = $request->input('search');
-            }
+            $filters = $request->only([
+                'fechaInicio',
+                'fechaFinal',
+                'nombreCompleto'
+            ]);
 
             $perPage = $request->input('per_page', 10);
-
-            $filters = array_map(function ($value) {
-                if ($value === 'true') return true;
-                if ($value === 'false') return false;
-                return $value;
-            }, $filters);
 
             $matriculas = $this->matriculaService->getAllMatriculasWithFilters($filters, $perPage);
 
@@ -273,20 +267,24 @@ class MatriculaController extends Controller
         try {
             $data = $request->all();
 
+            // Validar que los campos existan antes de usarlos para evitar un error de índice indefinido
+            if (!isset($data['id_persona']) || !isset($data['fecha_matricula'])) {
+                return response()->json([
+                    'result' => false,
+                    'message' => 'Los campos id_persona y fecha_matricula son obligatorios.',
+                    'code' => 'INVALID_RECORD'
+                ], 400);
+            }
+
             $usuarioAutenticado = Auth::user();
             $username = $usuarioAutenticado ? ($usuarioAutenticado->name) : 'systemapi';
 
-            $filters = [
-                'id_persona' => $data['id_persona'],
-                'fecha_matricula' => $data['fecha_matricula']
-            ];
-
-            $matriculaExistente = $this->matriculaService->getAllMatriculas($filters)->first();
+            $matriculaExistente = $this->matriculaService->getMatriculaByPersonaAndFecha((int)$data['id_persona'], $data['fecha_matricula']);
 
             if ($matriculaExistente) {
                 return response()->json([
                     'result' => true,
-                    'data' => $matriculaExistente->load('detalles'),
+                    'data' => $matriculaExistente,
                     'message' => 'La matrícula ya ha sido ingresada',
                     'code' => 'PREVIOUSLY_REGISTERED'
                 ], 200);
@@ -296,7 +294,11 @@ class MatriculaController extends Controller
             $data['concepto_pago'] = "PAGO DE MATRÍCULA";
             $data['user_crea'] = $username;
 
+            Log::info('Evaluando variable $data', ['data' => $data]);
+
             $matriculaCreateDTO = MatriculaCreateDTO::from($data);
+
+            Log::info('Evaluando variable $matriculaCreateDTO', ['matriculaCreateDTO' => $matriculaCreateDTO]);
 
             $matricula = $this->matriculaService->createMatricula($matriculaCreateDTO);
 

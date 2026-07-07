@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 
 class EventoController extends Controller
 {
@@ -44,7 +45,7 @@ class EventoController extends Controller
             ], 200);
         } catch (\Exception $e) {
             Log::error("Error fetching eventos: " . $e->getMessage());
-            
+
             return response()->json([
                 'result' => false,
                 'message' => 'Error al obtener eventos: ' . $e->getMessage()
@@ -64,10 +65,14 @@ class EventoController extends Controller
                 $data['titulo_url'] = Str::slug($data['titulo']);
             }
 
+            $usuarioAutenticado = Auth::user();
+            $username = $usuarioAutenticado ? ($usuarioAutenticado->name) : 'systemapi';
+            $data['user_crea'] = $username;
+
             $eventoCreateDTO = EventoCreateDTO::from($data);
-            
+
             $evento = $this->eventoService->createEvento($eventoCreateDTO);
-            
+
             return response()->json([
                 'result' => true,
                 'data' => $evento,
@@ -81,7 +86,7 @@ class EventoController extends Controller
             ], 422);
         } catch (\Exception $e) {
             Log::error("Error creating evento: " . $e->getMessage());
-            
+
             return response()->json([
                 'result' => false,
                 'message' => 'Error al crear evento: ' . $e->getMessage()
@@ -96,7 +101,7 @@ class EventoController extends Controller
     {
         try {
             $evento = $this->eventoService->getEventoById($id);
-            
+
             if (!$evento) {
                 return response()->json([
                     'result' => false,
@@ -104,7 +109,7 @@ class EventoController extends Controller
                     'data' => []
                 ], 404);
             }
-            
+
             return response()->json([
                 'result' => true,
                 'data' => $evento,
@@ -112,7 +117,7 @@ class EventoController extends Controller
             ], 200);
         } catch (\Exception $e) {
             Log::error("Error fetching evento (id: {$id}): " . $e->getMessage());
-            
+
             return response()->json([
                 'result' => false,
                 'message' => 'Error al obtener el evento: ' . $e->getMessage()
@@ -127,6 +132,10 @@ class EventoController extends Controller
     {
         try {
             $data = $request->all();
+
+            $usuarioAutenticado = Auth::user();
+            $username = $usuarioAutenticado ? ($usuarioAutenticado->name) : 'systemapi';
+            $data['user_actualiza'] = $username;
 
             $eventoUpdateDTO = EventoUpdateDTO::from($data);
 
@@ -155,7 +164,7 @@ class EventoController extends Controller
             $message = 'Error al actualizar al evento:' . $e->getMessage();
 
             Log::error("Error updating evento: " . $e->getMessage());
-            
+
             return response()->json([
                 'result' => false,
                 'message' => $message

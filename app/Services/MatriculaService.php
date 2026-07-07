@@ -5,10 +5,14 @@ namespace App\Services;
 use App\DTOs\Matricula\MatriculaCreateDTO;
 use App\DTOs\Matricula\MatriculaUpdateDTO;
 use App\DTOs\Pago\PagoCreateDTO;
+use App\DTOs\User\UserCreateDTO;
 use App\Helpers\ItemPagoHelper;
 use App\Models\Matricula;
 use App\Repositories\Contracts\IMatriculaRepository;
 use App\Repositories\Contracts\IPagoRepository;
+use App\Repositories\Contracts\IUserRepository;
+use App\Repositories\Contracts\IPersonaRepository;
+use App\Repositories\Contracts\IDetalleParametroRepository;
 use App\Services\Contracts\IMatriculaService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
@@ -20,19 +24,30 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use App\Mail\MatriculaConfirmadaMail;
+use Illuminate\Support\Facades\Mail;
 use Override;
 
 class MatriculaService implements IMatriculaService
 {
     protected IMatriculaRepository $matriculaRepository;
     protected IPagoRepository $pagoRepository;
+    protected IUserRepository $userRepository;
+    protected IPersonaRepository $personaRepository;
+    protected IDetalleParametroRepository $detalleRepository;
 
     public function __construct(
         IMatriculaRepository $matriculaRepository,
-        IPagoRepository $pagoRepository
+        IPagoRepository $pagoRepository,
+        IUserRepository $userRepository,
+        IPersonaRepository $personaRepository,
+        IDetalleParametroRepository $detalleRepository
     ) {
         $this->matriculaRepository = $matriculaRepository;
         $this->pagoRepository = $pagoRepository;
+        $this->userRepository = $userRepository;
+        $this->personaRepository = $personaRepository;
+        $this->detalleRepository = $detalleRepository;
     }
 
     /**
@@ -42,6 +57,8 @@ class MatriculaService implements IMatriculaService
      */
     public function getAllMatriculas(?array $searchParams = null): Collection
     {
+        Log::info('Obteniendo matrícula registrada', ['searchParams' => $searchParams]);
+
         return $this->matriculaRepository->getAll($searchParams);
     }
 
@@ -64,6 +81,22 @@ class MatriculaService implements IMatriculaService
     public function getMatriculaById(int $id): ?Matricula
     {
         return $this->matriculaRepository->findById($id);
+    }
+
+    /**
+     * Verifica si una persona ya cuenta con una matrícula en una fecha determinada
+     * @param int $idPersona
+     * @param string $fechaMatricula
+     * @return Matricula|null
+     */
+    public function getMatriculaByPersonaAndFecha(int $idPersona, string $fechaMatricula): ?Matricula
+    {
+        Log::info('Validando existencia de matrícula', [
+            'id_persona' => $idPersona,
+            'fecha_matricula' => $fechaMatricula
+        ]);
+
+        return $this->matriculaRepository->findByPersonaAndFecha($idPersona, $fechaMatricula);
     }
 
     public function generateFichaPDF(int $id)
@@ -203,6 +236,8 @@ class MatriculaService implements IMatriculaService
     {
         $matricula = $this->matriculaRepository->findById($idMatricula);
 
+        Log::info('Validando variable $matricula', ['matricula' => $matricula]);
+
         if (!$matricula) {
             return [
                 'status' => false,
@@ -212,27 +247,6 @@ class MatriculaService implements IMatriculaService
             ];
         }
 
-        // $institucion = $matricula->institucion;
-
-        // $numeroFormateado = str_pad($matricula->id, 6, '0', STR_PAD_LEFT);
-
-        // $anio = Carbon::parse($matricula->fecha_matricula)->year;
-        // $nombreIns = str($institucion->nombre)->slug();
-        // $documento = $matricula->persona->numero_documento;
-
-        // $folderPath = "matriculas/{$anio}/{$nombreIns}/{$documento}";
-        // $fileName = "cronograma_pagos_matricula_{$numeroFormateado}.pdf";
-        // $fullPath = "{$folderPath}/{$fileName}";
-
-        // Log::info('Iniciando proceso de PDF de cronograma de pagos', ['folderPath' => $folderPath, 'fileName' => $fileName, 'fullPath' => $fullPath]);
-
-        // Verificar si ya existe
-        // if (Storage::disk("local")->exists($fullPath)) {
-        //     return Storage::disk("local")->path($fullPath);
-        // }
-
-        // Log::info('se creó archivo en directorio', ['fullPath' => $fullPath]);
-
         $pagosReales = $this->pagoRepository->getPagosByMatricula($idMatricula);
 
         Log::info('Obteniendo pagos reales', ['pagosReales' => $pagosReales]);
@@ -240,8 +254,6 @@ class MatriculaService implements IMatriculaService
         $cronograma = [];
 
         $totalModulos = $matricula->numero_modulos;
-
-        // Log::info('Obteniendo total módulos', ['totalModulos' => $totalModulos]);
 
         for ($i = 1; $i <= $totalModulos; $i++) {
             $pagoEfectuado = $pagosReales->firstWhere('numero_modulo', $i);
@@ -315,24 +327,42 @@ class MatriculaService implements IMatriculaService
     public function createMatricula(MatriculaCreateDTO $matriculaCreateDTO): Matricula
     {
         return DB::transaction(function () use ($matriculaCreateDTO) {
+            Log::info('Evaluando las variables $matriculaCreateDTO', ['matriculaCreateDTO' => $matriculaCreateDTO]);
+
+            $persona = $this->personaRepository->findById($matriculaCreateDTO->id_persona);
+
+            $userCrea = $matriculaCreateDTO->user_crea;
+            $estado = $matriculaCreateDTO->estado;
+            $valorMatricula = $matriculaCreateDTO->monto_matricula;
+            $valorModulo = $matriculaCreateDTO->monto_modulo;
+            $idPersona = $matriculaCreateDTO->id_persona;
+            $fechaMatricula = $matriculaCreateDTO->fecha_matricula;
+            $idInstitucion = $matriculaCreateDTO->id_institucion;
+
             $dataCabecera = [
-                'id_persona' => $matriculaCreateDTO->id_persona,
+                'id_persona' => $idPersona,
                 'id_estadomatricula' => $matriculaCreateDTO->id_estadomatricula,
-                'id_institucion' => $matriculaCreateDTO->id_institucion,
+                'id_institucion' => $idInstitucion,
                 'numero_modulos' => $matriculaCreateDTO->numero_modulos,
-                'fecha_matricula' => $matriculaCreateDTO->fecha_matricula,
-                'estado' => $matriculaCreateDTO->estado,
-                'user_crea' => $matriculaCreateDTO->user_crea
+                'fecha_matricula' => $fechaMatricula,
+                'estado' => $estado,
+                'user_crea' => $userCrea
             ];
+
+            Log::info('Evaluando las variables persona y dataCabecera', ['persona' => $persona, 'dataCabecera' => $dataCabecera]);
 
             // Crear la matrícula usando el repositorio Eloquent original
             /** @var Matricula $matricula */
             $matricula = $this->matriculaRepository->create($dataCabecera);
 
+            Log::info('Evaluando variable matrícula', ['matricula' => $matricula]);
+
             foreach ($matriculaCreateDTO->programas as $idPrograma) {
                 $matricula->detalles()->create([
                     'id_programa' => $idPrograma,
-                    'user_crea' => $matriculaCreateDTO->user_crea,
+                    'valor_matricula' => $valorMatricula,
+                    'valor_modulo' => $valorModulo,
+                    'user_crea' => $userCrea,
                     'estado' => true
                 ]);
             }
@@ -342,18 +372,52 @@ class MatriculaService implements IMatriculaService
                 'id_modulo'          => $matriculaCreateDTO->id_modulo_pago,
                 'id_estadopago'      => $matriculaCreateDTO->id_estadopago,
                 'id_formapago'       => $matriculaCreateDTO->id_formapago,
-                'id_institucion'     => $matriculaCreateDTO->id_institucion,
+                'id_institucion'     => $idInstitucion,
                 'concepto'           => $matriculaCreateDTO->concepto_pago,
                 'numero_operacion'   => $matriculaCreateDTO->numero_operacion,
-                'fecha_pago'         => $matriculaCreateDTO->fecha_matricula, // Se asume pago el mismo día
+                'fecha_pago'         => $fechaMatricula, // Se asume pago el mismo día
                 'fecha_vencimiento'  => null,
                 'cantidad_efectivo'  => $matriculaCreateDTO->cantidad_efectivo,
                 'cantidad_operacion' => $matriculaCreateDTO->cantidad_operacion,
-                'user_crea'          => $matriculaCreateDTO->user_crea,
-                'estado'             => true
+                'user_crea'          => $userCrea,
+                'estado'             => $estado
             ]);
 
             $this->pagoRepository->create($pagoDTO->toArray());
+
+            // Obteniendo la clase del grupo perfil
+            $clase = config('params.clases.perfil');
+
+            // Obteniendo perfil de la persona
+            $perfil = $this->detalleRepository->findByClaseAndNombreUrl($clase, 'alumno');
+
+            Log::info('Evaluando variables pago, clase y perfil', [
+                'pagoDTO' => $pagoDTO,
+                'array_pago_dto' => $pagoDTO->toArray(),
+                'clase' => $clase,
+                'perfil' => $perfil
+            ]);
+
+            $userCreateData = [
+                'name'          => substr($persona->nombre_completo, 0, 10),
+                'email'         => $persona->email,
+                'password'      => $persona->numero_documento,
+                'id_perfil'     => $perfil->codigo,
+                'id_persona'    => $persona->id,
+                'estado'        => true
+            ];
+
+            Log::info('Evaluando variable userCreateData', ['userCreateData' => $userCreateData]);
+
+            // Creamos el usuario
+            $this->userRepository->create($userCreateData);
+
+            // Obtener la matrícula registrada
+            $dataMatricula = $this->matriculaRepository->findById($matricula->id);
+
+            Mail::to($persona->email)->send(
+                new MatriculaConfirmadaMail($dataMatricula, $persona->numero_documento)
+            );
 
             return $matricula->load(['detalles.programa']);
         });

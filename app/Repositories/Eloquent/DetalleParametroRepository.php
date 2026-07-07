@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Repositories\Eloquent;
 
 use App\Models\DetalleParametro;
@@ -6,7 +7,8 @@ use App\Repositories\Contracts\IDetalleParametroRepository;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
-class DetalleParametroRepository implements IDetalleParametroRepository {
+class DetalleParametroRepository implements IDetalleParametroRepository
+{
     /**
      * Obtiene todos los registros relacionados a un parámetro
      * @return Collection<int, DetalleParametro>
@@ -83,9 +85,9 @@ class DetalleParametroRepository implements IDetalleParametroRepository {
         }
 
         if (isset($filters['search'])) {
-            $search = '%'.strtolower($filters['search']).'%';
+            $search = '%' . strtolower($filters['search']) . '%';
 
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->whereRaw('LOWER(nombre) LIKE ?', [$search]);
             });
         }
@@ -132,7 +134,7 @@ class DetalleParametroRepository implements IDetalleParametroRepository {
     /**
      * Busca un detalle de parámetro por clase y nombre_url
      * @param int $parametro_clase
-     * @param string $nombrw_url
+     * @param string $nombreUrl
      * @return DetalleParametro|null
      */
     public function findByClaseAndNombreUrl(int $parametro_clase, string $nombreUrl): ?DetalleParametro
@@ -166,7 +168,7 @@ class DetalleParametroRepository implements IDetalleParametroRepository {
             $detalle->update($data);
             return $detalle;
         }
-        
+
         return null;
     }
 

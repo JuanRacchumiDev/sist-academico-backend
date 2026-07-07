@@ -25,21 +25,22 @@ class AuthController extends Controller
     public function validateUnique(Request $request): JsonResponse
     {
         $credenciales = $request->only(['email', 'password']);
-        
+
         $email = $credenciales['email'];
-        
+
         $filters = ['email' => $email];
 
         Log::info('Validate filters', $filters);
 
         try {
             $usuario = $this->userService->getUserByParams($filters);
-        
+
             Log::info('Validate usuario', $usuario ? $usuario->toArray() : []);
 
             if (!$usuario) {
                 return response()->json([
                     'success' => false,
+                    'status' => 401,
                     'data' => [],
                     'message' => 'Usuario no encontrado. Verifique sus credenciales'
                 ], 401);
@@ -47,21 +48,18 @@ class AuthController extends Controller
 
             if (!$token = JWTAuth::attempt($credenciales)) {
                 return response()->json([
-                    'result' => false,
+                    'success' => false,
+                    'status' => 401,
+                    'data' => [],
+                    'message' => 'Contraseña incorrecta. Verifique sus credenciales',
                     'error' => 'Contraseña incorrecta. Verifique sus credenciales'
                 ], 401);
             }
-            
+
             return $this->respondWithToken($token, $usuario);
-            
-            // return response()->json([
-            //     'success' => true,
-            //     'data' => $user,
-            //     'message' => 'Usuario encontrado correctamente'
-            // ], 200);
         } catch (\Exception $e) {
             Log::error("Error fetching usuario: " . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error al obtener el usuario: ' . $e->getMessage()
@@ -69,42 +67,12 @@ class AuthController extends Controller
         } catch (JWTException $e) {
             Log::error("Error al crear token: " . $e->getMessage());
             return response()->json([
-                'result' => false,
+                'success' => false,
+                'message' => 'No se puede crear el token de acceso',
                 'error' => 'No se puede crear el token de acceso'
             ], 500);
         }
     }
-
-    // public function login(Request $request): JsonResponse
-    // {
-    //     Log::info('Login Request Data', $request->all());
-    //     $credenciales = $request->only('email', 'password');
-
-    //     try {
-    //         $usuario = $this->userService->getUserByEmail($request->email);
-
-    //         if (!$usuario) {
-    //             return response()->json([
-    //                 'result' => false, 
-    //                 'error' => 'Usuario no encontrado. Verifique sus credenciales'
-    //             ], 401);
-    //         }
-
-    //         if (!$token = JWTAuth::attempt($credenciales)) {
-    //             return response()->json([
-    //                 'result' => false,
-    //                 'error' => 'Contraseña incorrecta. Verifique sus credenciales'
-    //             ], 401);
-    //         }
-
-    //         return $this->respondWithToken($token, $usuario);
-    //     } catch (JWTException $e) {
-    //         return response()->json([
-    //             'result' => false,
-    //             'error' => 'No se puede crear el token'
-    //         ], 500);
-    //     }
-    // }
 
     public function logout(): JsonResponse
     {
@@ -125,7 +93,8 @@ class AuthController extends Controller
         }
     }
 
-    public function refresh(): JsonResponse {
+    public function refresh(): JsonResponse
+    {
         try {
             return $this->respondWithToken(Auth::refresh(), null);
         } catch (JWTException $e) {
@@ -141,7 +110,7 @@ class AuthController extends Controller
         try {
             // Obtener el usuario autenticado
             $user = Auth::user();
-      
+
             if (!$user) {
                 return response()->json([
                     'result' => false,
@@ -178,7 +147,7 @@ class AuthController extends Controller
 
         if ($usuario && $usuario->persona) {
             $persona = $usuario->persona;
-            $nombrePersona = $persona->nombre_completo; 
+            $nombrePersona = $persona->nombre_completo;
         }
 
         return response()->json([
@@ -192,7 +161,8 @@ class AuthController extends Controller
                 "name" => $usuario->name ?? null,
                 "email" => $usuario->email ?? null,
                 "nombre_perfil" => $nombrePerfil,
-                "nombre_completo" => $nombrePersona
+                "nombre_completo" => $nombrePersona,
+                "id_persona" => $usuario->id_persona ?? null
             ]
         ], 200);
     }

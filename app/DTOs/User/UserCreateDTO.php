@@ -1,4 +1,5 @@
 <?php
+
 namespace App\DTOs\User;
 
 use Spatie\LaravelData\Data;
@@ -11,8 +12,11 @@ class UserCreateDTO extends Data
         public string $password,
         public int $id_perfil,
         public bool $estado = true,
-        public ?int $id_persona = null
-    ){}
+        public ?int $id_persona = null,
+        public ?string $user_crea = null,
+        public ?string $user_actualiza = null,
+        public ?string $user_elimina = null,
+    ) {}
 
     public static function rules(): array
     {
@@ -41,6 +45,24 @@ class UserCreateDTO extends Data
                 'sometimes',
                 'int',
                 'exists:persona,id',
+                'nullable'
+            ],
+            'user_crea' => [
+                'sometimes',
+                'string',
+                'max:12',
+                'nullable'
+            ],
+            'user_actualiza' => [
+                'sometimes',
+                'string',
+                'max:12',
+                'nullable'
+            ],
+            'user_elimina' => [
+                'sometimes',
+                'string',
+                'max:12',
                 'nullable'
             ],
             'estado' => [

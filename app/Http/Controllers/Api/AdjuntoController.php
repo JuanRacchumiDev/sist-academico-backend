@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\DTOs\Adjunto\AdjuntoCreateDTO;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 // use App\DTOs\Adjunto\AdjuntoCreateDTO;
@@ -9,6 +10,7 @@ use App\Services\AdjuntoService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Auth;
 
 class AdjuntoController extends Controller
 {
@@ -79,7 +81,7 @@ class AdjuntoController extends Controller
             ], 200);
         } catch (\Exception $e) {
             Log::error("Error fetching adjuntos: " . $e->getMessage());
-            
+
             return response()->json([
                 'result' => false,
                 'message' => 'Error al obtener adjuntos: ' . $e->getMessage(),
@@ -88,26 +90,59 @@ class AdjuntoController extends Controller
         }
     }
 
+    public function verificarExistencia(Request $request): JsonResponse
+    {
+        try {
+            $filters = $request->validate([
+                'id_programa' => 'required|integer|exists:programa,id',
+                'id_modulo' => 'sometimes|nullable|integer|exists:modulo,id',
+                'titulo' => 'required|string|max:100'
+            ]);
+
+            $adjuntoExistente = $this->adjuntoService->obtenerAdjunto(
+                $filters['id_programa'],
+                $filters['id_modulo'] ?? null,
+                $filters['titulo']
+            );
+
+            if ($adjuntoExistente) {
+                return response()->json([
+                    'result' => true,
+                    'exists' => true,
+                    'data' => $adjuntoExistente,
+                    'message' => 'El adjunto ya ha sido ingresado previamente',
+                    'code' => 'PREVIOUSLY_REGISTERED'
+                ], 200);
+            }
+
+            return response()->json([
+                'result' => true,
+                'exists' => false,
+                'message' => 'El adjunto no existe',
+                'code' => 'NOT_REGISTERED'
+            ], 200);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'result' => false,
+                'message' => 'Error de validación',
+                'errors' => $e->errors(),
+                'code' => 'INVALID_FILTERS'
+            ], 422);
+        }
+    }
+
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request): JsonResponse
+    public function store(AdjuntoCreateDTO $dto, Request $request): JsonResponse
     {
         try {
-            $request->validate([
-                'id_programa' => 'required|integer|exists:programa,id',
-                'titulo' => 'required|string|max:100',
-                'file' => 'required|file|max:10240',
-            ]);
+            $idPrograma = $dto->id_programa;
+            $idModulo = $dto->id_modulo ?? null;
+            $titulo = $dto->titulo;
 
-            $data = $request->all();
-
-            $filters = [
-                'id_programa' => $data['id_programa'],
-                'titulo' => $data['titulo']
-            ];
-
-            $adjuntoExistente = $this->adjuntoService->getAllAdjuntos($filters)->first();
+            // $adjuntoExistente = $this->adjuntoService->getAllAdjuntos($filters)->first();
+            $adjuntoExistente = $this->adjuntoService->obtenerAdjunto($idPrograma, $idModulo, $titulo);
 
             if ($adjuntoExistente) {
                 return response()->json([
@@ -118,7 +153,12 @@ class AdjuntoController extends Controller
                 ], 200);
             }
 
-            // $adjuntoCreateDTO = AdjuntoCreateDTO::from($data);
+            $usuarioAutenticado = Auth::user();
+            $username = $usuarioAutenticado ? ($usuarioAutenticado->name) : 'systemapi';
+
+            $data = $dto->toArray();
+            $data['user_crea'] = $username;
+            $data['id_modulo'] = $idModulo;
 
             $adjunto = $this->adjuntoService->createAdjunto($data, $request->file('file'));
 
@@ -156,9 +196,9 @@ class AdjuntoController extends Controller
 
             if (!$adjunto) {
                 return response()->json([
-                   'result' => false,
-                   'message' => 'Adjunto no encontrado',
-                   'data' => [] 
+                    'result' => false,
+                    'message' => 'Adjunto no encontrado',
+                    'data' => []
                 ], 404);
             }
 
@@ -169,7 +209,7 @@ class AdjuntoController extends Controller
             ], 200);
         } catch (\Exception $e) {
             Log::error("Error fetching adjunto (id: {$id}): " . $e->getMessage());
-            
+
             return response()->json([
                 'result' => false,
                 'message' => 'Error al obtener el adjunto: ' . $e->getMessage()
@@ -182,7 +222,33 @@ class AdjuntoController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        try {
+            // Obtenemos los datos excepto el archivo para su tratamiento posterior
+            $data = $request->except('file');
+            $file = $request->file('file'); // Puede ser null si el usuario no reemplazó el archivo
+
+            $adjunto = $this->adjuntoService->updateAdjunto((int)$id, $data, $file);
+
+            if (!$adjunto) {
+                return response()->json([
+                    'result' => false,
+                    'message' => 'No se pudo encontrar o actualizar el adjunto especificado',
+                    'data' => []
+                ], 404);
+            }
+
+            return response()->json([
+                'result' => true,
+                'data' => $adjunto,
+                'message' => 'Adjunto actualizado correctamente'
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error("Error actualizando adjunto (id: {$id}): " . $e->getMessage());
+            return response()->json([
+                'result' => false,
+                'message' => 'Error al actualizar el adjunto: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**

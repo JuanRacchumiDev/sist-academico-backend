@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Repositories\Eloquent;
 
 use App\Models\Adjunto;
@@ -6,8 +7,10 @@ use App\DTOs\Adjunto\AdjuntoCreateDTO;
 use App\Repositories\Contracts\IAdjuntoRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Override;
 
-class AdjuntoRepository implements IAdjuntoRepository {
+class AdjuntoRepository implements IAdjuntoRepository
+{
     public function getAll(?array $searchParams = null): Collection
     {
         $query = Adjunto::with([
@@ -43,6 +46,20 @@ class AdjuntoRepository implements IAdjuntoRepository {
             'modulo',
             'institucion'
         ])->findOrFail($id);
+    }
+
+    public function findDuplicate(int $idPrograma, ?int $idModulo, string $titulo): ?Adjunto
+    {
+        $query = Adjunto::where('id_programa', $idPrograma)
+            ->where('titulo', $titulo);
+
+        if (is_null($idModulo)) {
+            $query->whereNull('id_modulo');
+        } else {
+            $query->where('id_modulo', $idModulo);
+        }
+
+        return $query->first();
     }
 
     public function create(array $data): Adjunto
@@ -93,7 +110,7 @@ class AdjuntoRepository implements IAdjuntoRepository {
             $search = '%' . strtolower($filters['search']) . '%';
             $query->where(function ($q) use ($search) {
                 $q->whereRaw('LOWER(titulo) LIKE ?', [$search])
-                  ->orWhereRaw('LOWER(descripcion) LIKE ?', [$search]);
+                    ->orWhereRaw('LOWER(descripcion) LIKE ?', [$search]);
             });
         }
     }

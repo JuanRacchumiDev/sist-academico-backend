@@ -20,6 +20,10 @@ class User extends Authenticatable implements JWTSubject
         'password',
         'id_perfil',
         'id_persona',
+        "user_crea",
+        "user_actualiza",
+        "user_elimina",
+        "estado"
     ];
 
     /**

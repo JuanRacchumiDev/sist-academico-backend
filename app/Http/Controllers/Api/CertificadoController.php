@@ -10,6 +10,7 @@ use App\Services\Contracts\ICertificadoService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Auth;
 
 class CertificadoController extends Controller
 {
@@ -30,7 +31,8 @@ class CertificadoController extends Controller
         return response()->json($certificados);
     }
 
-    public function download(int $id) {
+    public function download(int $id)
+    {
         try {
             $certificado = $this->certificadoService->getCertificadoById($id);
 
@@ -66,6 +68,10 @@ class CertificadoController extends Controller
         try {
             $data = $request->all();
 
+            $usuarioAutenticado = Auth::user();
+            $username = $usuarioAutenticado ? ($usuarioAutenticado->name) : 'systemapi';
+            $data['user_crea'] = $username;
+
             $dto = CertificadoCreateDTO::from($data);
 
             $certificado = $this->certificadoService->createCertificado($dto);
@@ -86,7 +92,7 @@ class CertificadoController extends Controller
                 'code' => 'INVALID_RECORD'
             ], 422);
         } catch (\Exception $e) {
-             Log::error("Error al crear el certificado: " . $e->getMessage());
+            Log::error("Error al crear el certificado: " . $e->getMessage());
 
             return response()->json([
                 'result' => false,
@@ -135,6 +141,10 @@ class CertificadoController extends Controller
         try {
             $data = $request->all();
 
+            $usuarioAutenticado = Auth::user();
+            $username = $usuarioAutenticado ? ($usuarioAutenticado->name) : 'systemapi';
+            $data['user_actualiza'] = $username;
+
             $dto = CertificadoUpdateDTO::from($data);
 
             $certificado = $this->certificadoService->updateCertificado($id, $dto);
@@ -164,7 +174,7 @@ class CertificadoController extends Controller
             $message = 'Error al actualizar el certificado:' . $e->getMessage();
 
             Log::error("Error updating certificado: " . $e->getMessage());
-            
+
             return response()->json([
                 'result' => false,
                 'message' => $message
@@ -181,8 +191,8 @@ class CertificadoController extends Controller
             $deleted = $this->certificadoService->deleteCertificado($id);
 
             return response()->json([
-               'result' => $deleted,
-               'message' => $deleted ? 'Eliminado' : 'No encontrado' 
+                'result' => $deleted,
+                'message' => $deleted ? 'Eliminado' : 'No encontrado'
             ]);
         } catch (\Exception $e) {
             return response()->json([

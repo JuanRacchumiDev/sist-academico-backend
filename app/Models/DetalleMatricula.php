@@ -11,11 +11,13 @@ class DetalleMatricula extends Model
     protected $primaryKey = "id";
     public $incrementing = true;
 
-    public $timestamps = true; 
+    public $timestamps = true;
 
     protected $fillable = [
         'id_matricula',
         'id_programa',
+        'valor_matricula',
+        'valor_modulo',
         'user_crea',
         'user_actualiza',
         'user_elimina',

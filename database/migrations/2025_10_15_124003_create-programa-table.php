@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('programa', function(Blueprint $table) {
+        Schema::create('programa', function (Blueprint $table) {
             $table->id();
-        
+
             $table->unsignedBigInteger('id_segmento')->nullable();
             $table->unsignedBigInteger('id_tipoprograma')->nullable();
             $table->unsignedBigInteger('id_categoriaprograma')->nullable();
@@ -32,7 +32,7 @@ return new class extends Migration
             $table->integer('numero_modulos')->nullable();
             $table->integer('creditos')->nullable();
             $table->string('plan', 100)->nullable();
-            $table->enum('modalidad', ['VIRTUAL', 'PRESENCIAL', 'MIXTO'], 20)->default('VIRTUAL');
+            $table->enum('modalidad', ['VIRTUAL', 'PRESENCIAL', 'MIXTO'])->default('VIRTUAL');
             $table->integer('capacidad_minima')->nullable();
             $table->integer('capacidad_maxima')->nullable();
             $table->integer('cantidad_inscritos')->nullable();
@@ -67,7 +67,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('programa', function(Blueprint $table) {
+        Schema::table('programa', function (Blueprint $table) {
             $table->dropForeign('id_segmento');
             $table->dropColumn('id_segmento');
 

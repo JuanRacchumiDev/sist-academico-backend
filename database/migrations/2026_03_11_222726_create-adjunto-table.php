@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('adjunto', function(Blueprint $table) {
+        Schema::create('adjunto', function (Blueprint $table) {
             $table->id();
 
             $table->unsignedBigInteger('id_programa')->nullable();
@@ -24,11 +24,11 @@ return new class extends Migration
             $table->string('filename', 120);
             $table->string('originalname', 180);
             $table->string('filepath', 150);
-            $table->string('mimetype', 20);
+            $table->string('mimetype', 200);
             $table->integer('size');
             $table->boolean('es_descargable')->default(true);
             $table->boolean('es_visible')->default(true);
-            
+
             $table->string('user_crea', 12)->nullable();
             $table->string('user_actualiza', 12)->nullable();
             $table->string('user_elimina', 12)->nullable();
@@ -57,7 +57,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('adjunto', function(Blueprint $table) {
+        Schema::table('adjunto', function (Blueprint $table) {
             $table->dropForeign('id_programa');
             $table->dropColumn('id_programa');
 

@@ -24,6 +24,9 @@ class MatriculaCreateDTO extends Data
         public ?float $cantidad_efectivo = null,
         public ?float $cantidad_operacion = null,
 
+        public ?float $monto_matricula = null,
+        public ?float $monto_modulo = null,
+
         public ?string $fecha_retiro = null,
         public ?string $fecha_reserva = null,
         public ?string $fecha_anula = null,
@@ -67,6 +70,16 @@ class MatriculaCreateDTO extends Data
             'fecha_matricula' => [
                 'required',
                 'string'
+            ],
+            'monto_matricula' => [
+                'sometimes',
+                'float',
+                'nullable'
+            ],
+            'monto_modulo' => [
+                'sometimes',
+                'float',
+                'nullable'
             ],
             'fecha_retiro' => [
                 'sometimes',

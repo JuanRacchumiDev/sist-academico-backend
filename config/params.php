@@ -11,8 +11,9 @@ return [
         'segmento' => 1006,
         'grupo' => 1007,
         'banco-cuenta' => 1008,
-        'categoria-programa' => 1009,
+        // 'categoria-programa' => 1009,
         'estado-matriicula' => 1010,
-        'estado-pago' => 1011
+        'estado-pago' => 1011,
+        'forma-pago' => 1012
     ]
 ];

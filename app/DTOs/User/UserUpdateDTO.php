@@ -1,4 +1,5 @@
 <?php
+
 namespace App\DTOs\User;
 
 use App\DTOs\Persona\PersonaUpdateNestedDTO;
@@ -14,9 +15,12 @@ class UserUpdateDTO extends Data
         public ?string $password = null,
         public ?int $id_perfil = null,
         public ?int $id_persona = null,
-        public ?bool $estado = true,
+        public ?string $user_crea = null,
+        public ?string $user_actualiza = null,
+        public ?string $user_elimina = null,
+        public ?bool $estado = null,
         public ?PersonaUpdateNestedDTO $persona = null
-    ){}
+    ) {}
 
     public static function rules(): array
     {
@@ -48,6 +52,29 @@ class UserUpdateDTO extends Data
                 'sometimes',
                 'int',
                 'exists:persona,id'
+            ],
+            'user_crea' => [
+                'sometimes',
+                'string',
+                'max:12',
+                'nullable'
+            ],
+            'user_actualiza' => [
+                'sometimes',
+                'string',
+                'max:12',
+                'nullable'
+            ],
+            'user_elimina' => [
+                'sometimes',
+                'string',
+                'max:12',
+                'nullable'
+            ],
+            'estado' => [
+                'sometimes',
+                'boolean',
+                'nullable'
             ]
         ];
     }

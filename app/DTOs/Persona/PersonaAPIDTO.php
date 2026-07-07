@@ -1,9 +1,11 @@
 <?php
+
 namespace App\DTOs\Persona;
 
 use Carbon\Carbon;
 
-class PersonaAPIDTO {
+class PersonaAPIDTO
+{
     public readonly string $nombre_completo;
 
     public function __construct(
@@ -23,19 +25,22 @@ class PersonaAPIDTO {
         public readonly ?string $ubigeo = null,
         public readonly ?string $fecha_nacimiento = null,
         public readonly ?string $estado_civil = null,
+        public readonly ?string $user_crea = null,
+        public readonly ?string $user_actualiza = null,
+        public readonly ?string $user_elimina = null,
         public readonly string $origen = 'API',
         ?string $nombre_completo_override = null
-    ){
-        $this->nombre_completo = $nombre_completo_override 
-            ?? $this->nombres.' '.$this->apellido_paterno.' '.$this->apellido_materno;
+    ) {
+        $this->nombre_completo = $nombre_completo_override
+            ?? $this->nombres . ' ' . $this->apellido_paterno . ' ' . $this->apellido_materno;
     }
 
     public static function fromAPIResponse(array $response): self
     {
         // Validar y extraer la data de la respuesta
-        
+
         if (empty($response) || !isset($response['numero'], $response['nombres'])) {
-             throw new \Exception("No se recibieron datos de persona válidos para el mapeo.");
+            throw new \Exception("No se recibieron datos de persona válidos para el mapeo.");
         }
 
         // Mapear y transformar los datos
@@ -67,6 +72,9 @@ class PersonaAPIDTO {
             ubigeo: $ubigeoString,
             fecha_nacimiento: $fechaNacimientoBD,
             estado_civil: $response['estado_civil'] ?? null,
+            user_crea: $response['user_crea'] ?? null,
+            user_actualiza: $response['user_actualiza'] ?? null,
+            user_elimina: $response['user_elimina'] ?? null,
             sexo: $response['sexo'],
             origen: 'API',
         );
@@ -91,6 +99,9 @@ class PersonaAPIDTO {
             ubigeo: $this->ubigeo,
             fecha_nacimiento: $this->fecha_nacimiento,
             estado_civil: $this->estado_civil,
+            user_crea: $this->user_crea,
+            user_actualiza: $this->user_actualiza,
+            user_elimina: $this->user_elimina,
             sexo: $this->sexo,
             origen: $this->origen,
             nombre_completo_override: $this->nombre_completo // Mantener el nombre completo
@@ -114,9 +125,12 @@ class PersonaAPIDTO {
             ubigeo: $this->ubigeo,
             fecha_nacimiento: $this->fecha_nacimiento,
             estado_civil: $this->estado_civil,
+            user_crea: $this->user_crea,
+            user_actualiza: $this->user_actualiza,
+            user_elimina: $this->user_elimina,
             sexo: $this->sexo,
             origen: $this->origen,
-            nombre_completo_override: $nuevoNombre 
+            nombre_completo_override: $nuevoNombre
         );
     }
 }

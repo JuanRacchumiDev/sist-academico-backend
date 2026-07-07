@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Auth;
 
 class ModuloController extends Controller
 {
@@ -43,7 +44,7 @@ class ModuloController extends Controller
             ], 200);
         } catch (\Exception $e) {
             Log::error("Error fetching módulos: " . $e->getMessage());
-            
+
             return response()->json([
                 'result' => false,
                 'message' => 'Error al obtener módulos: ' . $e->getMessage()
@@ -62,7 +63,7 @@ class ModuloController extends Controller
 
             $perPage = $request->input('per_page', 10);
 
-            $filters = array_map(function($value) {
+            $filters = array_map(function ($value) {
                 if ($value === 'true') return true;
                 if ($value === 'false') return false;
                 return $value;
@@ -93,7 +94,7 @@ class ModuloController extends Controller
             ], 200);
         } catch (\Exception $e) {
             Log::error("Error filtering módulos: " . $e->getMessage());
-            
+
             return response()->json([
                 'result' => false,
                 'message' => 'Error al obtener módulos.',
@@ -116,13 +117,17 @@ class ModuloController extends Controller
             $idPrograma = $request->input('id_programa');
             $modulosInput = $request->input('modulos');
 
-            $dtos = array_map(function ($item) use ($idPrograma) {
+            $usuarioAutenticado = Auth::user();
+            $username = $usuarioAutenticado ? ($usuarioAutenticado->name) : 'systemapi';
+
+            $dtos = array_map(function ($item) use ($idPrograma, $username) {
                 $item['id_programa'] = $idPrograma;
                 $item['titulo_url'] = Str::slug($item['titulo']);
                 $item['estado'] = $item['estado'] ?? true;
                 // Asignamos un orden temporal para pasar la validación si fuera necesaria
-                $item['orden'] = $item['orden'] ?? 0; 
-                
+                $item['orden'] = $item['orden'] ?? 0;
+                $item['user_crea'] = $username;
+
                 return ModuloCreateDTO::from($item);
             }, $modulosInput);
 
@@ -133,22 +138,6 @@ class ModuloController extends Controller
                 'data' => $creados,
                 'message' => count($creados) . ' módulos registrados correctamente'
             ], 201);
-
-            // $data = $request->all();
-
-            // if (isset($data['titulo'])) {
-            //     $data['titulo_url'] = Str::slug($data['titulo']);
-            // }
-
-            // $moduloCreateDTO = ModuloCreateDTO::from($data);
-            
-            // $modulo = $this->moduloService->createModulo($moduloCreateDTO);
-            
-            // return response()->json([
-            //     'result' => true,
-            //     'data' => $modulo,
-            //     'message' => 'Módulo registrado correctamente'
-            // ], 201);
         } catch (ValidationException $e) {
             return response()->json([
                 'result' => false,
@@ -157,7 +146,7 @@ class ModuloController extends Controller
             ], 422);
         } catch (\Exception $e) {
             Log::error("Error creating módulo: " . $e->getMessage());
-            
+
             return response()->json([
                 'result' => false,
                 'message' => 'Error al crear módulo: ' . $e->getMessage()
@@ -172,7 +161,7 @@ class ModuloController extends Controller
     {
         try {
             $modulo = $this->moduloService->getModuloById($id);
-            
+
             if (!$modulo) {
                 return response()->json([
                     'result' => false,
@@ -180,7 +169,7 @@ class ModuloController extends Controller
                     'data' => []
                 ], 404);
             }
-            
+
             return response()->json([
                 'result' => true,
                 'data' => $modulo,
@@ -188,7 +177,7 @@ class ModuloController extends Controller
             ], 200);
         } catch (\Exception $e) {
             Log::error("Error fetching módulo (id: {$id}): " . $e->getMessage());
-            
+
             return response()->json([
                 'result' => false,
                 'message' => 'Error al obtener el módulo: ' . $e->getMessage()

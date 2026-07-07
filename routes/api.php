@@ -120,8 +120,10 @@ Route::prefix('v1')->group(function () {
         Route::prefix('adjuntos')->group(function () {
             Route::get('/paginate', [AdjuntoController::class, 'getFilteredPaginate'])->name('adjuntos.paginate');
             Route::get('/', [AdjuntoController::class, 'index'])->name('adjuntos');
+            Route::post('/verificar', [AdjuntoController::class, 'verificarExistencia'])->name('adjuntos.verificar');
             Route::get('/{id}', [AdjuntoController::class, 'show'])->name('adjuntos.show');
             Route::post('/', [AdjuntoController::class, 'store'])->name('adjuntos.store');
+            Route::patch('/{id}', [AdjuntoController::class, 'update'])->name('adjuntos.update');
         });
 
         Route::prefix('usuarios')->group(function () {

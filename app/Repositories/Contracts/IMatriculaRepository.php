@@ -39,6 +39,14 @@ interface IMatriculaRepository
     public function findById(int $id): ?Matricula;
 
     /**
+     * Busca si ya existe una matrícula para una persona en una fecha específica
+     * @param int $idPersona
+     * @param string $fechaMatricula
+     * @return Matricula|null
+     */
+    public function findByPersonaAndFecha(int $idPersona, string $fechaMatricula): ?Matricula;
+
+    /**
      * Crea una matrícula
      * @param array<string, mixed> $data
      * @return Matricula

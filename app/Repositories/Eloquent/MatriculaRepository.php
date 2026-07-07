@@ -45,9 +45,7 @@ class MatriculaRepository implements IMatriculaRepository
 
         $this->applyFilters($query, $filters);
 
-        $query->orderBy('fecha_matricula', 'DESC');
-
-        return $query->paginate($perPage);
+        return $query->orderBy('fecha_matricula', 'DESC')->paginate($perPage);
     }
 
     /**
@@ -91,6 +89,14 @@ class MatriculaRepository implements IMatriculaRepository
             'detalles.programa.tipoPrograma',
             'detalles.programa.categoriaPrograma'
         ])->find($id);
+    }
+
+    public function findByPersonaAndFecha(int $idPersona, string $fechaMatricula): ?Matricula
+    {
+        return Matricula::with(['detalles'])
+            ->where('id_persona', $idPersona)
+            ->where('fecha_matricula', $fechaMatricula)
+            ->first();
     }
 
     /**
@@ -142,24 +148,18 @@ class MatriculaRepository implements IMatriculaRepository
 
     private function applyFilters($query, array $filters): void
     {
-        if (isset($filters['id_persona'])) {
-            $query->where('id_persona', $filters['id_persona']);
+        if (!empty($filters['fechaInicio'])) {
+            $query->where('fecha_matricula', '>=', $filters['fechaInicio']);
         }
 
-        if (isset($filters['id_estadomatricula'])) {
-            $query->where('id_estadomatricula', $filters['id_estadomatricula']);
+        if (!empty($filters['fechaFinal'])) {
+            $query->where('fecha_matricula', '<=', $filters['fechaFinal']);
         }
 
-        if (isset($filters['id_institucion'])) {
-            $query->where('id_institucion', $filters['id_institucion']);
-        }
-
-        if (isset($filters['fecha_matricula'])) {
-            $query->where('fecha_matricula', '>=', $filters['fecha_matricula']);
-        }
-
-        if (isset($filters['estado'])) {
-            $query->where('estado', filter_var($filters['estado'], FILTER_VALIDATE_BOOLEAN));
+        if (!empty($filters['nombreCompleto'])) {
+            $query->whereHas('persona', function ($q) use ($filters) {
+                $q->where('nombre_completo', 'ILIKE', '%' . $filters['nombreCompleto'] . '%');
+            });
         }
     }
 }

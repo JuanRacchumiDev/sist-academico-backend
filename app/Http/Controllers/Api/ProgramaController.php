@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 
 class ProgramaController extends Controller
 {
@@ -57,23 +58,11 @@ class ProgramaController extends Controller
     public function getFilteredPaginate(Request $request): JsonResponse
     {
         try {
-            // $filters = [];
-
-            // if ($request->has('search')) {
-            //     $filters['search'] = $request->input('search');
-            // }
-
-            // $filters = array_map(function($value) {
-            //     if ($value === 'true') return true;
-            //     if ($value === 'false') return false;
-            //     return $value;
-            // }, $filters);
-
             $filters = $request->only([
-                'titulo', 
-                'id_segmento', 
-                'id_tipoprograma', 
-                'id_categoriaprograma', 
+                'titulo',
+                'id_segmento',
+                'id_tipoprograma',
+                'id_categoriaprograma',
                 'modalidad'
             ]);
 
@@ -104,7 +93,7 @@ class ProgramaController extends Controller
             ], 200);
         } catch (\Exception $e) {
             Log::error("Error filtering programas: " . $e->getMessage());
-            
+
             return response()->json([
                 'result' => false,
                 'message' => 'Error al obtener programas.',
@@ -142,6 +131,10 @@ class ProgramaController extends Controller
                 $data['titulo_url'] = Str::slug($data['titulo']);
             }
 
+            $usuarioAutenticado = Auth::user();
+            $username = $usuarioAutenticado ? ($usuarioAutenticado->name) : 'systemapi';
+            $data['user_crea'] = $username;
+
             $programaCreateDTO = ProgramaCreateDTO::from($data);
 
             $programa = $this->programaService->createPrograma($programaCreateDTO);
@@ -176,7 +169,7 @@ class ProgramaController extends Controller
     {
         try {
             $programa = $this->programaService->getProgramaById($id);
-            
+
             if (!$programa) {
                 return response()->json([
                     'result' => false,
@@ -184,7 +177,7 @@ class ProgramaController extends Controller
                     'data' => []
                 ], 404);
             }
-            
+
             return response()->json([
                 'result' => true,
                 'data' => $programa,
@@ -192,7 +185,7 @@ class ProgramaController extends Controller
             ], 200);
         } catch (\Exception $e) {
             Log::error("Error fetching programa (id: {$id}): " . $e->getMessage());
-            
+
             return response()->json([
                 'result' => false,
                 'message' => 'Error al obtener el programa: ' . $e->getMessage()
@@ -208,6 +201,10 @@ class ProgramaController extends Controller
             if (isset($data['titulo'])) {
                 $data['titulo_url'] = Str::slug($data['titulo']);
             }
+
+            $usuarioAutenticado = Auth::user();
+            $username = $usuarioAutenticado ? ($usuarioAutenticado->name) : 'systemapi';
+            $data['user_actualiza'] = $username;
 
             $programaUpdateDTO = ProgramaUpdateDTO::from([
                 ...$data,
@@ -239,7 +236,7 @@ class ProgramaController extends Controller
             $message = 'Error al actualizar el programa:' . $e->getMessage();
 
             Log::error("Error updating programa: " . $e->getMessage());
-            
+
             return response()->json([
                 'result' => false,
                 'message' => $message

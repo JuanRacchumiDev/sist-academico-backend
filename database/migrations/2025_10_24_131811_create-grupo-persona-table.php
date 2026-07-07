@@ -11,10 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('grupo_persona', function(Blueprint $table) {
+        Schema::create('grupo_persona', function (Blueprint $table) {
             $table->unsignedBigInteger('codigo_detalle_parametro');
             $table->unsignedBigInteger('id_persona');
 
+            $table->integer('id_institucion')->nullable();
             $table->string('user_crea', 12)->nullable();
             $table->string('user_actualiza', 12)->nullable();
             $table->string('user_elimina', 12)->nullable();
@@ -23,15 +24,19 @@ return new class extends Migration
 
             // Definición explícita de la clave foránea para 'detalle_parametro'
             $table->foreign('codigo_detalle_parametro')
-                  ->references('codigo') // La clave primaria de detalle_parametro se llama 'codigo'
-                  ->on('detalle_parametro');
-                //   ->onDelete('cascade');
+                ->references('codigo') // La clave primaria de detalle_parametro se llama 'codigo'
+                ->on('detalle_parametro');
+            //   ->onDelete('cascade');
 
             // Definición explícita de la clave foránea para 'persona'
             $table->foreign('id_persona')
-                  ->references('id') // La clave primaria de persona se llama 'id'
-                  ->on('persona');
-                //   ->onDelete('cascade');
+                ->references('id') // La clave primaria de persona se llama 'id'
+                ->on('persona');
+            //   ->onDelete('cascade');
+
+            $table->foreign('id_institucion')
+                ->references('id')
+                ->on('institucion');
         });
     }
 

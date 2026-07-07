@@ -16,7 +16,7 @@ class Programa extends Model
         'id_tipoprograma',
         'id_categoriaprograma',
         'id_institucion',
-        
+
         'codigo_old',
         'sigla',
         'titulo',
@@ -99,5 +99,10 @@ class Programa extends Model
     public function detalleModulos()
     {
         return $this->hasMany(Modulo::class, 'id_programa', 'id');
+    }
+
+    public function adjuntos()
+    {
+        return $this->hasMany(Adjunto::class, 'id_programa', 'id');
     }
 }
