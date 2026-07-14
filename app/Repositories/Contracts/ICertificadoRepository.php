@@ -4,9 +4,9 @@ namespace App\Repositories\Contracts;
 
 use App\Models\Certificado;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Collection;
 
-interface ICertificadoRepository {
+interface ICertificadoRepository
+{
     /**
      * Obtiene todos los certificados
      * @param array<string, mixed> $filters

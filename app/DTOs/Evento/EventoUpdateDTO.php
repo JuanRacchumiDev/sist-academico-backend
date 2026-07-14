@@ -1,4 +1,5 @@
 <?php
+
 namespace App\DTOs\Evento;
 
 use Spatie\LaravelData\Data;
@@ -26,7 +27,7 @@ class EventoUpdateDTO extends Data
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null,
         public ?bool $estado = null
-    ){}
+    ) {}
 
     /**
      * Manipula los datos de la validación
@@ -49,24 +50,28 @@ class EventoUpdateDTO extends Data
             'id_tipoevento' => [
                 'sometimes',
                 'integer',
-                'exists:detalle_parametro,codigo'
+                'exists:detalle_parametro,codigo',
+                'nullable'
             ],
             'id_categoriaevento' => [
                 'sometimes',
                 'integer',
-                'exists:detalle_parametro,codigo'
+                'exists:detalle_parametro,codigo',
+                'nullable'
             ],
             'titulo' => [
                 'sometimes',
                 'string',
                 'max:100',
-                Rule::unique('evento', 'titulo')->ignore($eventoId)
+                Rule::unique('evento', 'titulo')->ignore($eventoId),
+                'nullable'
             ],
             'titulo_url' => [
                 'sometimes',
                 'string',
                 'max:120',
-                Rule::unique('evento', 'titulo_url')->ignore($eventoId)
+                Rule::unique('evento', 'titulo_url')->ignore($eventoId),
+                'nullable'
             ],
             'descripcion' => [
                 'sometimes',
@@ -81,19 +86,23 @@ class EventoUpdateDTO extends Data
             ],
             'fecha_inicio' => [
                 'sometimes',
-                'string'
+                'string',
+                'nullable'
             ],
             'fecha_final' => [
                 'sometimes',
-                'string'
+                'string',
+                'nullable'
             ],
             'duracion' => [
                 'sometimes',
-                'string'
+                'string',
+                'nullable'
             ],
             'modalidad' => [
                 'sometimes',
-                'string'
+                'string',
+                'nullable'
             ],
             'precio' => [
                 'sometimes',
@@ -132,7 +141,8 @@ class EventoUpdateDTO extends Data
             ],
             'estado' => [
                 'sometimes',
-                'boolean'
+                'boolean',
+                'nullable'
             ]
         ];
     }

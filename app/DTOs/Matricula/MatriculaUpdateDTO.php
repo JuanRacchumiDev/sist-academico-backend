@@ -1,4 +1,5 @@
 <?php
+
 namespace App\DTOs\Matricula;
 
 use Spatie\LaravelData\Data;
@@ -18,7 +19,7 @@ class MatriculaUpdateDTO extends Data
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null,
-    ){}
+    ) {}
 
     public static function rules(): array
     {
@@ -44,12 +45,14 @@ class MatriculaUpdateDTO extends Data
             'programas' => [
                 'sometimes',
                 'array',
-                'min:1'
+                'min:1',
+                'nullable'
             ],
             'programas.*' => [
                 'sometimes',
                 'integer',
-                'exists:programa,id'
+                'exists:programa,id',
+                'nullable'
             ],
             'fecha_matricula' => [
                 'sometimes',
@@ -91,8 +94,9 @@ class MatriculaUpdateDTO extends Data
             ],
             'estado' => [
                 'sometimes',
-                'boolean'
+                'boolean',
+                'nullable'
             ]
         ];
-    } 
+    }
 }

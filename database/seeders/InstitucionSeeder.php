@@ -20,11 +20,11 @@ class InstitucionSeeder extends Seeder
 
         DB::table('institucion')->insert([
             [
-                'nombre' => 'peruinnova',
+                'nombre' => 'innovaperu',
                 'sigla' => 'Aprendizaje continúo para ti',
                 'ruc' => '20204040200',
                 'ubicacion' => 'Chiclayo',
-                'logo_path' => 'logo_peruinnova.png',
+                'logo_path' => 'logo_innovaperu.png',
                 'created_at' => $now,
                 'updated_at' => $now
             ],

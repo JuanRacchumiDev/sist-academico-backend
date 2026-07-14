@@ -171,6 +171,34 @@ class DetalleParametroSeeder extends Seeder
                 'venta' => false,
                 'created_at' => $now,
                 'updated_at' => $now
+            ],
+            [
+                'parametro_clase' => 1002,
+                'nombre' => 'CAPACITACIÓN',
+                'nombre_url' => 'capacitacion',
+                'descripcion' => 'CAPACITACIÓN',
+                'abreviatura' => 'CA',
+                'longitud' => null,
+                'en_persona' => false,
+                'en_empresa' => false,
+                'compra' => false,
+                'venta' => false,
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'parametro_clase' => 1002,
+                'nombre' => 'CONFERENCIA',
+                'nombre_url' => 'conferencia',
+                'descripcion' => 'CONFERENCIA',
+                'abreviatura' => 'CO',
+                'longitud' => null,
+                'en_persona' => false,
+                'en_empresa' => false,
+                'compra' => false,
+                'venta' => false,
+                'created_at' => $now,
+                'updated_at' => $now
             ]
         ]);
 
@@ -255,8 +283,8 @@ class DetalleParametroSeeder extends Seeder
         DB::table('detalle_parametro')->insert([
             [
                 'parametro_clase' => 1004,
-                'nombre' => 'PERUINNOVA',
-                'nombre_url' => 'peruinnova',
+                'nombre' => 'INNOVAPERU',
+                'nombre_url' => 'innovaperu',
                 'longitud' => null,
                 'en_persona' => false,
                 'en_empresa' => false,
@@ -389,6 +417,19 @@ class DetalleParametroSeeder extends Seeder
                 'venta' => false,
                 'created_at' => $now,
                 'updated_at' => $now
+            ],
+            [
+                'parametro_clase' => 1006,
+                'nombre' => 'AGRONOMÍA',
+                'nombre_url' => 'agronomia',
+                'abreviatura' => null,
+                'longitud' => null,
+                'en_persona' => false,
+                'en_empresa' => false,
+                'compra' => false,
+                'venta' => false,
+                'created_at' => $now,
+                'updated_at' => $now
             ]
         ]);
 
@@ -454,8 +495,8 @@ class DetalleParametroSeeder extends Seeder
         DB::table('detalle_parametro')->insert([
             [
                 'parametro_clase' => 1008,
-                'nombre' => 'BN-PERUINNOVA',
-                'nombre_url' => 'bn-peruinnova',
+                'nombre' => 'BN-INNOVAPERU',
+                'nombre_url' => 'bn-innovaperu',
                 'valor' => '1111-2222-3333',
                 'abreviatura' => null,
                 'longitud' => null,
@@ -468,8 +509,8 @@ class DetalleParametroSeeder extends Seeder
             ],
             [
                 'parametro_clase' => 1008,
-                'nombre' => 'BCP-PERUINNOVA',
-                'nombre_url' => 'bcp-peruinnova',
+                'nombre' => 'BCP-INNOVAPERU',
+                'nombre_url' => 'bcp-innovaperu',
                 'valor' => '4444-5555-6666',
                 'abreviatura' => null,
                 'longitud' => null,

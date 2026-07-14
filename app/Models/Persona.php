@@ -79,4 +79,33 @@ class Persona extends Model
     {
         return $this->hasMany(Certificado::class, 'id_persona', 'id');
     }
+
+    public function cuestionarios(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Cuestionario::class,
+            "cuestionario_persona",
+            "id_persona",
+            "id_cuestionario"
+        )
+            ->using(CuestionarioPersona::class)
+            ->withPivot([
+                'id',
+                'numero_intento',
+                'fecha_inicio',
+                'fecha_fin',
+                'puntaje_total',
+                'estado_intento',
+                'estado'
+            ])
+            ->withTimestamps();
+    }
+
+    /**
+     * Obtener el historial de todos los intentos de cuestionarios de la persona.
+     */
+    public function intentosCuestionarios(): HasMany
+    {
+        return $this->hasMany(CuestionarioPersona::class, 'id_persona', 'id');
+    }
 }

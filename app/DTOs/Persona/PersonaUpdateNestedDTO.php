@@ -1,4 +1,5 @@
 <?php
+
 namespace App\DTOs\Persona;
 
 use Illuminate\Validation\Rule;
@@ -33,7 +34,7 @@ class PersonaUpdateNestedDTO extends Data
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null,
         public ?bool $estado = null
-    ){}
+    ) {}
 
     public static function rules(): array
     {
@@ -43,28 +44,33 @@ class PersonaUpdateNestedDTO extends Data
             'id_tipodocumento' => [
                 'sometimes',
                 'integer',
-                'exists:detalle_parametro,codigo'
+                'exists:detalle_parametro,codigo',
+                'nullable'
             ],
             'numero_documento' => [
                 'sometimes',
                 'string',
                 'max:13',
-                Rule::unique('persona', 'numero_documento')->ignore($personaId)
+                Rule::unique('persona', 'numero_documento')->ignore($personaId),
+                'nullable'
             ],
             'nombres' => [
                 'sometimes',
                 'string',
-                'max:30'
+                'max:30',
+                'nullable'
             ],
             'apellido_paterno' => [
                 'sometimes',
                 'string',
-                'max:30'
+                'max:30',
+                'nullable'
             ],
             'apellido_materno' => [
                 'sometimes',
                 'string',
-                'max:30'
+                'max:30',
+                'nullable'
             ],
             'departamento' => [
                 'sometimes',
@@ -101,63 +107,76 @@ class PersonaUpdateNestedDTO extends Data
                 'string',
                 'email',
                 'max:60',
-                Rule::unique('persona', 'email')->ignore($personaId)
+                Rule::unique('persona', 'email')->ignore($personaId),
+                'nullable'
             ],
             'telefono' => [
                 'sometimes',
                 'string',
-                'max:13'
+                'max:13',
+                'nullable'
             ],
             'ubigeo_reniec' => [
                 'sometimes',
                 'string',
-                'max:12'
+                'max:12',
+                'nullable'
             ],
             'ubigeo_sunat' => [
                 'sometimes',
                 'string',
-                'max:12'
+                'max:12',
+                'nullable'
             ],
             'ubigeo' => [
                 'sometimes',
                 'string',
-                'max:12'
+                'max:12',
+                'nullable'
             ],
             'fecha_nacimiento' => [
                 'sometimes',
                 'string',
-                'max:10'
+                'max:10',
+                'nullable'
             ],
             'estado_civil' => [
                 'sometimes',
                 'string',
                 'max:20',
-                'exists:detalle_parametro,codigo'
+                'exists:detalle_parametro,codigo',
+                'nullable'
             ],
             'foto' => [
                 'sometimes',
-                'string'
+                'string',
+                'nullable'
             ],
             'sexo' => [
                 'sometimes',
                 'string',
-                'exists:detalle_parametro,codigo'
+                'exists:detalle_parametro,codigo',
+                'nullable'
             ],
             'user_crea' => [
                 'sometimes',
-                'string'
+                'string',
+                'nullable'
             ],
             'user_actualiza' => [
                 'sometimes',
-                'string'
+                'string',
+                'nullable'
             ],
             'user_elimina' => [
                 'sometimes',
-                'string'
+                'string',
+                'nullable'
             ],
             'estado' => [
                 'sometimes',
-                'boolean'
+                'boolean',
+                'nullable'
             ]
         ];
     }

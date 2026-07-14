@@ -11,15 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('modulo', function(Blueprint $table) {
+        Schema::create('modulo', function (Blueprint $table) {
             $table->id();
 
             $table->unsignedBigInteger('id_programa')->nullable();
-            $table->unsignedBigInteger('id_institucion')->nullable();
 
             $table->string('titulo', 100);
             $table->string('titulo_url', 120);
             $table->string('descripcion', 150)->nullable();
+            $table->text('temario')->nullable();
+            $table->decimal('nota', 10, 2)->nullable();
             $table->integer('orden');
 
             $table->string('user_crea', 12)->nullable();
@@ -32,10 +33,6 @@ return new class extends Migration
             $table->foreign('id_programa')
                 ->references('id')
                 ->on('programa');
-
-            $table->foreign('id_institucion')
-                ->references('id')
-                ->on('institucion');
         });
     }
 
@@ -44,12 +41,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('modulo', function(Blueprint $table) {
+        Schema::table('modulo', function (Blueprint $table) {
             $table->dropForeign('id_programa');
             $table->dropColumn('id_programa');
-
-            $table->dropForeign('id_institucion');
-            $table->dropColumn('id_institucion');
         });
 
         Schema::dropIfExists('modulo');

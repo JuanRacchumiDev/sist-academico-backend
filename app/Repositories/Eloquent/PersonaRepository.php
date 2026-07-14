@@ -8,6 +8,7 @@ use App\Models\Persona;
 use App\Repositories\Contracts\IPersonaRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Builder;
 
 class PersonaRepository implements IPersonaRepository
 {
@@ -20,7 +21,7 @@ class PersonaRepository implements IPersonaRepository
     {
         $query = Persona::with($this->getEagerLoads());
 
-        $this->applyFilters($query, $searchParams ?? []);
+        $query = $this->applyFilters($query, $searchParams ?? []);
 
         return $query->get();
     }
@@ -35,7 +36,7 @@ class PersonaRepository implements IPersonaRepository
     {
         $query = Persona::with($this->getEagerLoads());
 
-        $this->applyFilters($query, $filters);
+        $query = $this->applyFilters($query, $filters);
 
         return $query->orderBy('apellido_paterno', 'ASC')->paginate($perPage);
     }
@@ -44,7 +45,7 @@ class PersonaRepository implements IPersonaRepository
     {
         $query = Persona::with($this->getEagerLoads());
 
-        $this->applyFilters($query, $filters);
+        $query = $this->applyFilters($query, $filters);
 
         if ($limit) {
             $query->limit($limit);
@@ -170,7 +171,7 @@ class PersonaRepository implements IPersonaRepository
         return $persona;
     }
 
-    private function applyFilters($query, array $filters): void
+    private function applyFilters(Builder $query, array $filters): Builder
     {
         if (isset($filters['id_tipodocumento'])) {
             $query->where('id_tipodocumento', $filters['id_tipodocumento']);
@@ -198,6 +199,8 @@ class PersonaRepository implements IPersonaRepository
                     ->orWhereRaw('LOWER(email) LIKE ?', [$search]);
             });
         }
+
+        return $query;
     }
 
     private function getEagerLoads(): array

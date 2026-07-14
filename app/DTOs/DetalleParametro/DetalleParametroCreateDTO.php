@@ -1,4 +1,5 @@
 <?php
+
 namespace App\DTOs\DetalleParametro;
 
 use Illuminate\Validation\Rule;
@@ -23,7 +24,7 @@ class DetalleParametroCreateDTO extends Data
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null,
-    ){}
+    ) {}
 
     /**
      * Define los valores por defecto que se aplicarían si el campo no está presente
@@ -86,23 +87,28 @@ class DetalleParametroCreateDTO extends Data
             ],
             'en_persona' => [
                 'sometimes',
-                'boolean'
+                'boolean',
+                'nullable'
             ],
             'en_empresa' => [
                 'sometimes',
-                'boolean'
+                'boolean',
+                'nullable'
             ],
             'compra' => [
                 'sometimes',
-                'boolean'
+                'boolean',
+                'nullable'
             ],
             'venta' => [
                 'sometimes',
-                'boolean'
+                'boolean',
+                'nullable'
             ],
             'visible' => [
                 'sometimes',
-                'boolean'
+                'boolean',
+                'nullable'
             ],
             'user_crea' => [
                 'sometimes',
@@ -121,7 +127,8 @@ class DetalleParametroCreateDTO extends Data
             ],
             'estado' => [
                 'sometimes',
-                'boolean'
+                'boolean',
+                'nullable'
             ]
         ];
     }

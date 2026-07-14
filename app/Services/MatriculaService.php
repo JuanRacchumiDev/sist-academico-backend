@@ -307,7 +307,7 @@ class MatriculaService implements IMatriculaService
         if (!$matricula) return false;
 
         $anio = \Carbon\Carbon::parse($matricula->fecha_matricula)->year;
-        $institucion = "peruinnova";
+        $institucion = "innovaperu";
         $documento = $matricula->persona->numero_documento;
 
         $fullPath = "matriculas/{$anio}/{$institucion}/{$documento}/ficha_matricula_{$id}.pdf";
@@ -383,7 +383,11 @@ class MatriculaService implements IMatriculaService
                 'estado'             => $estado
             ]);
 
-            $this->pagoRepository->create($pagoDTO->toArray());
+            $pagoArray = $pagoDTO->toArray();
+
+            Log::info('Evaluando variable $pagoDTO', ['pagoDTO' => $pagoDTO]);
+
+            $this->pagoRepository->create($pagoArray);
 
             // Obteniendo la clase del grupo perfil
             $clase = config('params.clases.perfil');

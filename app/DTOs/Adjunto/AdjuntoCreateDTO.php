@@ -2,7 +2,6 @@
 
 namespace App\DTOs\Adjunto;
 
-use Illuminate\Validation\Rule;
 use Spatie\LaravelData\Data;
 
 class AdjuntoCreateDTO extends Data
@@ -65,7 +64,8 @@ class AdjuntoCreateDTO extends Data
             'titulo_url' => [
                 'sometimes',
                 'string',
-                'max:120'
+                'max:120',
+                'nullable'
             ],
             'descripcion' => [
                 'sometimes',
@@ -81,34 +81,41 @@ class AdjuntoCreateDTO extends Data
             'filename' => [
                 'sometimes',
                 'string',
-                'max:120'
+                'max:120',
+                'nullable'
             ],
             'originalname' => [
                 'sometimes',
                 'string',
-                'max:180'
+                'max:180',
+                'nullable'
             ],
             'filepath' => [
                 'sometimes',
                 'string',
-                'max:150'
+                'max:150',
+                'nullable'
             ],
             'mimetype' => [
                 'sometimes',
                 'string',
-                'max:40'
+                'max:40',
+                'nullable'
             ],
             'size' => [
                 'sometimes',
-                'integer'
+                'integer',
+                'nullable'
             ],
             'es_descargable' => [
                 'sometimes',
-                'boolean'
+                'boolean',
+                'nullable'
             ],
             'es_visible' => [
                 'sometimes',
-                'boolean'
+                'boolean',
+                'nullable'
             ],
             'user_crea' => [
                 'sometimes',
@@ -130,7 +137,8 @@ class AdjuntoCreateDTO extends Data
             ],
             'estado' => [
                 'sometimes',
-                'boolean'
+                'boolean',
+                'nullable'
             ]
         ];
     }

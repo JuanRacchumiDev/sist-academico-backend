@@ -3,11 +3,10 @@
 namespace App\Repositories\Eloquent;
 
 use App\Models\Adjunto;
-use App\DTOs\Adjunto\AdjuntoCreateDTO;
 use App\Repositories\Contracts\IAdjuntoRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
-use Override;
+use Illuminate\Database\Eloquent\Builder;
 
 class AdjuntoRepository implements IAdjuntoRepository
 {
@@ -19,7 +18,7 @@ class AdjuntoRepository implements IAdjuntoRepository
             'institucion'
         ]);
 
-        $this->applyFilters($query, $searchParams ?? []);
+        $query = $this->applyFilters($query, $searchParams ?? []);
 
         return $query->get();
     }
@@ -32,7 +31,7 @@ class AdjuntoRepository implements IAdjuntoRepository
             'institucion'
         ]);
 
-        $this->applyFilters($query, $filters);
+        $query = $this->applyFilters($query, $filters);
 
         $query->orderBy('id', 'DESC');
 
@@ -92,7 +91,7 @@ class AdjuntoRepository implements IAdjuntoRepository
         return false;
     }
 
-    private function applyFilters($query, array $filters): void
+    private function applyFilters(Builder $query, array $filters): Builder
     {
         if (isset($filters['id_programa'])) {
             $query->where('id_programa', $filters['id_programa']);
@@ -113,5 +112,7 @@ class AdjuntoRepository implements IAdjuntoRepository
                     ->orWhereRaw('LOWER(descripcion) LIKE ?', [$search]);
             });
         }
+
+        return $query;
     }
 }

@@ -1,12 +1,15 @@
 <?php
+
 namespace App\Repositories\Eloquent;
 
 use App\Models\Programa;
 use App\Repositories\Contracts\IProgramaRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Builder;
 
-class ProgramaRepository implements IProgramaRepository {
+class ProgramaRepository implements IProgramaRepository
+{
     /**
      * Obtiene todos los programas
      * @param array<string, mixed>|null $searchParams
@@ -21,9 +24,9 @@ class ProgramaRepository implements IProgramaRepository {
             'detalleModulos'
         ]);
 
-        $this->applyFilters($query, $searchParams ?? []);
+        $query = $this->applyFilters($query, $searchParams ?? []);
 
-        return $query->get();
+        return $query->orderBy('fecha_inicio', 'DESC')->get();
     }
 
     /**
@@ -41,9 +44,9 @@ class ProgramaRepository implements IProgramaRepository {
             'detalleModulos'
         ]);
 
-        $this->applyFilters($query, $filters);
+        $query = $this->applyFilters($query, $filters);
 
-        return $query->orderBy('titulo', 'ASC')->paginate($perPage);
+        return $query->orderBy('fecha_inicio', 'DESC')->paginate($perPage);
     }
 
     /**
@@ -103,7 +106,7 @@ class ProgramaRepository implements IProgramaRepository {
         return $programa ? $programa->delete() : false;
     }
 
-    private function applyFilters($query, array $filters): void
+    private function applyFilters(Builder $query, array $filters): Builder
     {
         if (isset($filters['id_segmento'])) {
             $query->where('id_segmento', $filters['id_segmento']);
@@ -122,8 +125,8 @@ class ProgramaRepository implements IProgramaRepository {
         }
 
         if (isset($filters['titulo'])) {
-            $search = '%'.strtolower($filters['titulo']).'%';
-            $query->where(function($q) use ($search) {
+            $search = '%' . strtolower($filters['titulo']) . '%';
+            $query->where(function ($q) use ($search) {
                 $q->whereRaw('LOWER(titulo) LIKE ?', [$search]);
             });
         }
@@ -131,5 +134,7 @@ class ProgramaRepository implements IProgramaRepository {
         if (isset($filters['modalidad'])) {
             $query->where('modalidad', $filters['modalidad']);
         }
+
+        return $query;
     }
 }

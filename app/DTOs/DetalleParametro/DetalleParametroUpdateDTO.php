@@ -1,4 +1,5 @@
 <?php
+
 namespace App\DTOs\DetalleParametro;
 
 use Illuminate\Validation\Rule;
@@ -23,7 +24,7 @@ class DetalleParametroUpdateDTO extends Data
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null,
         public ?bool $estado = null
-    ){}
+    ) {}
 
     public static function rules(): array
     {
@@ -74,7 +75,8 @@ class DetalleParametroUpdateDTO extends Data
             ],
             'en_persona' => [
                 'sometimes',
-                'boolean'
+                'boolean',
+                'nullable'
             ],
             'en_empresa' => [
                 'sometimes',
@@ -82,15 +84,18 @@ class DetalleParametroUpdateDTO extends Data
             ],
             'compra' => [
                 'sometimes',
-                'boolean'
+                'boolean',
+                'nullable'
             ],
             'venta' => [
                 'sometimes',
-                'boolean'
+                'boolean',
+                'nullable'
             ],
             'visible' => [
                 'sometimes',
-                'boolean'
+                'boolean',
+                'nullable'
             ],
             'user_crea' => [
                 'sometimes',
@@ -109,7 +114,8 @@ class DetalleParametroUpdateDTO extends Data
             ],
             'estado' => [
                 'sometimes',
-                'boolean'
+                'boolean',
+                'nullable'
             ]
         ];
     }

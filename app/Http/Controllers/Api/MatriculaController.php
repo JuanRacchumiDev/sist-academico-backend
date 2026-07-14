@@ -267,11 +267,15 @@ class MatriculaController extends Controller
         try {
             $data = $request->all();
 
+            $idPersona = $data['id_persona'];
+
+            $fechaMatricula = $data['fecha_matricula'];
+
             // Validar que los campos existan antes de usarlos para evitar un error de índice indefinido
-            if (!isset($data['id_persona']) || !isset($data['fecha_matricula'])) {
+            if (!isset($idPersona) || !isset($fechaMatricula)) {
                 return response()->json([
                     'result' => false,
-                    'message' => 'Los campos id_persona y fecha_matricula son obligatorios.',
+                    'message' => 'La selección de una persona y fecha de matrícula son obligatorios.',
                     'code' => 'INVALID_RECORD'
                 ], 400);
             }
@@ -279,7 +283,7 @@ class MatriculaController extends Controller
             $usuarioAutenticado = Auth::user();
             $username = $usuarioAutenticado ? ($usuarioAutenticado->name) : 'systemapi';
 
-            $matriculaExistente = $this->matriculaService->getMatriculaByPersonaAndFecha((int)$data['id_persona'], $data['fecha_matricula']);
+            $matriculaExistente = $this->matriculaService->getMatriculaByPersonaAndFecha((int)$idPersona, $fechaMatricula);
 
             if ($matriculaExistente) {
                 return response()->json([

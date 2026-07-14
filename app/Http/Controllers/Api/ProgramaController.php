@@ -2,26 +2,31 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\DTOs\Modulo\ModuloUpdateDTO;
 use App\DTOs\Programa\ProgramaCreateDTO;
 use App\DTOs\Programa\ProgramaUpdateDTO;
 use App\Http\Controllers\Controller;
-use App\Models\Programa;
+use App\Http\Requests\Programa\UpdateModulosProgramaRequest;
+use App\Services\Contracts\IModuloService;
 use App\Services\Contracts\IProgramaService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 
 class ProgramaController extends Controller
 {
     protected IProgramaService $programaService;
+    protected IModuloService $moduloService;
 
-    public function __construct(IProgramaService $programaService)
-    {
+    public function __construct(
+        IProgramaService $programaService,
+        IModuloService $moduloService
+    ) {
         $this->programaService = $programaService;
+        $this->moduloService = $moduloService;
     }
 
     /**
@@ -242,5 +247,44 @@ class ProgramaController extends Controller
                 'message' => $message
             ], 500);
         }
+    }
+
+    public function updateModulos(UpdateModulosProgramaRequest $request, int $id): JsonResponse
+    {
+        $programa = $this->programaService->getProgramaById($id);
+
+        if (!$programa) {
+            return response()->json([
+                'result' => false,
+                'data' => [],
+                'message' => 'El programa solicitado no existe.'
+            ], 404);
+        }
+
+        $usuarioAutenticado = Auth::user();
+        $username = $usuarioAutenticado ? ($usuarioAutenticado->name) : 'systemapi';
+
+        // Mapear los ítems enviados en el array a DTOs
+        $dtos = collect($request->validated()['modulos'])->map(function (array $item) use ($id, $username) {
+            return ModuloUpdateDTO::from([
+                'id' => $item['id'] ?? null,
+                'id_programa' => $id,
+                'titulo' => $item['titulo'],
+                'titulo_url' => Str::slug($item['titulo']),
+                'temario' => $item['temario'] ?? null,
+                'orden' => $item['orden'] ?? null,
+                'user_actualiza' => $username
+            ]);
+        })->toArray();
+
+        Log::info('Validar la variable $dtos', ['dtos' => $dtos]);
+
+        $modulosProcesados = $this->moduloService->syncModulosPrograma($id, $dtos);
+
+        return response()->json([
+            'result' => true,
+            'message' => 'Módulos actualizados correctamente.',
+            'data' => $modulosProcesados
+        ], 200);
     }
 }

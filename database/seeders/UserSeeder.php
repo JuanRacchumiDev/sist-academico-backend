@@ -34,7 +34,7 @@ class UserSeeder extends Seeder
 
         $passwordAdminHashedPI = Hash::make('admin123');
 
-        $passwordAdminHashedIpede = Hash::make('ipede123'); 
+        $passwordAdminHashedIpede = Hash::make('ipede123');
 
         $passwordAlumnoHashedIpede = Hash::make("alumno123");
 
@@ -45,7 +45,7 @@ class UserSeeder extends Seeder
         DB::table('users')->insert([
             [
                 'name' => 'admin',
-                'email' => 'admin@peruinnova.com',
+                'email' => 'admin@innovaperu.com',
                 'password' => $passwordAdminHashedPI,
                 'id_perfil' => $perfilAdmnin->codigo,
                 'created_at' => $now,
@@ -64,14 +64,6 @@ class UserSeeder extends Seeder
                 'email' => 'alumno.test@gmail.com',
                 'password' => $passwordAlumnoHashedIpede,
                 'id_perfil' => $perfilAlumno->codigo,
-                'created_at' => $now,
-                'updated_at' => $now
-            ],
-            [
-                'name' => 'udocente',
-                'email' => 'juan.racchumi.nima@gmail.com',
-                'password' => $passwordDocenteHashedIpede,
-                'id_perfil' => $perfilDocente->codigo,
                 'created_at' => $now,
                 'updated_at' => $now
             ]

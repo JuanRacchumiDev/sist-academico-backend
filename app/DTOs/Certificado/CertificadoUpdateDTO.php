@@ -1,4 +1,5 @@
 <?php
+
 namespace App\DTOs\Certificado;
 
 use Illuminate\Validation\Rule;
@@ -20,7 +21,7 @@ class CertificadoUpdateDTO extends Data
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null,
         public ?bool $estado
-    ){}
+    ) {}
 
     public static function rules(): array
     {
@@ -30,28 +31,33 @@ class CertificadoUpdateDTO extends Data
             'id_persona' => [
                 'sometimes',
                 'integer',
-                'exists:persona,id'
+                'exists:persona,id',
+                'nullable'
             ],
             'id_tipocertificado' => [
                 'sometimes',
                 'integer',
-                'exists:detalle_parametro,codigo'
+                'exists:detalle_parametro,codigo',
+                'nullable'
             ],
             'id_plantilla' => [
                 'sometimes',
                 'integer',
-                'exists:plantilla,id'
+                'exists:plantilla,id',
+                'nullable'
             ],
             'id_programa' => [
                 'sometimes',
                 'integer',
-                'exists:programa,id'
+                'exists:programa,id',
+                'nullable'
             ],
             'codigo_verificacion' => [
                 'sometimes',
                 'string',
                 'max:12',
-                Rule::unique('certificado', 'codigo_verificacion')->ignore($certificadoId)
+                Rule::unique('certificado', 'codigo_verificacion')->ignore($certificadoId),
+                'nullable'
             ],
             'codigo_qr_path' => [
                 'sometimes',
@@ -103,4 +109,3 @@ class CertificadoUpdateDTO extends Data
         ];
     }
 }
-

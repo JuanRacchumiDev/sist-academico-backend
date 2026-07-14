@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\DTOs\Modulo\ModuloCreateDTO;
+use App\DTOs\Modulo\ModuloUpdateDTO;
 use App\Http\Controllers\Controller;
 use App\Services\Contracts\IModuloService;
 use Illuminate\Http\JsonResponse;
@@ -126,6 +127,7 @@ class ModuloController extends Controller
                 $item['estado'] = $item['estado'] ?? true;
                 // Asignamos un orden temporal para pasar la validación si fuera necesaria
                 $item['orden'] = $item['orden'] ?? 0;
+                $item['temario'] = $item['temario'] ?? null;
                 $item['user_crea'] = $username;
 
                 return ModuloCreateDTO::from($item);
@@ -188,9 +190,53 @@ class ModuloController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, string $id): JsonResponse
     {
-        //
+        try {
+            $data = $request->all();
+
+            if (isset($data['titulo'])) {
+                $data['titulo_url'] = Str::slug($data['titulo']);
+            }
+
+            $usuarioAutenticado = Auth::user();
+            $username = $usuarioAutenticado ? $usuarioAutenticado->name : 'systemapi';
+            $data['user_actualiza'] = $username;
+
+            $moduloUpdateDTO = ModuloUpdateDTO::from([
+                ...$data,
+                'id' => (int)$id
+            ]);
+
+            $modulo = $this->moduloService->updateModulo((int)$id, $moduloUpdateDTO);
+
+            if (!$modulo) {
+                return response()->json([
+                    'result' => false,
+                    'data' => [],
+                    'message' => 'Módulo no encontrado o no se pudo actualizar'
+                ], 404);
+            }
+
+            return response()->json([
+                'result' => true,
+                'data' => $modulo,
+                'message' => 'Módulo actualizado correctamente'
+            ], 200);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'result' => false,
+                'message' => 'Error de validación',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            Log::error("Error actualizando módulo ID {$id}: " . $e->getMessage());
+
+            return response()->json([
+                'result' => false,
+                'message' => 'Error al actualizar el módulo: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**

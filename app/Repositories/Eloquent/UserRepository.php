@@ -12,10 +12,10 @@ use Illuminate\Support\Facades\Hash;
 class UserRepository implements IUserRepository
 {
 
-    public function getAll(array $filters = [], ?int $perPage = null)
+    public function getAll(array $filters = []): Collection
     {
         $query = $this->applyFilters(User::query(), $filters);
-        return $perPage ? $query->paginate($perPage) : $query->get();
+        return $query->get();
     }
 
     public function getAllFiltered(array $filters, int $perPage): LengthAwarePaginator
@@ -25,7 +25,7 @@ class UserRepository implements IUserRepository
             'persona'
         ]);
 
-        $this->applyFilters($query, $filters);
+        $query = $this->applyFilters($query, $filters);
 
         return $query->orderBy('name', 'ASC')->paginate($perPage);
     }

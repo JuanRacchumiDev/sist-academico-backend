@@ -1,12 +1,15 @@
 <?php
+
 namespace App\Repositories\Eloquent;
 
 use App\Models\Modulo;
 use App\Repositories\Contracts\IModuloRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Override;
 
-class ModuloRepository implements IModuloRepository {
+class ModuloRepository implements IModuloRepository
+{
     /**
      * Obtiene todos los módulos
      * @param array<string, mixed>|null $searchParams
@@ -19,9 +22,9 @@ class ModuloRepository implements IModuloRepository {
         ]);
 
         if ($searchParams) {
-            $query->where(function($q) use ($searchParams) {
+            $query->where(function ($q) use ($searchParams) {
                 if (isset($searchParams['search'])) {
-                    $search = '%'.strtolower($searchParams['search']).'%';
+                    $search = '%' . strtolower($searchParams['search']) . '%';
 
                     $q->whereRaw('LOWER(titulo) LIKE ?', [$search]);
                 }
@@ -49,7 +52,7 @@ class ModuloRepository implements IModuloRepository {
 
         // Aplicar búsqueda por texto
         if (isset($filters['search'])) {
-            $search = '%'.strtolower($filters['search']).'%';
+            $search = '%' . strtolower($filters['search']) . '%';
 
             $query->where(function ($q) use ($search) {
                 $q->whereRaw('LOWER(titulo) LIKE ?', [$search]);
@@ -96,5 +99,24 @@ class ModuloRepository implements IModuloRepository {
     {
         $modulo = Modulo::create($data);
         return $modulo;
+    }
+
+    public function update(int $id, array $data): ?Modulo
+    {
+        $modulo = $this->findById($id);
+
+        if (!$modulo) {
+            return null;
+        }
+
+        $modulo->update($data);
+
+        return $modulo;
+    }
+
+    public function delete(int $id): bool
+    {
+        $modulo = $this->findById($id);
+        return $modulo ? $modulo->delete() : false;
     }
 }

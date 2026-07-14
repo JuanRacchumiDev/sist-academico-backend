@@ -8,6 +8,7 @@ use App\DTOs\Matricula\MatriculaCreateDTO;
 use Illuminate\Support\Facades\{DB, Log, Storage};
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Builder;
 use Override;
 
 class MatriculaRepository implements IMatriculaRepository
@@ -22,7 +23,7 @@ class MatriculaRepository implements IMatriculaRepository
             'detalles.programa.categoriaPrograma'
         ]);
 
-        $this->applyFilters($query, $searchParams ?? []);
+        $query = $this->applyFilters($query, $searchParams ?? []);
 
         return $query->get();
     }
@@ -43,7 +44,7 @@ class MatriculaRepository implements IMatriculaRepository
             'detalles.programa.categoriaPrograma'
         ]);
 
-        $this->applyFilters($query, $filters);
+        $query = $this->applyFilters($query, $filters);
 
         return $query->orderBy('fecha_matricula', 'DESC')->paginate($perPage);
     }
@@ -146,7 +147,7 @@ class MatriculaRepository implements IMatriculaRepository
         return false;
     }
 
-    private function applyFilters($query, array $filters): void
+    private function applyFilters(Builder $query, array $filters): Builder
     {
         if (!empty($filters['fechaInicio'])) {
             $query->where('fecha_matricula', '>=', $filters['fechaInicio']);
@@ -161,5 +162,7 @@ class MatriculaRepository implements IMatriculaRepository
                 $q->where('nombre_completo', 'ILIKE', '%' . $filters['nombreCompleto'] . '%');
             });
         }
+
+        return $query;
     }
 }

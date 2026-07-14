@@ -31,27 +31,32 @@ class UserUpdateDTO extends Data
                 'sometimes',
                 'string',
                 'max:10',
+                'nullable'
             ],
             'email' => [
                 'sometimes',
                 'string',
                 'email',
                 'max:60',
-                Rule::unique('users', 'email')->ignore($usuarioId)
+                Rule::unique('users', 'email')->ignore($usuarioId),
+                'nullable'
             ],
             'password' => [
                 'sometimes',
-                'string'
+                'string',
+                'nullable'
             ],
             'id_perfil' => [
                 'sometimes',
                 'int',
-                'exists:detalle_parametro,codigo'
+                'exists:detalle_parametro,codigo',
+                'nullable'
             ],
             'id_persona' => [
                 'sometimes',
                 'int',
-                'exists:persona,id'
+                'exists:persona,id',
+                'nullable'
             ],
             'user_crea' => [
                 'sometimes',

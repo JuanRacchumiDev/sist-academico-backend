@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\CertificadoController;
 use App\Http\Controllers\Api\AdjuntoController;
 use App\Http\Controllers\Api\InstitucionController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\CuestionarioController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -67,6 +68,7 @@ Route::prefix('v1')->group(function () {
         });
 
         Route::prefix('programas')->group(function () {
+            Route::post('/{id}/actualizar-modulos', [ProgramaController::class, 'updateModulos'])->name('programas.actualizar-modulos');
             Route::get('/paginate', [ProgramaController::class, 'getFilteredPaginate'])->name('programas.paginate');
             Route::get('/{programa}/descargar-plan', [ProgramaController::class, 'downloadPlan'])->name('programas.descargarplan');
             Route::get('/{id}', [ProgramaController::class, 'show'])->name('programas.show');
@@ -80,6 +82,7 @@ Route::prefix('v1')->group(function () {
             Route::get('/{id}', [ModuloController::class, 'show'])->name('modulos.show');
             Route::get('/', [ModuloController::class, 'index'])->name('modulos');
             Route::post('/', [ModuloController::class, 'store'])->name('modulos.store');
+            Route::patch('/{id}', [ModuloController::class, 'update'])->name('modulos.update');
         });
 
         Route::prefix('matriculas')->group(function () {
@@ -124,6 +127,14 @@ Route::prefix('v1')->group(function () {
             Route::get('/{id}', [AdjuntoController::class, 'show'])->name('adjuntos.show');
             Route::post('/', [AdjuntoController::class, 'store'])->name('adjuntos.store');
             Route::patch('/{id}', [AdjuntoController::class, 'update'])->name('adjuntos.update');
+        });
+
+        Route::prefix('cuestionarios')->group(function () {
+            Route::get('/paginate', [CuestionarioController::class, 'getFilteredPaginate'])->name('cuestionarios.paginate');
+            Route::get('/{id}', [CuestionarioController::class, 'show'])->name('cuestionarios.show');
+            Route::get('/', [CuestionarioController::class, 'index'])->name('cuestionarios');
+            Route::post('/', [CuestionarioController::class, 'store'])->name('cuestionarios.store');
+            Route::patch('/{id}', [CuestionarioController::class, 'update'])->name('cuestionarios.update');
         });
 
         Route::prefix('usuarios')->group(function () {

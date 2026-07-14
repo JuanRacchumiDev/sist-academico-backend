@@ -1,11 +1,13 @@
 <?php
+
 namespace App\DTOs\Programa;
 
 use Illuminate\Validation\Rule;
 use Spatie\LaravelData\Data;
 use Illuminate\Http\UploadedFile;
 
-class ProgramaUpdateDTO extends Data {
+class ProgramaUpdateDTO extends Data
+{
     public function __construct(
         public ?int $id_segmento = null,
         public ?int $id_tipoprograma = null,
@@ -23,7 +25,7 @@ class ProgramaUpdateDTO extends Data {
         public ?int $horas_academicas = null,
         public ?int $numero_modulos = null,
         public ?int $creditos = null,
-        public mixed $plan = null,
+        public ?string $plan = null,
         public ?string $modalidad,
         public ?int $capacidad_minima = null,
         public ?int $capacidad_maxima = null,
@@ -33,8 +35,8 @@ class ProgramaUpdateDTO extends Data {
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null,
-        public ?bool $estado
-    ){}
+        public ?bool $estado = null
+    ) {}
 
     public static function rules(): array
     {
@@ -42,25 +44,25 @@ class ProgramaUpdateDTO extends Data {
             'id_segmento' => [
                 'sometimes',
                 'integer',
-                'exists:detalle_parametro:codigo',
+                'exists:detalle_parametro,codigo',
                 'nullable'
             ],
             'id_tipoprograma' => [
                 'sometimes',
                 'integer',
-                'exists:detalle_parametro:codigo',
+                'exists:detalle_parametro,codigo',
                 'nullable'
             ],
             'id_categoriaprograma' => [
                 'sometimes',
                 'integer',
-                'exists:detalle_parametro:codigo',
+                'exists:detalle_parametro,codigo',
                 'nullable'
             ],
             'id_institucion' => [
                 'sometimes',
                 'integer',
-                'exists:institucion:id',
+                'exists:institucion,id',
                 'nullable'
             ],
             'codigo_old' => [

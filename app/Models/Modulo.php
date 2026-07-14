@@ -16,6 +16,8 @@ class Modulo extends Model
         'titulo',
         'titulo_url',
         'descripcion',
+        'temario',
+        'nota',
         'orden',
         'user_crea',
         'user_actualiza',

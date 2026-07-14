@@ -1,12 +1,15 @@
 <?php
+
 namespace App\Services\Contracts;
 
 use App\DTOs\Modulo\ModuloCreateDTO;
+use App\DTOs\Modulo\ModuloUpdateDTO;
 use App\Models\Modulo;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 
-interface IModuloService {
+interface IModuloService
+{
     /**
      * Obtener todos los módulos
      * @param array<string, mixed>|null $searchParams
@@ -43,4 +46,7 @@ interface IModuloService {
      * @return Modulo
      */
     public function createModulo(ModuloCreateDTO $moduloCreateDTO): Modulo;
+
+    public function updateModulo(int $id, ModuloUpdateDTO $moduloUpdateDTO): ?Modulo;
+    public function syncModulosPrograma(int $idPrograma, array $dtos): Collection;
 }

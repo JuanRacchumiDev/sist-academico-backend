@@ -1,4 +1,5 @@
 <?php
+
 namespace App\DTOs\Pago;
 
 use Spatie\LaravelData\Data;
@@ -19,7 +20,7 @@ class PagoUpdateDTO extends Data
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null
-    ){}
+    ) {}
 
     public static function rules(): array
     {
@@ -27,13 +28,13 @@ class PagoUpdateDTO extends Data
             'id_matricula' => [
                 'sometimes',
                 'integer',
-                'exists:matricula:id',
+                'exists:matricula,id',
                 'nullable'
             ],
             'id_modulo' => [
                 'sometimes',
                 'integer',
-                'exists:modulo:id',
+                'exists:modulo,id',
                 'nullable'
             ],
             'id_estadopago' => [

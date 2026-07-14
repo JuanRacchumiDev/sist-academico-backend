@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Repositories\Contracts;
 
 use App\Models\Modulo;
@@ -49,4 +50,7 @@ interface IModuloRepository
      * @return Modulo
      */
     public function create(array $data): Modulo;
+
+    public function update(int $id, array $data): ?Modulo;
+    public function delete(int $id): bool;
 }

@@ -172,7 +172,6 @@ class PagoRepository implements IPagoRepository
         return $modulosData;
     }
 
-    #[Override]
     public function getModulosPagados(int $idMatricula)
     {
         $modulosData = DB::select(
