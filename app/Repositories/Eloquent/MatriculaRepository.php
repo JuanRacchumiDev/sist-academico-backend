@@ -20,7 +20,10 @@ class MatriculaRepository implements IMatriculaRepository
             'estadoMatricula',
             'institucion',
             'detalles.programa.tipoPrograma',
-            'detalles.programa.categoriaPrograma'
+            'detalles.programa.categoriaPrograma',
+            'pagos',
+            'pagoMatricula',
+            'pagoModulos'
         ]);
 
         $query = $this->applyFilters($query, $searchParams ?? []);
@@ -41,7 +44,10 @@ class MatriculaRepository implements IMatriculaRepository
             'estadoMatricula',
             'institucion',
             'detalles.programa.tipoPrograma',
-            'detalles.programa.categoriaPrograma'
+            'detalles.programa.categoriaPrograma',
+            'pagos',
+            'pagoMatricula',
+            'pagoModulos'
         ]);
 
         $query = $this->applyFilters($query, $filters);
@@ -88,13 +94,27 @@ class MatriculaRepository implements IMatriculaRepository
             'estadoMatricula',
             'institucion',
             'detalles.programa.tipoPrograma',
-            'detalles.programa.categoriaPrograma'
+            'detalles.programa.categoriaPrograma',
+            'pagos',
+            'pagoMatricula',
+            'pagoModulos'
         ])->find($id);
     }
 
     public function findByPersonaAndFecha(int $idPersona, string $fechaMatricula): ?Matricula
     {
-        return Matricula::with(['detalles'])
+        return Matricula::with(
+            [
+                'persona',
+                'estadoMatricula',
+                'institucion',
+                'detalles.programa.tipoPrograma',
+                'detalles.programa.categoriaPrograma',
+                'pagos',
+                'pagoMatricula',
+                'pagoModulos'
+            ]
+        )
             ->where('id_persona', $idPersona)
             ->where('fecha_matricula', $fechaMatricula)
             ->first();

@@ -247,7 +247,7 @@ class DetalleParametroController extends Controller
         try {
             $paramClase = config('params.clases.' . $clase);
 
-            $detalle = $this->detalleParametroService->getByClaseAndCodigo($paramClase, (int)$codigo);
+            $detalle = $this->detalleParametroService->getByClaseAndCodigo((int)$paramClase, (int)$codigo);
 
             if (!$detalle) {
                 return response()->json([

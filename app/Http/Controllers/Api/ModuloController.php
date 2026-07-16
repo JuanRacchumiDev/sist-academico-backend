@@ -110,40 +110,51 @@ class ModuloController extends Controller
     public function store(Request $request)
     {
         try {
-            $request->validate([
-                'id_programa' => 'required|exists:programa,id',
-                'modulos' => 'required|array|min:1',
-            ]);
+            $data = $request->all();
 
-            $idPrograma = $request->input('id_programa');
-            $modulosInput = $request->input('modulos');
+            $idPersona = $data['id_persona'] ?? null;
+            $fechaMatricula = $data['fecha_matricula'] ?? null;
+
+            if (!$idPersona || !$fechaMatricula) {
+                return response()->json([
+                    'result' => false,
+                    'message' => 'La selección de una persona y fecha de matrícula son obligatorios.',
+                    'code' => 'INVALID_RECORD'
+                ], 400);
+            }
 
             $usuarioAutenticado = Auth::user();
-            $username = $usuarioAutenticado ? ($usuarioAutenticado->name) : 'systemapi';
+            $data['user_crea'] = $usuarioAutenticado ? $usuarioAutenticado->name : 'systemapi';
 
-            $dtos = array_map(function ($item) use ($idPrograma, $username) {
-                $item['id_programa'] = $idPrograma;
-                $item['titulo_url'] = Str::slug($item['titulo']);
-                $item['estado'] = $item['estado'] ?? true;
-                // Asignamos un orden temporal para pasar la validación si fuera necesaria
-                $item['orden'] = $item['orden'] ?? 0;
-                $item['temario'] = $item['temario'] ?? null;
-                $item['user_crea'] = $username;
+            $matriculaExistente = $this->matriculaService->getMatriculaByPersonaAndFecha((int)$idPersona, $fechaMatricula);
 
-                return ModuloCreateDTO::from($item);
-            }, $modulosInput);
+            if ($matriculaExistente) {
+                return response()->json([
+                    'result' => true,
+                    'data' => $matriculaExistente,
+                    'message' => 'La matrícula ya ha sido ingresada',
+                    'code' => 'PREVIOUSLY_REGISTERED'
+                ], 200);
+            }
 
-            $creados = $this->moduloService->createModulosBatch($idPrograma, $dtos);
+            Log::info('Evaluando variable $data antes de DTO', ['data' => $data]);
+
+            $matriculaCreateDTO = MatriculaCreateDTO::from($data);
+
+            Log::info('Evaluando variable $matriculaCreateDTO', ['matriculaCreateDTO' => $matriculaCreateDTO]);
+
+            $matricula = $this->matriculaService->createMatricula($matriculaCreateDTO);
 
             return response()->json([
                 'result' => true,
-                'data' => $creados,
-                'message' => count($creados) . ' módulos registrados correctamente'
+                'data' => $matricula,
+                'message' => 'Matrícula registrada correctamente',
+                'code' => 'CORRECT_RECORDED'
             ], 201);
         } catch (ValidationException $e) {
             return response()->json([
                 'result' => false,
-                'message' => 'Validation error',
+                'message' => 'Error de validación', // Validation error
                 'errors' => $e->errors()
             ], 422);
         } catch (\Exception $e) {
@@ -151,7 +162,8 @@ class ModuloController extends Controller
 
             return response()->json([
                 'result' => false,
-                'message' => 'Error al crear módulo: ' . $e->getMessage()
+                'message' => 'Error al crear módulo: ' . $e->getMessage(),
+                'code' => 'INVALID_RECORD'
             ], 500);
         }
     }

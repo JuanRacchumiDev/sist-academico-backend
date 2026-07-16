@@ -12,21 +12,27 @@ class MatriculaCreateDTO extends Data
         public int $id_institucion,
         public int $numero_modulos,
         public string $fecha_matricula,
-
-        public int $id_formapago,
-        public string $concepto_pago,
         public array $programas,
         public bool $estado,
 
-        public ?int $id_modulo_pago = null,
-        public ?int $id_estadopago = null,
-        public ?string $numero_operacion = null,
-        public ?float $cantidad_efectivo = null,
-        public ?float $cantidad_operacion = null,
+        // --- Datos específicos del Pago de Matrícula (OBLIGATORIO) ---
+        public float $monto_matricula,
+        public int $id_formapago_matricula,
+        public string $concepto_matricula,
+        public ?string $numero_operacion_matricula = null,
+        public ?float $monto_efectivo_matricula = null,
+        public ?float $monto_operacion_matricula = null,
 
-        public ?float $monto_matricula = null,
+        // --- Datos opcionales del Primer Pago de Módulo ---
+        public ?bool $pagarPrimerModulo = false,
         public ?float $monto_modulo = null,
+        public ?int $id_formapago_modulo = null,
+        public ?string $concepto_modulo = null,
+        public ?string $numero_operacion_modulo = null,
+        public ?float $monto_efectivo_modulo = null,
+        public ?float $monto_operacion_modulo = null,
 
+        // --- Auditoría / Fechas suplementarias ---
         public ?string $fecha_retiro = null,
         public ?string $fecha_reserva = null,
         public ?string $fecha_anula = null,
@@ -55,7 +61,12 @@ class MatriculaCreateDTO extends Data
             ],
             'numero_modulos' => [
                 'required',
-                'integer'
+                'integer',
+                'min:1'
+            ],
+            'fecha_matricula' => [
+                'required',
+                'string'
             ],
             'programas' => [
                 'required',
@@ -67,20 +78,77 @@ class MatriculaCreateDTO extends Data
                 'integer',
                 'exists:programa,id'
             ],
-            'fecha_matricula' => [
+            'estado' => [
+                'required',
+                'boolean'
+            ],
+
+            // Validaciones para Pago de Matrícula
+            'monto_matricula' => [
+                'required',
+                'numeric',
+                'gt:0'
+            ],
+            'id_formapago_matricula' => [
+                'required',
+                'integer',
+                'exists:detalle_parametro,codigo'
+            ],
+            'concepto_matricula' => [
                 'required',
                 'string'
             ],
-            'monto_matricula' => [
-                'sometimes',
-                'float',
-                'nullable'
+            'numero_operacion_matricula' => [
+                'nullable',
+                'string'
+            ],
+            'monto_efectivo_matricula' => [
+                'nullable',
+                'numeric',
+                'min:0'
+            ],
+            'monto_operacion_matricula' => [
+                'nullable',
+                'numeric',
+                'min:0'
+            ],
+
+            // Validaciones para Pago de Módulo
+            'pagarPrimerModulo' => [
+                'nullable',
+                'boolean'
             ],
             'monto_modulo' => [
-                'sometimes',
-                'float',
-                'nullable'
+                'nullable',
+                'numeric',
+                'min:0'
             ],
+            'id_formapago_modulo' => [
+                'required_if:pagarPrimerModulo,true',
+                'nullable',
+                'integer',
+                'exists:detalle_parametro,codigo'
+            ],
+            'concepto_modulo' => [
+                'nullable',
+                'string'
+            ],
+            'numero_operacion_modulo' => [
+                'nullable',
+                'string'
+            ],
+            'monto_efectivo_modulo' => [
+                'nullable',
+                'numeric',
+                'min:0'
+            ],
+            'monto_operacion_modulo' => [
+                'nullable',
+                'numeric',
+                'min:0'
+            ],
+
+            // Auditoría
             'fecha_retiro' => [
                 'sometimes',
                 'string',
@@ -111,10 +179,6 @@ class MatriculaCreateDTO extends Data
                 'string',
                 'nullable'
             ],
-            'estado' => [
-                'required',
-                'boolean'
-            ]
         ];
     }
 }

@@ -294,8 +294,6 @@ class MatriculaController extends Controller
                 ], 200);
             }
 
-            $data['id_formapago'] = $data['id_formapago_matricula'];
-            $data['concepto_pago'] = "PAGO DE MATRÍCULA";
             $data['user_crea'] = $username;
 
             Log::info('Evaluando variable $data', ['data' => $data]);

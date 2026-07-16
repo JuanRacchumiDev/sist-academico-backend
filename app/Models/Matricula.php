@@ -58,4 +58,19 @@ class Matricula extends Model
     {
         return $this->hasMany(DetalleMatricula::class, 'id_matricula', 'id');
     }
+
+    public function pagos(): HasMany
+    {
+        return $this->hasMany(Pago::class, 'id_matricula', 'id');
+    }
+
+    public function pagoMatricula(): HasMany
+    {
+        return $this->pagos()->where('concepto', 'LIKE', '%PAGO%DE%MATRÍCULA%');
+    }
+
+    public function pagoModulos(): HasMany
+    {
+        return $this->pagos()->where('concepto', 'LIKE', '%PAGO%DE%MÓDULO%');
+    }
 }

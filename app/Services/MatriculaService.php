@@ -329,13 +329,14 @@ class MatriculaService implements IMatriculaService
         return DB::transaction(function () use ($matriculaCreateDTO) {
             Log::info('Evaluando las variables $matriculaCreateDTO', ['matriculaCreateDTO' => $matriculaCreateDTO]);
 
-            $persona = $this->personaRepository->findById($matriculaCreateDTO->id_persona);
+            $idPersona = $matriculaCreateDTO->id_persona;
+
+            $persona = $this->personaRepository->findById($idPersona);
 
             $userCrea = $matriculaCreateDTO->user_crea;
             $estado = $matriculaCreateDTO->estado;
             $valorMatricula = $matriculaCreateDTO->monto_matricula;
-            $valorModulo = $matriculaCreateDTO->monto_modulo;
-            $idPersona = $matriculaCreateDTO->id_persona;
+            $valorModulo = $matriculaCreateDTO->monto_modulo;            
             $fechaMatricula = $matriculaCreateDTO->fecha_matricula;
             $idInstitucion = $matriculaCreateDTO->id_institucion;
 
@@ -351,12 +352,13 @@ class MatriculaService implements IMatriculaService
 
             Log::info('Evaluando las variables persona y dataCabecera', ['persona' => $persona, 'dataCabecera' => $dataCabecera]);
 
-            // Crear la matrícula usando el repositorio Eloquent original
+            // Crear el registro cabecera de matrícula
             /** @var Matricula $matricula */
             $matricula = $this->matriculaRepository->create($dataCabecera);
 
             Log::info('Evaluando variable matrícula', ['matricula' => $matricula]);
 
+            // Registrar los programas asignados
             foreach ($matriculaCreateDTO->programas as $idPrograma) {
                 $matricula->detalles()->create([
                     'id_programa' => $idPrograma,
@@ -367,40 +369,48 @@ class MatriculaService implements IMatriculaService
                 ]);
             }
 
-            $pagoDTO = PagoCreateDTO::from([
-                'id_matricula'       => $matricula->id,
-                'id_modulo'          => $matriculaCreateDTO->id_modulo_pago,
-                'id_estadopago'      => $matriculaCreateDTO->id_estadopago,
-                'id_formapago'       => $matriculaCreateDTO->id_formapago,
-                'id_institucion'     => $idInstitucion,
-                'concepto'           => $matriculaCreateDTO->concepto_pago,
-                'numero_operacion'   => $matriculaCreateDTO->numero_operacion,
-                'fecha_pago'         => $fechaMatricula, // Se asume pago el mismo día
-                'fecha_vencimiento'  => null,
-                'cantidad_efectivo'  => $matriculaCreateDTO->cantidad_efectivo,
-                'cantidad_operacion' => $matriculaCreateDTO->cantidad_operacion,
-                'user_crea'          => $userCrea,
-                'estado'             => $estado
+            $pagoMatriculaDTO = PagoCreateDTO::from([
+                'id_matricula'      => $matricula->id,
+                'id_formapago'      => $matriculaCreateDTO->id_formapago_matricula,
+                'id_institucion'    => $idInstitucion,
+                'concepto'          => $matriculaCreateDTO->concepto_matricula ?? 'PAGO DE MATRÍCULA',
+                'numero_operacion'  => $matriculaCreateDTO->numero_operacion_matricula,
+                'fecha_pago'        => $fechaMatricula,
+                'cantidad_efectivo' => $matriculaCreateDTO->monto_efectivo_matricula,
+                'cantidad_operacion' => $matriculaCreateDTO->monto_operacion_matricula,
+                'user_crea'         => $userCrea,
+                'estado'            => $estado
             ]);
 
-            $pagoArray = $pagoDTO->toArray();
+            Log::info('Creando pago de Matrícula', ['pagoMatriculaDTO' => $pagoMatriculaDTO]);
 
-            Log::info('Evaluando variable $pagoDTO', ['pagoDTO' => $pagoDTO]);
+            $this->pagoRepository->create($pagoMatriculaDTO->toArray());
 
-            $this->pagoRepository->create($pagoArray);
+            // Crear opcionalmente el pago del módulo 1
+            if ($matriculaCreateDTO->pagarPrimerModulo) {
+                $pagoModuloDTO = PagoCreateDTO::from([
+                    'id_matricula'       => $matricula->id,
+                    'id_formapago'       => $matriculaCreateDTO->id_formapago_modulo,
+                    'id_institucion'     => $idInstitucion,
+                    'concepto'           => $matriculaCreateDTO->concepto_modulo ?? 'PAGO DE MÓDULO #1',
+                    'numero_modulo'      => 1,
+                    'numero_operacion'   => $matriculaCreateDTO->numero_operacion_modulo,
+                    'fecha_pago'         => $fechaMatricula,
+                    'cantidad_efectivo'  => $matriculaCreateDTO->monto_efectivo_modulo,
+                    'cantidad_operacion' => $matriculaCreateDTO->monto_operacion_modulo,
+                    'user_crea'          => $userCrea,
+                    'estado'             => $estado
+                ]);
+
+                Log::info('Creando pago de Módulo 1', ['pagoModuloDTO' => $pagoModuloDTO]);
+                $this->pagoRepository->create($pagoModuloDTO->toArray());
+            }
 
             // Obteniendo la clase del grupo perfil
             $clase = config('params.clases.perfil');
 
             // Obteniendo perfil de la persona
             $perfil = $this->detalleRepository->findByClaseAndNombreUrl($clase, 'alumno');
-
-            Log::info('Evaluando variables pago, clase y perfil', [
-                'pagoDTO' => $pagoDTO,
-                'array_pago_dto' => $pagoDTO->toArray(),
-                'clase' => $clase,
-                'perfil' => $perfil
-            ]);
 
             $userCreateData = [
                 'name'          => substr($persona->nombre_completo, 0, 10),
