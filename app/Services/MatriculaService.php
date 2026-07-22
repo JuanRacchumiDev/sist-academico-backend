@@ -247,6 +247,23 @@ class MatriculaService implements IMatriculaService
             ];
         }
 
+        // Definición de datos por defecto de la Institución si vienen vacíos o nulos
+        $institucion = $matricula->institucion;
+        $institucionData = [
+            'nombre' => $institucion->nombre ?? 'INSTITUCIÓN ACADÉMICA',
+            'sigla' => $institucion->sigla ?? 'Innovación y aprendizaje continuo para ti',
+            'telefono' => $institucion->telefono_contacto ?? '999-999-999',
+            'email' => $institucion->email ?? 'contacto@institucion.edu.pe',
+            'logo' => ($institucion && $institucion->logo_path)
+                ? public_path('storage/' . $institucion->logo_path)
+                : public_path('images/default_logo.png') // Asegúrate de tener una imagen por defecto o usa un placeholder base64
+        ];
+
+        // Si el logo físico no existe en la ruta de almacenamiento, usamos una alternativa base64 o texto
+        if (!file_exists($institucionData['logo'])) {
+            $institucionData['logo'] = null; // En la vista Blade manejaremos el fallback si es null
+        }
+
         $pagosReales = $this->pagoRepository->getPagosByMatricula($idMatricula);
 
         Log::info('Obteniendo pagos reales', ['pagosReales' => $pagosReales]);
@@ -285,20 +302,17 @@ class MatriculaService implements IMatriculaService
 
         $dataPdf = [
             'matricula' => $matricula,
+            'institucion' => $institucionData,
             'cronograma' => $cronograma,
             'fecha_emision' => now()->format('d/m/Y H:i')
         ];
 
         Log::info('Evaluando variable dataPdf', ['dataPdf' => $dataPdf]);
 
-        $pdf = Pdf::loadView('pdf.cronograma_pagos', $dataPdf)
+        $pdf = Pdf::loadView('pdfs.cronograma_pagos', $dataPdf)
             ->setPaper('a4', 'portrait');
 
         return $pdf->output();
-
-        // Storage::disk('local')->put($fullPath, $pdf->output());
-
-        // return Storage::disk('local')->path($fullPath);
     }
 
     public function deleteFichaPDF(int $id): bool
@@ -336,7 +350,7 @@ class MatriculaService implements IMatriculaService
             $userCrea = $matriculaCreateDTO->user_crea;
             $estado = $matriculaCreateDTO->estado;
             $valorMatricula = $matriculaCreateDTO->monto_matricula;
-            $valorModulo = $matriculaCreateDTO->monto_modulo;            
+            $valorModulo = $matriculaCreateDTO->monto_modulo;
             $fechaMatricula = $matriculaCreateDTO->fecha_matricula;
             $idInstitucion = $matriculaCreateDTO->id_institucion;
 

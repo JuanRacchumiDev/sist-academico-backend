@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Response;
 
 class PagoController extends Controller
 {
@@ -168,6 +169,32 @@ class PagoController extends Controller
         return response($result['pdfContent'], 200)
             ->header('Content-Type', 'application/pdf')
             ->header('Content-Disposition', "inline; filename=\"{$filename}\"");
+    }
+
+    public function downloadConstancia(Request $request)
+    {
+        try {
+            $request->validate([
+                'id_pago' => 'required|integer'
+            ]);
+
+            $idPago = (int)$request->query('id_pago');
+
+            $pdfContent = $this->pagoService->generarConstancia($idPago);
+
+            $filename = "constancia_pago_{$idPago}.pdf";
+
+            return new Response($pdfContent, 200, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="' . $filename . '"',
+            ]);
+        } catch (\Exception $e) {
+            Log::error("Error al generar constancia de pago: " . $e->getMessage());
+            return response()->json([
+                'result' => false,
+                'message' => $e->getMessage()
+            ], 404);
+        }
     }
 
     /**

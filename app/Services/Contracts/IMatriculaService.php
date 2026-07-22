@@ -24,7 +24,6 @@ interface IMatriculaService
      * @return LengthAwarePaginator<Matricula>
      */
     public function getAllMatriculasWithFilters(array $filters, int $perPage): LengthAwarePaginator;
-
     /**
      * Obtiene una matrícula por ID
      * @param int $id

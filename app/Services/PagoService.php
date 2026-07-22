@@ -162,6 +162,52 @@ class PagoService implements IPagoService
         return $this->pagoRepository->findById($id);
     }
 
+    public function generarConstancia(int $idPago)
+    {
+        $pago = $this->pagoRepository->findById($idPago);
+
+        Log::info('Validando variable $pago', ['pago' => $pago]);
+
+        if (!$pago) {
+            return [
+                'status' => false,
+                'message' => 'El pago especificado no existe',
+                'detalle' => null,
+                'code' => 404
+            ];
+        }
+
+        // Definición de datos por defecto de la Institución si vienen vacíos o nulos
+        $institucion = $pago->matricula->institucion;
+        $institucionData = [
+            'nombre' => $institucion->nombre ?? 'INSTITUCIÓN ACADÉMICA',
+            'sigla' => $institucion->sigla ?? 'Innovación y aprendizaje continuo para ti',
+            'telefono' => $institucion->telefono_contacto ?? '999-999-999',
+            'email' => $institucion->email ?? 'contacto@institucion.edu.pe',
+            'logo' => ($institucion && $institucion->logo_path)
+                ? public_path('storage/' . $institucion->logo_path)
+                : public_path('images/default_logo.png') // Asegúrate de tener una imagen por defecto o usa un placeholder base64
+        ];
+
+        // Si el logo físico no existe en la ruta de almacenamiento, usamos una alternativa base64 o texto
+        if (!file_exists($institucionData['logo'])) {
+            $institucionData['logo'] = null; // En la vista Blade manejaremos el fallback si es null
+        }
+
+        $dataPdf = [
+            'pago' => $pago,
+            'institucion' => $institucion,
+            'fecha_emision' => now()->format('d/m/Y H:i')
+        ];
+
+        Log::info('Evaluando variable dataPdf', ['dataPdf' => $dataPdf]);
+
+        $pdf = Pdf::loadView('pdfs.constancia_pago', $dataPdf)
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->output();
+    }
+
     public function createPago(PagoCreateDTO $pagoCreateDTO): Pago
     {
         $data = array_filter($pagoCreateDTO->toArray(), fn($value) => !is_null($value));

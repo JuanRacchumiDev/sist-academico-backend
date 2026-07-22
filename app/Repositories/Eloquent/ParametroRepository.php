@@ -8,7 +8,8 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 
-class ParametroRepository implements IParametroRepository {
+class ParametroRepository implements IParametroRepository
+{
     /**
      * Obtiene todos los parámetros
      * @return Collection<int, Parametro>
@@ -24,23 +25,23 @@ class ParametroRepository implements IParametroRepository {
      * @param int $perPage
      * @return LengthAwarePaginator 
      */
-    public function getAllFiltered(array $filters, int $perPage): LengthAwarePaginator
+    public function getAllFiltered(array $filters, int $perPage = 10): LengthAwarePaginator
     {
         $query = Parametro::with('detalle');
 
         if (isset($filters['nombre'])) {
-            $query->where('nombre', 'like', '%'.$filters['nombre'].'%');
+            $query->where('nombre', 'like', '%' . $filters['nombre'] . '%');
         }
 
         if (isset($filters['descripcion'])) {
-            $query->where('descripcion', 'like', '%'.$filters['descripcion'].'%');
+            $query->where('descripcion', 'like', '%' . $filters['descripcion'] . '%');
         }
 
         if (isset($filters['estado'])) {
             $query->where('estado', (bool)$filters['estado']);
         }
 
-        return $query->paginate($perPage);   
+        return $query->paginate($perPage);
     }
 
     /**
@@ -110,6 +111,6 @@ class ParametroRepository implements IParametroRepository {
      */
     public function getWithDetalle(int $clase): ?Parametro
     {
-        return Parametro::with('detalle')->find($clase);       
+        return Parametro::with('detalle')->find($clase);
     }
 }

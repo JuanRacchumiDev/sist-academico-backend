@@ -24,7 +24,7 @@ class CuestionarioRepository implements ICuestionarioRepository
         return $query->orderBy('id', 'DESC')->get();
     }
 
-    public function getAllFiltered(array $filters, int $perPage): LengthAwarePaginator
+    public function getAllFiltered(array $filters, int $perPage = 10): LengthAwarePaginator
     {
         $query = Cuestionario::with([
             'programa',

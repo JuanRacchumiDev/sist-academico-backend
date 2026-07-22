@@ -88,11 +88,11 @@ Route::prefix('v1')->group(function () {
         Route::prefix('matriculas')->group(function () {
             Route::get('{id}/modulos-por-pagar', [MatriculaController::class, 'getModulosPorPagar'])->name('matriculas.modulosporpagar');
             Route::get('{id}/modulos-pagados', [MatriculaController::class, 'getModulosPagados'])->name('matriculas.modulospagados');
-            Route::get('/certificado', [MatriculaController::class, 'downloadCertificado'])->name('matriculas.certificado');
+            // Route::get('/certificado', [MatriculaController::class, 'downloadCertificado'])->name('matriculas.certificado');
             Route::get('/cronograma-pagos', [MatriculaController::class, 'downloadCronograma'])->name('matriculas.cronogramapagos');
             Route::get('/paginate', [MatriculaController::class, 'getFilteredPaginate'])->name('matriculas.paginate');
             Route::get('/{id}', [MatriculaController::class, 'show'])->name('matriculas.show');
-            Route::get('/{id}/pdf', [MatriculaController::class, 'downloadFicha'])->name('matriculas.pdf');
+            // Route::get('/{id}/pdf', [MatriculaController::class, 'downloadFicha'])->name('matriculas.pdf');
             Route::get('/', [MatriculaController::class, 'index'])->name('matriculas');
             Route::post('/', [MatriculaController::class, 'store'])->name('matriculas.store');
             Route::patch('/{id}', [MatriculaController::class, 'update'])->name('matriculas.update');
@@ -107,17 +107,20 @@ Route::prefix('v1')->group(function () {
             Route::get('/paginate', [PagoController::class, 'getFilteredPaginate'])->name('pagos.paginate');
             Route::get('/matricula', [PagoController::class, 'getMatricula'])->name('pagos.matricula');
             Route::get('/modulo', [PagoController::class, 'getPagoModulo'])->name('pagos.modulo');
+            Route::get('/constancia', [PagoController::class, 'downloadConstancia'])->name('pagos.constancia');
             Route::get('{id}', [PagoController::class, 'show'])->name('pagos.show');
             Route::get('/', [PagoController::class, 'index'])->name('pagos');
             Route::post('/', [PagoController::class, 'store'])->name('pagos.store');
         });
 
         Route::prefix('certificados')->group(function () {
+            Route::get('/paginate', [CertificadoController::class, 'getFilteredPaginate'])->name('certificados.paginate');
             Route::get('/', [CertificadoController::class, 'index'])->name('certificados');
-            Route::post('/', [CertificadoController::class, 'store'])->name('certificados.store');
             Route::get('/{id}', [CertificadoController::class, 'show'])->name('certificados.show');
-            Route::patch('/{id}', [CertificadoController::class, 'update'])->name('certificados.update');
-            Route::delete('/{id}', [CertificadoController::class, 'destroy']);
+            Route::get('/{id}/pdf', [CertificadoController::class, 'downloadPDF'])->name('certificados.downloadpdf');
+            Route::post('/modular', [CertificadoController::class, 'storeModular'])->name('certificados.storemodular');
+            // Route::patch('/{id}', [CertificadoController::class, 'update'])->name('certificados.update');
+            Route::delete('/{id}', [CertificadoController::class, 'destroy'])->name('certificados.destroy');
         });
 
         Route::prefix('adjuntos')->group(function () {

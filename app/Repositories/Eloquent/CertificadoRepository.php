@@ -5,39 +5,26 @@ namespace App\Repositories\Eloquent;
 use App\DTOs\Certificado\CertificadoCreateDTO;
 use App\DTOs\Certificado\CertificadoUpdateDTO;
 use App\Models\Certificado;
+use App\Models\Matricula;
 use App\Repositories\Contracts\ICertificadoRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Storage;
 
-class CertificadoRepository implements ICertificadoRepository {
-    public function getAllFiltered(array $filters, int $perPage): LengthAwarePaginator
+class CertificadoRepository implements ICertificadoRepository
+{
+    public function getAll(?array $searchParams = null): Collection
     {
-        $query = Certificado::with([
-            'persona',
-            'tipoCertificado',
-            'plantilla',
-            'programa'
-        ]);
+        $query = $this->applyFilters($searchParams ?? []);
 
-        if (!empty($filters['id_persona'])) {
-            $query->where('id_persona', $filters['id_persona']);
-        }
+        return $query->get();
+    }
 
-        if (!empty($filters['id_tipocertificado'])) {
-            $query->where('id_tipocertificado', $filters['id_tipocertificado']);
-        }
-
-        if (isset($filters['estado'])) {
-            $query->where('estado', $filters['estado']);
-        }
-
-        if (!empty($filters['search'])) {
-            $query->where('nombre_impresion', 'ILIKE', '%'.$filters['search'].'%');
-        }
-
-        return $query->paginate($perPage);
+    public function getAllFiltered(array $filters, int $perPage = 10): LengthAwarePaginator
+    {
+        return $this->applyFilters($filters)->paginate($perPage);
     }
 
     public function findById(int $id): ?Certificado
@@ -74,8 +61,62 @@ class CertificadoRepository implements ICertificadoRepository {
 
         if (!$certificado) return false;
 
-        Storage::disk('local')->delete([$certificado->path_file.'/'.$certificado->filename, $certificado->codigo_qr_path]);
-    
+        Storage::disk('local')->delete(
+            [
+                $certificado->path_file . '/' . $certificado->filename,
+                $certificado->codigo_qr_path
+            ]
+        );
+
         return $certificado->delete();
+    }
+
+    private function applyFilters(array $filters): Builder
+    {
+        $query = Matricula::query()
+            ->where('estado', true)
+            ->with([
+                'persona',
+                'estadoMatricula',
+                'institucion',
+                'detalles.programa.tipoPrograma',
+                'detalles.programa.categoriaPrograma',
+                'detalles.programa.detalleModulos' => function ($q) {
+                    $q->where('estado', true)->orderBy('orden', 'ASC');
+                },
+                'pagos' => function ($q) {
+                    $q->where('estado', true);
+                },
+                'pagoMatricula',
+                'pagoModulos',
+            ]);
+
+        // Filtro por búsqueda textual (nombre, apellidos o documento de persona)
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
+
+            $query->whereHas('persona', function ($q) use ($search) {
+                $q->where(function ($sub) use ($search) {
+                    $searchTerm = '%' . $search . '%';
+                    $sub->where('nombres', 'LIKE', $searchTerm)
+                        ->orWhere('apellidos', 'LIKE', $searchTerm)
+                        ->orWhere('numero_documento', 'LIKE', $searchTerm);
+                });
+            });
+        }
+
+        // Filtro por rango de fechas
+        if (!empty($filters['fecha_inicio']) || !empty($filters['fecha_final'])) {
+            $query->whereHas('detalles.programa', function ($q) use ($filters) {
+                if (!empty($filters['fecha_inicio'])) {
+                    $q->where('fecha_inicio', '>=', $filters['fecha_inicio']);
+                }
+                if (!empty($filters['fecha_final'])) {
+                    $q->where('fecha_final', '<=', $filters['fecha_final']);
+                }
+            });
+        }
+
+        return $query->orderBy('created_at', 'DESC');
     }
 }

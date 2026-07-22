@@ -35,7 +35,7 @@ class ProgramaRepository implements IProgramaRepository
      * @param int $perPage
      * @return LengthAwarePaginator<Programa>
      */
-    public function getAllFiltered(array $filters, int $perPage): LengthAwarePaginator
+    public function getAllFiltered(array $filters, int $perPage = 10): LengthAwarePaginator
     {
         $query = Programa::with([
             'segmento',

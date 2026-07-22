@@ -19,5 +19,7 @@ interface IPagoService
 
     public function getPagoById(int $id): ?Pago;
 
+    public function generarConstancia(int $idPago);
+
     public function createPago(PagoCreateDTO $pagoCreateDTO): Pago;
 }

@@ -41,7 +41,7 @@ class PagoRepository implements IPagoRepository
         return $query->get();
     }
 
-    public function getAllFiltered(array $filters, int $perPage): LengthAwarePaginator
+    public function getAllFiltered(array $filters, int $perPage = 10): LengthAwarePaginator
     {
         $query = Pago::with([
             'matricula.persona',

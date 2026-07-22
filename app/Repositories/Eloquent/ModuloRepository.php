@@ -40,7 +40,7 @@ class ModuloRepository implements IModuloRepository
      * @param int $perPage
      * @return LengthAwarePaginator<Modulo>
      */
-    public function getAllFiltered(array $filters, int $perPage): LengthAwarePaginator
+    public function getAllFiltered(array $filters, int $perPage = 10): LengthAwarePaginator
     {
         $query = Modulo::with([
             'programa'

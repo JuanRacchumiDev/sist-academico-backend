@@ -228,7 +228,7 @@ class MatriculaController extends Controller
                 'id_matricula' => 'required|integer'
             ]);
 
-            $idMatricula = (int) $request->query('id_matricula');
+            $idMatricula = (int)$request->query('id_matricula');
 
             $pdfContent = $this->matriculaService->generarCronogramaPagos($idMatricula);
 

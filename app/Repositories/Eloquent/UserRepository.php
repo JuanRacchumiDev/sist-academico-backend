@@ -18,7 +18,7 @@ class UserRepository implements IUserRepository
         return $query->get();
     }
 
-    public function getAllFiltered(array $filters, int $perPage): LengthAwarePaginator
+    public function getAllFiltered(array $filters, int $perPage = 10): LengthAwarePaginator
     {
         $query = User::with([
             'perfil',

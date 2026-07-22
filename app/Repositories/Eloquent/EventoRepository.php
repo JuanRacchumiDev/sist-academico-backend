@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Repositories\Eloquent;
 
 use App\Models\Evento;
@@ -6,7 +7,8 @@ use App\Repositories\Contracts\IEventoRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 
-class EventoRepository implements IEventoRepository {
+class EventoRepository implements IEventoRepository
+{
     /**
      * Obtiene todos los eventos
      * @param array<string, mixed>|null $searchParams
@@ -20,7 +22,7 @@ class EventoRepository implements IEventoRepository {
         ]);
 
         if ($searchParams) {
-            $query->where(function($q) use ($searchParams) {
+            $query->where(function ($q) use ($searchParams) {
                 if (isset($searchParams['id_tipoevento'])) {
                     $q->where('id_tipoevento', $searchParams['id_tipoevento']);
                 }
@@ -38,7 +40,7 @@ class EventoRepository implements IEventoRepository {
                 }
 
                 if (isset($searchParams['search'])) {
-                    $search = '%'.strtolower($searchParams['search']).'%';
+                    $search = '%' . strtolower($searchParams['search']) . '%';
 
                     $q->whereRaw('LOWER(titulo) LIKE ?', [$search])
                         ->orWhereRaw('LOWER(descripcion) LIKE ?', [$search]);
@@ -55,7 +57,7 @@ class EventoRepository implements IEventoRepository {
      * @param int $perPage
      * @return LengthAwarePaginator<Evento>
      */
-    public function getAllFiltered(array $filters, int $perPage): LengthAwarePaginator
+    public function getAllFiltered(array $filters, int $perPage = 10): LengthAwarePaginator
     {
         $query = Evento::with([
             'tipoEvento',
@@ -77,7 +79,7 @@ class EventoRepository implements IEventoRepository {
 
         // Aplicar búsqueda por texto
         if (isset($filters['search'])) {
-            $search = '%'.strtolower($filters['search']).'%';
+            $search = '%' . strtolower($filters['search']) . '%';
 
             $query->where(function ($q) use ($search) {
                 $q->whereRaw('LOWER(titulo) LIKE ?', [$search])

@@ -24,7 +24,7 @@ class PreguntaRepository implements IPreguntaRepository
         return $query->orderBy('id', 'DESC')->get();
     }
 
-    public function getAllFiltered(array $filters, int $perPage): LengthAwarePaginator
+    public function getAllFiltered(array $filters, int $perPage = 10): LengthAwarePaginator
     {
         $query = Pregunta::with([
             'cuestionario',

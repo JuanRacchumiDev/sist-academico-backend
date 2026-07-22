@@ -37,7 +37,7 @@ class MatriculaRepository implements IMatriculaRepository
      * @param int $perPage
      * @return LengthAwarePaginator<Matricula>
      */
-    public function getAllFiltered(array $filters, int $perPage): LengthAwarePaginator
+    public function getAllFiltered(array $filters, int $perPage = 10): LengthAwarePaginator
     {
         $query = Matricula::with([
             'persona',

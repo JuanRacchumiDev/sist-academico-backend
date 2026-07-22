@@ -59,7 +59,7 @@ class DetalleParametroRepository implements IDetalleParametroRepository
      * @param int $perPage
      * @return LengthAwarePaginator<DetalleParametro>
      */
-    public function getAllFilteredPaginate(array $filters, int $perPage): LengthAwarePaginator
+    public function getAllFilteredPaginate(array $filters, int $perPage = 10): LengthAwarePaginator
     {
         $query = DetalleParametro::query();
 

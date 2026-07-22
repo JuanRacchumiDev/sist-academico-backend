@@ -23,7 +23,7 @@ class AdjuntoRepository implements IAdjuntoRepository
         return $query->get();
     }
 
-    public function getAllFiltered(array $filters, int $perPage): LengthAwarePaginator
+    public function getAllFiltered(array $filters, int $perPage = 10): LengthAwarePaginator
     {
         $query = Adjunto::with([
             'programa',

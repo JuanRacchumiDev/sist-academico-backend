@@ -22,7 +22,6 @@ interface IMatriculaRepository
      * @return LengthAwarePaginator
      */
     public function getAllFiltered(array $filters, int $perPage): LengthAwarePaginator;
-
     /**
      * Obtiene un certificado por matrícula
      * @param int $idMatricula

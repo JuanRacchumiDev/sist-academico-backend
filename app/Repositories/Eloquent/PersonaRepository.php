@@ -32,7 +32,7 @@ class PersonaRepository implements IPersonaRepository
      * @param int $perPage
      * @return LengthAwarePaginator<Persona>
      */
-    public function getAllFiltered(array $filters, int $perPage): LengthAwarePaginator
+    public function getAllFiltered(array $filters, int $perPage = 10): LengthAwarePaginator
     {
         $query = Persona::with($this->getEagerLoads());
 
