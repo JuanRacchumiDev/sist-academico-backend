@@ -8,19 +8,20 @@ use Spatie\LaravelData\Data;
 class CertificadoUpdateDTO extends Data
 {
     public function __construct(
-        public ?int $id_persona,
-        public ?int $id_tipocertificado,
-        public ?int $id_plantilla,
-        public ?int $id_programa,
-        public ?string $codigo_verificacion,
-        public ?string $codigo_qr_path,
-        public ?string $path_file,
-        public ?string $filename,
-        public ?string $nombre_impresion,
+        public ?int $id_persona = null,
+        public ?int $id_tipocertificado = null,
+        public ?int $id_plantilla = null,
+        public ?int $id_programa = null,
+        public ?int $id_modulo = null,
+        public ?string $codigo_verificacion = null,
+        public ?string $codigo_qr_path = null,
+        public ?string $path_file = null,
+        public ?string $filename = null,
+        public ?string $nombre_impresion = null,
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null,
-        public ?bool $estado
+        public ?bool $estado = null
     ) {}
 
     public static function rules(): array
@@ -50,6 +51,12 @@ class CertificadoUpdateDTO extends Data
                 'sometimes',
                 'integer',
                 'exists:programa,id',
+                'nullable'
+            ],
+            'id_modulo' => [
+                'sometimes',
+                'integer',
+                'exists:modulo,id',
                 'nullable'
             ],
             'codigo_verificacion' => [

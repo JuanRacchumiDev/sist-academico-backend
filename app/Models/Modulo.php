@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Modulo extends Model
@@ -40,5 +41,10 @@ class Modulo extends Model
     public function programa(): BelongsTo
     {
         return $this->belongsTo(Programa::class, 'id_programa', 'id');
+    }
+
+    public function certificados(): HasMany
+    {
+        return $this->hasMany(Certificado::class, 'id_modulo', 'id');
     }
 }

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('certificado', function(Blueprint $table) {
+        Schema::create('certificado', function (Blueprint $table) {
             $table->id();
 
             $table->unsignedBigInteger('id_persona');
@@ -19,18 +19,19 @@ return new class extends Migration
             $table->unsignedBigInteger('id_institucion');
             $table->unsignedBigInteger('id_plantilla')->nullable();
             $table->unsignedBigInteger('id_programa')->nullable();
-            
+            $table->unsignedBigInteger('id_modulo')->nullable();
+
             $table->string('codigo_verificacion', 12)->unique()->nullable();
             $table->string('codigo_qr_path', 350)->nullable();
             $table->string('path_file', 350)->nullable();
             $table->string('filename', 150)->nullable();
             $table->string('nombre_impresion', 150)->nullable();
-            
+
             $table->string('user_crea', 12)->nullable();
             $table->string('user_actualiza', 12)->nullable();
             $table->string('user_elimina', 12)->nullable();
             $table->boolean('estado')->default(true);
-            
+
             $table->timestamps();
 
             $table->foreign('id_persona')
@@ -41,6 +42,10 @@ return new class extends Migration
                 ->references('codigo')
                 ->on('detalle_parametro');
 
+            $table->foreign('id_institucion')
+                ->references('id')
+                ->on('institucion');
+
             $table->foreign('id_plantilla')
                 ->references('id')
                 ->on('plantilla');
@@ -49,9 +54,9 @@ return new class extends Migration
                 ->references('id')
                 ->on('programa');
 
-            $table->foreign('id_institucion')
+            $table->foreign('id_modulo')
                 ->references('id')
-                ->on('institucion');
+                ->on('modulo');
         });
     }
 
@@ -60,12 +65,15 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('certificado', function(Blueprint $table) {
+        Schema::table('certificado', function (Blueprint $table) {
             $table->dropForeign('id_persona');
             $table->dropColumn('id_persona');
 
             $table->dropForeign('id_tipocertificado');
             $table->dropColumn('id_tipocertificado');
+
+            $table->dropForeign('id_institucion');
+            $table->dropColumn('id_institucion');
 
             $table->dropForeign('id_plantilla');
             $table->dropColumn('id_plantilla');
@@ -73,8 +81,8 @@ return new class extends Migration
             $table->dropForeign('id_programa');
             $table->dropColumn('id_programa');
 
-            $table->dropForeign('id_institucion');
-            $table->dropColumn('id_institucion');
+            $table->dropForeign('id_modulo');
+            $table->dropColumn('id_modulo');
         });
 
         Schema::dropIfExists('certificado');

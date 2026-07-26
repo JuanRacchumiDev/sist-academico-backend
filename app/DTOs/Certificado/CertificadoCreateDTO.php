@@ -1,4 +1,5 @@
 <?php
+
 namespace App\DTOs\Certificado;
 
 use Illuminate\Validation\Rule;
@@ -13,6 +14,7 @@ class CertificadoCreateDTO extends Data
         public bool $estado,
         public ?int $id_plantilla = null,
         public ?int $id_programa = null,
+        public ?int $id_modulo = null,
         public ?string $codigo_verificacion = null,
         public ?string $path_file = null,
         public ?string $filename = null,
@@ -21,7 +23,7 @@ class CertificadoCreateDTO extends Data
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null
-    ){}
+    ) {}
 
     /**
      * Define los valores por defecto para los campos opcionales/booleanos
@@ -61,6 +63,12 @@ class CertificadoCreateDTO extends Data
                 'sometimes',
                 'integer',
                 'exists:programa,id',
+                'nullable'
+            ],
+            'id_modulo' => [
+                'sometimes',
+                'integer',
+                'exists:modulo,id',
                 'nullable'
             ],
             'codigo_verificacion' => [
@@ -120,4 +128,3 @@ class CertificadoCreateDTO extends Data
         ];
     }
 }
-

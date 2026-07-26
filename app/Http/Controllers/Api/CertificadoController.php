@@ -108,71 +108,47 @@ class CertificadoController extends Controller
         }
     }
 
-
-    public function download(int $id)
+    public function download(int $id): BinaryFileResponse|JsonResponse
     {
         try {
-            $certificado = $this->certificadoService->getCertificadoById($id);
+            $fileData = $this->certificadoService->downloadCertificado($id);
 
-            if (!$certificado) {
-                return response()->json([
-                    'result' => false,
-                    'message' => 'No existe el certificado'
-                ], 404);
-            }
-
-            // Ruta completa del archivo
-            $fullPath = storage_path("app/local/{$certificado->path_file}/{$certificado->filename}");
-
-            // Si el archivo no existe, lo generamos
-            if (!file_exists($fullPath)) {
-                $this->certificadoService->generatePDF($id);
-            }
-
-            return response()->download($fullPath, $certificado->fullname, [
-                'Content-Type' => 'application/pdf'
+            return response()->download($fileData['full_path'], $fileData['filename'], [
+                'Content-Type' => 'application/pdf',
             ]);
-        } catch (\Exception $e) {
-            Log::error("Error al descargar PDF: " . $e->getMessage());
-            return response()->json(['result' => false, 'message' => 'Error al procesar el archivo'], 500);
+        } catch (Exception $e) {
+            $statusCode = $e->getCode() === 404 ? 404 : 500;
+
+            Log::error("Error al descargar el certificado {$id}: " . $e->getMessage());
+
+            return response()->json([
+                'status'  => 'error',
+                'message' => $e->getMessage()
+            ], $statusCode);
         }
     }
 
     public function downloadPDF(int $id): BinaryFileResponse|JsonResponse
     {
         try {
-            $certificado = $this->certificadoService->getCertificadoById($id);
+            $fileData = $this->certificadoService->downloadCertificado($id);
 
-            if (!$certificado) {
-                return response()->json(['status' => 'error', 'message' => 'Certificado no encontrado.'], 404);
-            }
-
-            $fullPath = "{$certificado->path_file}/{$certificado->filename}";
-
-            // Si el archivo no existe físicamente en disco, intentamos regenerarlo
-            if (!Storage::disk('local')->exists($fullPath)) {
-                $fullPath = $this->certificadoService->generatePDF($id);
-            } else {
-                $fullPath = Storage::disk('local')->path($fullPath);
-            }
-
-            return response()->file($fullPath, [
+            return response()->file($fileData['full_path'], [
                 'Content-Type'        => 'application/pdf',
-                'Content-Disposition' => 'inline; filename="' . $certificado->filename . '"'
+                'Content-Disposition' => 'inline; filename="' . $fileData['filename'] . '"'
             ]);
         } catch (Exception $e) {
-            Log::error("Error al descargar PDF del certificado {$id}: " . $e->getMessage());
+            $statusCode = $e->getCode() === 404 ? 404 : 500;
+
+            Log::error("Error al previsualizar el certificado {$id}: " . $e->getMessage());
 
             return response()->json([
                 'status'  => 'error',
-                'message' => 'No se pudo obtener el archivo PDF.'
-            ], 500);
+                'message' => $e->getMessage()
+            ], $statusCode);
         }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request): JsonResponse
     {
         try {
@@ -189,25 +165,25 @@ class CertificadoController extends Controller
             $this->certificadoService->generatePDF($certificado->id);
 
             return response()->json([
-                'result' => true,
-                'data' => $certificado,
+                'result'  => true,
+                'data'    => $certificado,
                 'message' => 'Certificado y PDF generados exitosamente',
-                'code' => 'CORRECT_RECORDED'
+                'code'    => 'CORRECT_RECORDED'
             ], 201);
         } catch (ValidationException $e) {
             return response()->json([
-                'result' => false,
+                'result'  => false,
                 'message' => 'Validation error',
-                'errors' => $e->errors(),
-                'code' => 'INVALID_RECORD'
+                'errors'  => $e->errors(),
+                'code'    => 'INVALID_RECORD'
             ], 422);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error("Error al crear el certificado: " . $e->getMessage());
 
             return response()->json([
-                'result' => false,
+                'result'  => false,
                 'message' => 'Error al crear el certificado: ' . $e->getMessage(),
-                'code' => 'INVALID_RECORD'
+                'code'    => 'INVALID_RECORD'
             ], 500);
         }
     }
@@ -303,51 +279,51 @@ class CertificadoController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(int $id, Request $request): JsonResponse
-    {
-        try {
-            $data = $request->all();
+    // public function update(int $id, Request $request): JsonResponse
+    // {
+    //     try {
+    //         $data = $request->all();
 
-            $usuarioAutenticado = Auth::user();
-            $username = $usuarioAutenticado ? ($usuarioAutenticado->name) : 'systemapi';
-            $data['user_actualiza'] = $username;
+    //         $usuarioAutenticado = Auth::user();
+    //         $username = $usuarioAutenticado ? ($usuarioAutenticado->name) : 'systemapi';
+    //         $data['user_actualiza'] = $username;
 
-            $dto = CertificadoUpdateDTO::from($data);
+    //         $dto = CertificadoUpdateDTO::from($data);
 
-            $certificado = $this->certificadoService->updateCertificado($id, $dto);
+    //         $certificado = $this->certificadoService->updateCertificado($id, $dto);
 
-            if (!$certificado) {
-                return response()->json([
-                    'result' => false,
-                    'data' => [],
-                    'message' => 'Certificado no encontrado o no se pudo actualizar'
-                ], 404);
-            }
+    //         if (!$certificado) {
+    //             return response()->json([
+    //                 'result' => false,
+    //                 'data' => [],
+    //                 'message' => 'Certificado no encontrado o no se pudo actualizar'
+    //             ], 404);
+    //         }
 
-            $this->certificadoService->generatePDF($id);
+    //         $this->certificadoService->generatePDF($id);
 
-            return response()->json([
-                'result' => true,
-                'data' => $certificado,
-                'message' => 'Certificado actualizo correctamente'
-            ], 200);
-        } catch (ValidationException $e) {
-            return response()->json([
-                'result' => false,
-                'message' => 'Validation error',
-                'errors' => $e->errors()
-            ], 422);
-        } catch (\Exception $e) {
-            $message = 'Error al actualizar el certificado:' . $e->getMessage();
+    //         return response()->json([
+    //             'result' => true,
+    //             'data' => $certificado,
+    //             'message' => 'Certificado actualizo correctamente'
+    //         ], 200);
+    //     } catch (ValidationException $e) {
+    //         return response()->json([
+    //             'result' => false,
+    //             'message' => 'Validation error',
+    //             'errors' => $e->errors()
+    //         ], 422);
+    //     } catch (\Exception $e) {
+    //         $message = 'Error al actualizar el certificado:' . $e->getMessage();
 
-            Log::error("Error updating certificado: " . $e->getMessage());
+    //         Log::error("Error updating certificado: " . $e->getMessage());
 
-            return response()->json([
-                'result' => false,
-                'message' => $message
-            ], 500);
-        }
-    }
+    //         return response()->json([
+    //             'result' => false,
+    //             'message' => $message
+    //         ], 500);
+    //     }
+    // }
 
     /**
      * Remove the specified resource from storage.
@@ -376,19 +352,5 @@ class CertificadoController extends Controller
                 'message' => 'Error al intentar eliminar el certificado.'
             ], 500);
         }
-
-        // try {
-        //     $deleted = $this->certificadoService->deleteCertificado($id);
-
-        //     return response()->json([
-        //         'result' => $deleted,
-        //         'message' => $deleted ? 'Eliminado' : 'No encontrado'
-        //     ]);
-        // } catch (\Exception $e) {
-        //     return response()->json([
-        //         'result' => false,
-        //         'message' => $e->getMessage()
-        //     ], 500);
-        // }
     }
 }

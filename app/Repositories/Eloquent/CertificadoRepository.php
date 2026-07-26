@@ -19,12 +19,37 @@ class CertificadoRepository implements ICertificadoRepository
     {
         $query = $this->applyFilters($searchParams ?? []);
 
-        return $query->get();
+        $matriculas = $query->get();
+
+        return $this->filtrarCertificadosPorPersona($matriculas);
     }
 
     public function getAllFiltered(array $filters, int $perPage = 10): LengthAwarePaginator
     {
-        return $this->applyFilters($filters)->paginate($perPage);
+        // return $this->applyFilters($filters)->paginate($perPage);
+        $paginator = $this->applyFilters($filters)->paginate($perPage);
+
+        // Modificamos directamente la colección interna del paginador
+        $paginator->getCollection()->transform(function ($matricula) {
+            $idPersona = $matricula->id_persona;
+
+            foreach ($matricula->detalles as $detalle) {
+                if ($detalle->programa) {
+                    foreach ($detalle->programa->detalleModulos as $modulo) {
+                        // Mantenemos solo los certificados que pertenecen a esta persona
+                        $certificadosFiltrados = $modulo->certificados->filter(function ($cert) use ($idPersona) {
+                            return $cert->id_persona == $idPersona;
+                        })->values();
+
+                        $modulo->setRelation('certificados', $certificadosFiltrados);
+                    }
+                }
+            }
+
+            return $matricula;
+        });
+
+        return $paginator;
     }
 
     public function findById(int $id): ?Certificado
@@ -82,7 +107,13 @@ class CertificadoRepository implements ICertificadoRepository
                 'detalles.programa.tipoPrograma',
                 'detalles.programa.categoriaPrograma',
                 'detalles.programa.detalleModulos' => function ($q) {
+                    // Obtenemos los módulos activos del programa
                     $q->where('estado', true)->orderBy('orden', 'ASC');
+                },
+                // Cargar los certificados de cada módulo pertenecientes a la persona matriculada
+                'detalles.programa.detalleModulos.certificados' => function ($q) {
+                    $q->where('estado', true)
+                        ->with(['tipoCertificado', 'plantilla']);
                 },
                 'pagos' => function ($q) {
                     $q->where('estado', true);
@@ -118,5 +149,34 @@ class CertificadoRepository implements ICertificadoRepository
         }
 
         return $query->orderBy('created_at', 'DESC');
+    }
+
+    /**
+     * Filtra en memoria para que cada módulo solo tenga los certificados 
+     * que pertenecen al alumno (id_persona) de su matrícula correspondiente.
+     */
+    private function filtrarCertificadosPorPersona(Collection $matriculas): Collection
+    {
+        $matriculas->transform(function ($matricula) {
+            $idPersona = $matricula->id_persona;
+
+            foreach ($matricula->detalles as $detalle) {
+                if ($detalle->programa) {
+                    foreach ($detalle->programa->detalleModulos as $modulo) {
+                        // Mantenemos solo los certificados que coincidan con la persona matriculada
+                        $certificadosFiltrados = $modulo->certificados->filter(function ($cert) use ($idPersona) {
+                            return $cert->id_persona == $idPersona;
+                        })->values(); // values() reindexa el array para que JSON lo formatee como array [] y no como objeto {}
+
+                        // Reasignamos la relación limpia
+                        $modulo->setRelation('certificados', $certificadosFiltrados);
+                    }
+                }
+            }
+
+            return $matricula;
+        });
+
+        return $matriculas;
     }
 }

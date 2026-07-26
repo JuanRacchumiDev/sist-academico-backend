@@ -116,10 +116,11 @@ Route::prefix('v1')->group(function () {
         Route::prefix('certificados')->group(function () {
             Route::get('/paginate', [CertificadoController::class, 'getFilteredPaginate'])->name('certificados.paginate');
             Route::get('/', [CertificadoController::class, 'index'])->name('certificados');
+            Route::get('/{id}/download', [CertificadoController::class, 'download'])->name('certificados.download');
+            Route::get('/{id}/preview', [CertificadoController::class, 'downloadPDF'])->name('certificados.preview');
             Route::get('/{id}', [CertificadoController::class, 'show'])->name('certificados.show');
-            Route::get('/{id}/pdf', [CertificadoController::class, 'downloadPDF'])->name('certificados.downloadpdf');
+            Route::post('/', [CertificadoController::class, 'store'])->name('certificados.store');
             Route::post('/modular', [CertificadoController::class, 'storeModular'])->name('certificados.storemodular');
-            // Route::patch('/{id}', [CertificadoController::class, 'update'])->name('certificados.update');
             Route::delete('/{id}', [CertificadoController::class, 'destroy'])->name('certificados.destroy');
         });
 

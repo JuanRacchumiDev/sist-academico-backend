@@ -189,7 +189,7 @@
                 <div class="document-box">
                     <div class="ruc">R.U.C. {{ $institucion->ruc ?? '20204040200' }}</div>
                     <div class="title">Constancia de Pago</div>
-                    <div class="number">N° {{ str_pad($pago->id, 6, '0', STR_PAD_LEFT) }}</div>
+                    <div class="number">N° {{ str_pad($pago->id, 4, '0', STR_PAD_LEFT) }}</div>
                 </div>
             </td>
         </tr>

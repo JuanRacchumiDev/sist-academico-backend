@@ -12,9 +12,10 @@ class Certificado extends Model
     protected $fillable = [
         'id_persona',
         'id_tipocertificado',
+        'id_institucion',
         'id_plantilla',
         'id_programa',
-        'id_institucion',
+        'id_modulo',
 
         'codigo_verificacion',
         'codigo_qr_path',
@@ -54,6 +55,15 @@ class Certificado extends Model
     }
 
     /**
+     * Obtener la institución asociado a un certificado
+     * @return BelongsTo<Institucion, $this>
+     */
+    public function institucion(): BelongsTo
+    {
+        return $this->belongsTo(Institucion::class, 'id_institucion', 'id');
+    }
+
+    /**
      * Obtener la plantilla a un certificado
      * @return BelongsTo<Plantilla, $this>
      */
@@ -72,11 +82,11 @@ class Certificado extends Model
     }
 
     /**
-     * Obtener la institución asociado a un certificado
-     * @return BelongsTo<Institucion, $this>
+     * Obtener el módulo asociado a un certificado
+     * @return BelongsTo<Modulo, $this>
      */
-    public function institucion(): BelongsTo
+    public function modulo(): BelongsTo
     {
-        return $this->belongsTo(Institucion::class, 'id_institucion', 'id');
+        return $this->belongsTo(Modulo::class, 'id_modulo', 'id');
     }
 }

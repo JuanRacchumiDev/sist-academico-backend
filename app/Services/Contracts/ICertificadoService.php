@@ -14,6 +14,7 @@ interface ICertificadoService
     public function getAllCertificadosWithFilters(array $filters, int $perPage): LengthAwarePaginator;
     public function getCertificadoById(int $id): ?Certificado;
     public function generatePDF(int $id);
+    public function downloadCertificado(int $id): array;
     public function generateCertificadoModular(?array $searchParams): string;
     public function createCertificado(CertificadoCreateDTO $dto): Certificado;
     public function updateCertificado(int $id, CertificadoUpdateDTO $dto): ?Certificado;

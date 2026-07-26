@@ -215,7 +215,7 @@
             <td class="doc-meta">
                 <div class="doc-badge">
                     <h2 class="doc-id">ESTADO DE CUENTA</h2>
-                    <div class="doc-date">Matrícula: <strong>#{{ str_pad($matricula->id, 6, '0', STR_PAD_LEFT) }}</strong></div>
+                    <div class="doc-date">Matrícula: <strong>#{{ str_pad($matricula->id, 4, '0', STR_PAD_LEFT) }}</strong></div>
                 </div>
             </td>
         </tr>

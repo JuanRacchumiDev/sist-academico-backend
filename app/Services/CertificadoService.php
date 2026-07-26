@@ -64,6 +64,75 @@ class CertificadoService implements ICertificadoService
         return $this->certificadoRepository->getAllFiltered($filters, $perPage);
     }
 
+    // public function generatePDF(int $id)
+    // {
+    //     $certificado = $this->certificadoRepository->findById($id);
+
+    //     if (!$certificado) {
+    //         throw new Exception("Certificado no encontrado para generar PDF");
+    //     }
+
+    //     $institucion = $certificado->institucion;
+    //     $programa = $certificado->programa;
+    //     $plantilla = $certificado->plantilla;
+
+    //     $pdfFullPath = "{$certificado->path_file}/{$certificado->filename}";
+    //     $qrFullPath = $certificado->codigo_qr_path;
+
+    //     $qrData = route('certificados.show', [
+    //         'id' => $certificado->id,
+    //         'verify' => $certificado->codigo_verificacion
+    //     ]);
+
+    //     $qrRaw = QrCode::format('svg')->size(150)->margin(0)->generate($qrData);
+
+    //     Storage::disk("local")->put($qrFullPath, $qrRaw);
+
+    //     $logoBase64 = null;
+
+    //     $logoPath = $institucion->logo_path
+    //         ? storage_path("app/public/" . $institucion->logo_path)
+    //         : public_path("images/logo_default.png");
+
+    //     if (file_exists($logoPath)) {
+    //         $logoData = file_get_contents($logoPath);
+    //         $logoBase64 = 'data:image/' . pathinfo($logoPath, PATHINFO_EXTENSION) . ';base64,' . base64_encode($logoData);
+    //     }
+
+    //     // Plantilla de Fondo (Desde el modelo Plantilla si existe)
+    //     $templateBase64 = null;
+    //     $imgFondo = $plantilla->path_imagen ?? 'PLANTILLA_INNOVA.jpg';
+    //     $templatePath = storage_path("app/public/templates/{$imgFondo}");
+
+    //     if (file_exists($templatePath)) {
+    //         $templateBase64 = "data:image/jpeg;base64," . base64_encode(file_get_contents($templatePath));
+    //     }
+
+    //     $qrBase64 = "data:image/svg+xml;base64," . base64_encode($qrRaw);
+
+    //     // Preparar data
+    //     $pdfData = [
+    //         'certificado'      => $certificado,
+    //         'nombre_impresion' => $certificado->nombre_impresion,
+    //         'programa'         => $programa->titulo ?? "Programa Académico",
+    //         'fecha_inicio'     => $programa ? Carbon::parse($programa->fecha_inicio)->format('d/m/Y') : '',
+    //         'fecha_fin'        => $programa ? Carbon::parse($programa->fecha_fin)->format('d/m/Y') : '',
+    //         'codigo_verif'     => $certificado->codigo_verificacion,
+    //         'qrCode'           => $qrBase64,
+    //         'logo'             => $logoBase64,
+    //         'fondo'            => $templateBase64,
+    //         'fecha_emision'    => Carbon::parse($certificado->created_at)->format('d/m/Y H:i A'),
+    //         'periodo'          => $this->getPeriodoAcademico()
+    //     ];
+
+    //     // Renderizar y guardar
+    //     $pdf = Pdf::loadView('pdf.certificado', $pdfData)->setPaper('a4', 'landscape');
+
+    //     Storage::disk("local")->put($pdfFullPath, $pdf->output());
+
+    //     return Storage::disk("local")->path($pdfFullPath);
+    // }
+
     public function generatePDF(int $id)
     {
         $certificado = $this->certificadoRepository->findById($id);
@@ -99,7 +168,6 @@ class CertificadoService implements ICertificadoService
             $logoBase64 = 'data:image/' . pathinfo($logoPath, PATHINFO_EXTENSION) . ';base64,' . base64_encode($logoData);
         }
 
-        // Plantilla de Fondo (Desde el modelo Plantilla si existe)
         $templateBase64 = null;
         $imgFondo = $plantilla->path_imagen ?? 'PLANTILLA_INNOVA.jpg';
         $templatePath = storage_path("app/public/templates/{$imgFondo}");
@@ -110,7 +178,6 @@ class CertificadoService implements ICertificadoService
 
         $qrBase64 = "data:image/svg+xml;base64," . base64_encode($qrRaw);
 
-        // Preparar data
         $pdfData = [
             'certificado'      => $certificado,
             'nombre_impresion' => $certificado->nombre_impresion,
@@ -125,12 +192,35 @@ class CertificadoService implements ICertificadoService
             'periodo'          => $this->getPeriodoAcademico()
         ];
 
-        // Renderizar y guardar
         $pdf = Pdf::loadView('pdf.certificado', $pdfData)->setPaper('a4', 'landscape');
 
         Storage::disk("local")->put($pdfFullPath, $pdf->output());
 
         return Storage::disk("local")->path($pdfFullPath);
+    }
+
+    public function downloadCertificado(int $id): array
+    {
+        $certificado = $this->certificadoRepository->findById($id);
+
+        if (!$certificado) {
+            throw new Exception("El certificado con ID {$id} no existe.", 404);
+        }
+
+        $relativePath = "{$certificado->path_file}/{$certificado->filename}";
+
+        if (!Storage::disk('local')->exists($relativePath)) {
+            $fullPath = $this->generatePDF($id);
+        } else {
+            $fullPath = Storage::disk('local')->path($relativePath);
+        }
+
+        $filename = $certificado->filename ?? "Certificado_{$certificado->codigo_verificacion}.pdf";
+
+        return [
+            'full_path' => $fullPath,
+            'filename'  => $filename,
+        ];
     }
 
     public function generateCertificadoModular(?array $searchParams): string
@@ -153,15 +243,17 @@ class CertificadoService implements ICertificadoService
             throw new \Exception("No se encontró la plantilla en: {$plantillaAbsolutePath}");
         }
 
-        $yearMonthDir = date('Y') . DIRECTORY_SEPARATOR . date('m'); // Ej: 2026/07
-        Storage::disk('public')->makeDirectory($yearMonthDir);
+        $numeroDocumento = $persona->numero_documento ?? $persona->numero_documento ?? 'sin_documento';
+
+        $yearMonthDocDir = 'certificados' . DIRECTORY_SEPARATOR . date('Y') . DIRECTORY_SEPARATOR . date('m') . DIRECTORY_SEPARATOR . $numeroDocumento;
+        Storage::disk('local')->makeDirectory($yearMonthDocDir);
 
         $urlVerificacion = config('app.url') . "/validar-certificado/" . $codigoVerificacion;
         $qrFilename = "qr_{$codigoVerificacion}.png";
-        $qrRelativePath = $yearMonthDir . DIRECTORY_SEPARATOR . $qrFilename;
+        $qrRelativePath = $yearMonthDocDir . DIRECTORY_SEPARATOR . $qrFilename;
 
         $this->generateCodeQR($urlVerificacion, $qrRelativePath);
-        $qrAbsolutePath = Storage::disk('public')->path($qrRelativePath);
+        $qrAbsolutePath = Storage::disk('local')->path($qrRelativePath);
 
         $pdf = new Fpdi();
         $pdf->SetAutoPageBreak(false);
@@ -243,8 +335,8 @@ class CertificadoService implements ICertificadoService
         );
 
         $pdfFilename = "certificado_modulo_{$modulo->id}_{$persona->id}_" . time() . ".pdf";
-        $pdfRelativePath = $yearMonthDir . DIRECTORY_SEPARATOR . $pdfFilename;
-        $pdfAbsolutePath = Storage::disk('public')->path($pdfRelativePath);
+        $pdfRelativePath = $yearMonthDocDir . DIRECTORY_SEPARATOR . $pdfFilename;
+        $pdfAbsolutePath = Storage::disk('local')->path($pdfRelativePath);
 
         $pdf->Output('F', $pdfAbsolutePath);
 

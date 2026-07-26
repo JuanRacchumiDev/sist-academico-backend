@@ -104,7 +104,7 @@ class MatriculaService implements IMatriculaService
         $matricula = $this->matriculaRepository->findById($id);
         $institucion = $matricula->institucion;
 
-        $numeroFormateado = str_pad($matricula->id, 6, '0', STR_PAD_LEFT);
+        $numeroFormateado = str_pad($matricula->id, 4, '0', STR_PAD_LEFT);
 
         // Definir la ruta: año/institucion/documento/ficha.php
         $anio = Carbon::parse($matricula->fecha_matricula)->year;
