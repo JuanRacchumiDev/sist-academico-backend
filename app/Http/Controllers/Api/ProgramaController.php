@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\DTOs\Modulo\ModuloUpdateDTO;
 use App\DTOs\Programa\ProgramaCreateDTO;
 use App\DTOs\Programa\ProgramaUpdateDTO;
+use App\Helpers\FechaHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Programa\UpdateModulosProgramaRequest;
 use App\Services\Contracts\IModuloService;
@@ -65,9 +66,9 @@ class ProgramaController extends Controller
         try {
             $filters = $request->only([
                 'titulo',
-                'id_segmento',
-                'id_tipoprograma',
-                'id_categoriaprograma',
+                'codigo_segmento',
+                'codigo_tipoprograma',
+                'codigo_categoriaprograma',
                 'modalidad'
             ]);
 
@@ -116,8 +117,8 @@ class ProgramaController extends Controller
             $data = $request->all();
 
             $filters = [
-                'id_segmento' => $data['id_segmento'],
-                'id_tipoprograma' => $data['id_tipoprograma'],
+                'codigo_segmento' => $data['codigo_segmento'],
+                'codigo_tipoprograma' => $data['codigo_tipoprograma'],
                 'titulo' => $data['titulo']
             ];
 
@@ -139,6 +140,7 @@ class ProgramaController extends Controller
             $usuarioAutenticado = Auth::user();
             $username = $usuarioAutenticado ? ($usuarioAutenticado->name) : 'systemapi';
             $data['user_crea'] = $username;
+            $data['fecha_crea'] = FechaHelper::obtenerFechaActual();
 
             $programaCreateDTO = ProgramaCreateDTO::from($data);
 
@@ -210,6 +212,7 @@ class ProgramaController extends Controller
             $usuarioAutenticado = Auth::user();
             $username = $usuarioAutenticado ? ($usuarioAutenticado->name) : 'systemapi';
             $data['user_actualiza'] = $username;
+            $data['fecha_actualiza'] = FechaHelper::obtenerFechaActual();
 
             $programaUpdateDTO = ProgramaUpdateDTO::from([
                 ...$data,

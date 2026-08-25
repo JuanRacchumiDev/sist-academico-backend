@@ -11,14 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('parametro', function(Blueprint $table) {
+        Schema::create('parametro', function (Blueprint $table) {
             $table->integer('clase')->primary()->unique();
+
             $table->string('nombre', 100)->unique();
             $table->string('nombre_url', 120)->unique();
             $table->string('descripcion', 150)->nullable();
+
+            $table->string('fecha_crea', 10)->nullable();
+            $table->string('fecha_actualiza', 10)->nullable();
+            $table->string('fecha_elimina', 10)->nullable();
+
             $table->string('user_crea', 12)->nullable();
             $table->string('user_actualiza', 12)->nullable();
             $table->string('user_elimina', 12)->nullable();
+
             $table->boolean('estado')->default(true);
             $table->timestamps();
         });

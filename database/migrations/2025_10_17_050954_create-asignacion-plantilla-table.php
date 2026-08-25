@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('asignacion_plantilla', function(Blueprint $table) {
+        Schema::create('asignacion_plantilla', function (Blueprint $table) {
             $table->id();
 
             // Clave foránea con la tabla 'plantilla'
@@ -22,11 +22,17 @@ return new class extends Migration
             $table->foreignId('id_programa')
                 ->constrained('programa');
 
+            $table->string('fecha_crea', 10)->nullable();
+            $table->string('fecha_actualiza', 10)->nullable();
+            $table->string('fecha_elimina', 10)->nullable();
+
             $table->string('user_crea', 12)->nullable();
             $table->string('user_actualiza', 12)->nullable();
             $table->string('user_elimina', 12)->nullable();
 
             $table->timestamps();
+
+            $table->boolean('estado')->default(true);
         });
     }
 
@@ -35,7 +41,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('asignacion_plantilla', function(Blueprint $table) {
+        Schema::table('asignacion_plantilla', function (Blueprint $table) {
             $table->dropConstrainedForeignId('id_plantilla');
             $table->dropConstrainedForeignId('id_programa');
         });

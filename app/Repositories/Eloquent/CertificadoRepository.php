@@ -19,37 +19,14 @@ class CertificadoRepository implements ICertificadoRepository
     {
         $query = $this->applyFilters($searchParams ?? []);
 
-        $matriculas = $query->get();
+        $certificados = $query->get();
 
-        return $this->filtrarCertificadosPorPersona($matriculas);
+        return $certificados;
     }
 
     public function getAllFiltered(array $filters, int $perPage = 10): LengthAwarePaginator
     {
-        // return $this->applyFilters($filters)->paginate($perPage);
-        $paginator = $this->applyFilters($filters)->paginate($perPage);
-
-        // Modificamos directamente la colección interna del paginador
-        $paginator->getCollection()->transform(function ($matricula) {
-            $idPersona = $matricula->id_persona;
-
-            foreach ($matricula->detalles as $detalle) {
-                if ($detalle->programa) {
-                    foreach ($detalle->programa->detalleModulos as $modulo) {
-                        // Mantenemos solo los certificados que pertenecen a esta persona
-                        $certificadosFiltrados = $modulo->certificados->filter(function ($cert) use ($idPersona) {
-                            return $cert->id_persona == $idPersona;
-                        })->values();
-
-                        $modulo->setRelation('certificados', $certificadosFiltrados);
-                    }
-                }
-            }
-
-            return $matricula;
-        });
-
-        return $paginator;
+        return $this->applyFilters($filters)->paginate($perPage);
     }
 
     public function findById(int $id): ?Certificado
@@ -57,8 +34,10 @@ class CertificadoRepository implements ICertificadoRepository
         return Certificado::with([
             'persona',
             'tipoCertificado',
+            'sucursal',
             'plantilla',
-            'programa'
+            'programa',
+            'modulo'
         ])->findOrFail($id);
     }
 
@@ -98,85 +77,64 @@ class CertificadoRepository implements ICertificadoRepository
 
     private function applyFilters(array $filters): Builder
     {
-        $query = Matricula::query()
-            ->where('estado', true)
+        $query = Certificado::query()
             ->with([
                 'persona',
-                'estadoMatricula',
-                'institucion',
-                'detalles.programa.tipoPrograma',
-                'detalles.programa.categoriaPrograma',
-                'detalles.programa.detalleModulos' => function ($q) {
-                    // Obtenemos los módulos activos del programa
-                    $q->where('estado', true)->orderBy('orden', 'ASC');
-                },
-                // Cargar los certificados de cada módulo pertenecientes a la persona matriculada
-                'detalles.programa.detalleModulos.certificados' => function ($q) {
-                    $q->where('estado', true)
-                        ->with(['tipoCertificado', 'plantilla']);
-                },
-                'pagos' => function ($q) {
-                    $q->where('estado', true);
-                },
-                'pagoMatricula',
-                'pagoModulos',
+                'tipoCertificado',
+                'sucursal',
+                'plantilla',
+                'programa',
+                'modulo'
             ]);
 
-        // Filtro por búsqueda textual (nombre, apellidos o documento de persona)
+        // Filtro por Búsqueda General (Código de verificación, Nombres o Documento de la Persona)
         if (!empty($filters['search'])) {
             $search = $filters['search'];
 
-            $query->whereHas('persona', function ($q) use ($search) {
-                $q->where(function ($sub) use ($search) {
-                    $searchTerm = '%' . $search . '%';
-                    $sub->where('nombres', 'LIKE', $searchTerm)
-                        ->orWhere('apellidos', 'LIKE', $searchTerm)
-                        ->orWhere('numero_documento', 'LIKE', $searchTerm);
-                });
+            $query->where(function (Builder $q) use ($search) {
+                $searchTerm = '%' . $search . '%';
+                $q->where('codigo_verificacion', 'LIKE', $searchTerm)
+                    ->orWhere('nombre_impresion', 'LIKE', $searchTerm)
+                    ->orWhereHas('persona', function (Builder $qPersona) use ($searchTerm) {
+                        $qPersona->where('nombres', 'LIKE', $searchTerm)
+                            ->orWhere('apellido_paterno', 'LIKE', $searchTerm)
+                            ->orWhere('apellido_materno', 'LIKE', $searchTerm)
+                            ->orWhere('nombre_completo', 'LIKE', $searchTerm)
+                            ->orWhere('numero_documento', 'LIKE', $searchTerm);
+                    });
             });
         }
 
-        // Filtro por rango de fechas
-        if (!empty($filters['fecha_inicio']) || !empty($filters['fecha_final'])) {
-            $query->whereHas('detalles.programa', function ($q) use ($filters) {
-                if (!empty($filters['fecha_inicio'])) {
-                    $q->where('fecha_inicio', '>=', $filters['fecha_inicio']);
-                }
-                if (!empty($filters['fecha_final'])) {
-                    $q->where('fecha_final', '<=', $filters['fecha_final']);
-                }
-            });
+        // Filtro por Tipo de Certificado
+        if (!empty($filters['codigo_tipocertificado'])) {
+            $query->where('codigo_tipocertificado', $filters['codigo_tipocertificado']);
         }
 
-        return $query->orderBy('created_at', 'DESC');
-    }
+        // Filtro por Institución
+        if (!empty($filters['id_sucursal'])) {
+            $query->where('id_sucursal', $filters['id_sucursal']);
+        }
 
-    /**
-     * Filtra en memoria para que cada módulo solo tenga los certificados 
-     * que pertenecen al alumno (id_persona) de su matrícula correspondiente.
-     */
-    private function filtrarCertificadosPorPersona(Collection $matriculas): Collection
-    {
-        $matriculas->transform(function ($matricula) {
-            $idPersona = $matricula->id_persona;
+        // Filtro por Programa
+        if (!empty($filters['id_programa'])) {
+            $query->where('id_programa', $filters['id_programa']);
+        }
 
-            foreach ($matricula->detalles as $detalle) {
-                if ($detalle->programa) {
-                    foreach ($detalle->programa->detalleModulos as $modulo) {
-                        // Mantenemos solo los certificados que coincidan con la persona matriculada
-                        $certificadosFiltrados = $modulo->certificados->filter(function ($cert) use ($idPersona) {
-                            return $cert->id_persona == $idPersona;
-                        })->values(); // values() reindexa el array para que JSON lo formatee como array [] y no como objeto {}
+        // Filtro por Módulo
+        if (!empty($filters['id_modulo'])) {
+            $query->where('id_modulo', $filters['id_modulo']);
+        }
 
-                        // Reasignamos la relación limpia
-                        $modulo->setRelation('certificados', $certificadosFiltrados);
-                    }
-                }
-            }
+        // Filtro por Rango de Fechas de Creación
+        if (!empty($filters['fecha_inicio'])) {
+            $query->whereDate('fecha_crea', '>=', $filters['fecha_inicio']);
+        }
 
-            return $matricula;
-        });
+        if (!empty($filters['fecha_final'])) {
+            $query->whereDate('fecha_crea', '<=', $filters['fecha_final']);
+        }
 
-        return $matriculas;
+        // Ordenamiento descendente por fecha de registro
+        return $query->orderBy('id', 'DESC');
     }
 }

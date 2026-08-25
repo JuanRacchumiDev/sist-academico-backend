@@ -8,8 +8,8 @@ class MatriculaCreateDTO extends Data
 {
     public function __construct(
         public int $id_persona,
-        public int $id_estadomatricula,
-        public int $id_institucion,
+        public int $codigo_estadomatricula,
+        public int $id_sucursal,
         public int $numero_modulos,
         public string $fecha_matricula,
         public array $programas,
@@ -17,7 +17,7 @@ class MatriculaCreateDTO extends Data
 
         // --- Datos específicos del Pago de Matrícula (OBLIGATORIO) ---
         public float $monto_matricula,
-        public int $id_formapago_matricula,
+        public int $codigo_formapago_matricula,
         public string $concepto_matricula,
         public ?string $numero_operacion_matricula = null,
         public ?float $monto_efectivo_matricula = null,
@@ -26,7 +26,7 @@ class MatriculaCreateDTO extends Data
         // --- Datos opcionales del Primer Pago de Módulo ---
         public ?bool $pagarPrimerModulo = false,
         public ?float $monto_modulo = null,
-        public ?int $id_formapago_modulo = null,
+        public ?int $codigo_formapago_modulo = null,
         public ?string $concepto_modulo = null,
         public ?string $numero_operacion_modulo = null,
         public ?float $monto_efectivo_modulo = null,
@@ -41,6 +41,13 @@ class MatriculaCreateDTO extends Data
         public ?string $user_elimina = null,
     ) {}
 
+    public static function withDefaults(): array
+    {
+        return [
+            'estado' => true
+        ];
+    }
+
     public static function rules(): array
     {
         return [
@@ -49,15 +56,15 @@ class MatriculaCreateDTO extends Data
                 'integer',
                 'exists:persona,id'
             ],
-            'id_estadomatricula' => [
+            'codigo_estadomatricula' => [
                 'required',
                 'integer',
                 'exists:detalle_parametro,codigo'
             ],
-            'id_institucion' => [
+            'id_sucursal' => [
                 'required',
                 'integer',
-                'exists:institucion,id'
+                'exists:detalle_parametro,codigo'
             ],
             'numero_modulos' => [
                 'required',
@@ -89,7 +96,7 @@ class MatriculaCreateDTO extends Data
                 'numeric',
                 'gt:0'
             ],
-            'id_formapago_matricula' => [
+            'codigo_formapago_matricula' => [
                 'required',
                 'integer',
                 'exists:detalle_parametro,codigo'
@@ -123,7 +130,7 @@ class MatriculaCreateDTO extends Data
                 'numeric',
                 'min:0'
             ],
-            'id_formapago_modulo' => [
+            'codigo_formapago_modulo' => [
                 'required_if:pagarPrimerModulo,true',
                 'nullable',
                 'integer',
@@ -164,6 +171,7 @@ class MatriculaCreateDTO extends Data
                 'string',
                 'nullable'
             ],
+
             'user_crea' => [
                 'sometimes',
                 'string',
@@ -178,7 +186,7 @@ class MatriculaCreateDTO extends Data
                 'sometimes',
                 'string',
                 'nullable'
-            ],
+            ]
         ];
     }
 }

@@ -1,35 +1,48 @@
 <?php
+
 namespace App\DTOs\Adjunto;
 
-use Illuminate\Validation\Rule;
 use Spatie\LaravelData\Data;
 
 class AdjuntoUpdateDTO extends Data
 {
     public function __construct(
-        public ?int $id_programa,
-        public ?int $id_modulo,
-        public ?int $id_institucion,
-        public ?string $titulo,
-        public ?string $titulo_url,
+        public ?string $titulo = null,
+        public ?bool $is_descargable = null,
+        public ?bool $is_visible = null,
+        public ?bool $estado = null,
+
+        public ?int $id_programa = null,
+        public ?int $id_modulo = null,
+        public ?int $id_sucursal = null,
+        public ?string $titulo_url = null,
         public ?string $descripcion = null,
-        public ?string $filename,
-        public ?string $originalname,
-        public ?string $filepath,
-        public ?string $mimetype,
-        public ?int $size,
-        public ?bool $es_descargable,
-        public ?bool $es_visible,
+        public ?string $filename = null,
+        public ?string $originalname = null,
+        public ?string $filepath = null,
+        public ?string $mimetype = null,
+        public ?int $size = null,
+
+        public ?string $fecha_crea = null,
+        public ?string $fecha_actualiza = null,
+        public ?string $fecha_elimina = null,
+
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null,
-        public ?bool $estado
-    ){}
+    ) {}
+
+    public static function withDefaults(): array
+    {
+        return [
+            'is_descargable' => true,
+            'is_visible' => true,
+            'estado' => true
+        ];
+    }
 
     public static function rules(): array
     {
-        $adjuntoId = request()->route('adjunto');
-
         return [
             'id_programa' => [
                 'sometimes',
@@ -43,24 +56,22 @@ class AdjuntoUpdateDTO extends Data
                 'exists:modulo,id',
                 'nullable'
             ],
-            'id_institucion' => [
+            'id_sucursal' => [
                 'sometimes',
                 'integer',
-                'exists:institucion,id',
+                'exists:detalle_parametro,codigo',
                 'nullable'
             ],
             'titulo' => [
                 'sometimes',
                 'string',
                 'max:100',
-                Rule::unique('adjunto', 'titulo')->ignore($adjuntoId),
                 'nullable'
             ],
             'titulo_url' => [
                 'sometimes',
                 'string',
                 'max:120',
-                Rule::unique('adjunto', 'titulo_url')->ignore($adjuntoId),
                 'nullable'
             ],
             'descripcion' => [
@@ -69,31 +80,34 @@ class AdjuntoUpdateDTO extends Data
                 'max:150',
                 'nullable'
             ],
+            'file' => [
+                'sometimes',
+                'file',
+                'max:10240',
+                'nullable'
+            ],
             'filename' => [
                 'sometimes',
                 'string',
                 'max:120',
-                Rule::unique('adjunto', 'filename')->ignore($adjuntoId),
                 'nullable'
             ],
             'originalname' => [
                 'sometimes',
                 'string',
                 'max:180',
-                Rule::unique('adjunto', 'originalname')->ignore($adjuntoId),
                 'nullable'
             ],
             'filepath' => [
                 'sometimes',
                 'string',
                 'max:150',
-                Rule::unique('adjunto', 'filepath')->ignore($adjuntoId),
                 'nullable'
             ],
             'mimetype' => [
                 'sometimes',
                 'string',
-                'max:20',
+                'max:40',
                 'nullable'
             ],
             'size' => [
@@ -101,29 +115,47 @@ class AdjuntoUpdateDTO extends Data
                 'integer',
                 'nullable'
             ],
-            'es_descargable' => [
+            'is_descargable' => [
                 'sometimes',
                 'boolean',
                 'nullable'
             ],
-            'es_visible' => [
+            'is_visible' => [
                 'sometimes',
                 'boolean',
+                'nullable'
+            ],
+            'fecha_crea' => [
+                'sometimes',
+                'string',
+                'nullable'
+            ],
+            'fecha_actualiza' => [
+                'sometimes',
+                'string',
+                'nullable'
+            ],
+            'fecha_elimina' => [
+                'sometimes',
+                'string',
                 'nullable'
             ],
             'user_crea' => [
                 'sometimes',
                 'string',
+                'max:12',
                 'nullable'
             ],
             'user_actualiza' => [
                 'sometimes',
                 'string',
+                'max:12',
                 'nullable'
             ],
             'user_elimina' => [
                 'sometimes',
                 'string',
+                'max:12',
                 'nullable'
             ],
             'estado' => [

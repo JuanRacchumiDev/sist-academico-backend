@@ -7,10 +7,11 @@ use App\DTOs\Certificado\CertificadoUpdateDTO;
 use App\Models\Certificado;
 use Illuminate\Support\Facades\DB;
 use App\Repositories\Contracts\ICertificadoRepository;
-use App\Repositories\Contracts\IInstitucionRepository;
+use App\Repositories\Contracts\IDetalleParametroRepository;
 use App\Repositories\Contracts\IModuloRepository;
 use App\Repositories\Contracts\IPersonaRepository;
 use App\Repositories\Contracts\IPlantillaRepository;
+use App\Repositories\Contracts\IProgramaRepository;
 use App\Services\Contracts\ICertificadoService;
 use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -29,27 +30,31 @@ use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\Writer\PngWriter;
 use Endroid\QrCode\ErrorCorrectionLevel;
 use Endroid\QrCode\RoundBlockSizeMode;
+use App\Helpers\CertificadoHelper;
 
 class CertificadoService implements ICertificadoService
 {
     protected ICertificadoRepository $certificadoRepository;
     protected IPersonaRepository $personaRepository;
-    protected IInstitucionRepository $institucionRepository;
     protected IModuloRepository $moduloRepository;
     protected IPlantillaRepository $plantillaRepository;
+    protected IDetalleParametroRepository $detalleRepository;
+    protected IProgramaRepository $programaRepository;
 
     public function __construct(
         ICertificadoRepository $certificadoRepository,
         IPersonaRepository $personaRepository,
-        IInstitucionRepository $institucionRepository,
         IModuloRepository $moduloRepository,
-        IPlantillaRepository $plantillaRepository
+        IPlantillaRepository $plantillaRepository,
+        IDetalleParametroRepository $detalleRepository,
+        IProgramaRepository $programaRepository
     ) {
         $this->certificadoRepository = $certificadoRepository;
         $this->personaRepository = $personaRepository;
-        $this->institucionRepository = $institucionRepository;
         $this->moduloRepository = $moduloRepository;
         $this->plantillaRepository = $plantillaRepository;
+        $this->detalleRepository = $detalleRepository;
+        $this->programaRepository = $programaRepository;
     }
 
     public function getAllCertificados(?array $searchParams = null): Collection
@@ -64,75 +69,6 @@ class CertificadoService implements ICertificadoService
         return $this->certificadoRepository->getAllFiltered($filters, $perPage);
     }
 
-    // public function generatePDF(int $id)
-    // {
-    //     $certificado = $this->certificadoRepository->findById($id);
-
-    //     if (!$certificado) {
-    //         throw new Exception("Certificado no encontrado para generar PDF");
-    //     }
-
-    //     $institucion = $certificado->institucion;
-    //     $programa = $certificado->programa;
-    //     $plantilla = $certificado->plantilla;
-
-    //     $pdfFullPath = "{$certificado->path_file}/{$certificado->filename}";
-    //     $qrFullPath = $certificado->codigo_qr_path;
-
-    //     $qrData = route('certificados.show', [
-    //         'id' => $certificado->id,
-    //         'verify' => $certificado->codigo_verificacion
-    //     ]);
-
-    //     $qrRaw = QrCode::format('svg')->size(150)->margin(0)->generate($qrData);
-
-    //     Storage::disk("local")->put($qrFullPath, $qrRaw);
-
-    //     $logoBase64 = null;
-
-    //     $logoPath = $institucion->logo_path
-    //         ? storage_path("app/public/" . $institucion->logo_path)
-    //         : public_path("images/logo_default.png");
-
-    //     if (file_exists($logoPath)) {
-    //         $logoData = file_get_contents($logoPath);
-    //         $logoBase64 = 'data:image/' . pathinfo($logoPath, PATHINFO_EXTENSION) . ';base64,' . base64_encode($logoData);
-    //     }
-
-    //     // Plantilla de Fondo (Desde el modelo Plantilla si existe)
-    //     $templateBase64 = null;
-    //     $imgFondo = $plantilla->path_imagen ?? 'PLANTILLA_INNOVA.jpg';
-    //     $templatePath = storage_path("app/public/templates/{$imgFondo}");
-
-    //     if (file_exists($templatePath)) {
-    //         $templateBase64 = "data:image/jpeg;base64," . base64_encode(file_get_contents($templatePath));
-    //     }
-
-    //     $qrBase64 = "data:image/svg+xml;base64," . base64_encode($qrRaw);
-
-    //     // Preparar data
-    //     $pdfData = [
-    //         'certificado'      => $certificado,
-    //         'nombre_impresion' => $certificado->nombre_impresion,
-    //         'programa'         => $programa->titulo ?? "Programa Académico",
-    //         'fecha_inicio'     => $programa ? Carbon::parse($programa->fecha_inicio)->format('d/m/Y') : '',
-    //         'fecha_fin'        => $programa ? Carbon::parse($programa->fecha_fin)->format('d/m/Y') : '',
-    //         'codigo_verif'     => $certificado->codigo_verificacion,
-    //         'qrCode'           => $qrBase64,
-    //         'logo'             => $logoBase64,
-    //         'fondo'            => $templateBase64,
-    //         'fecha_emision'    => Carbon::parse($certificado->created_at)->format('d/m/Y H:i A'),
-    //         'periodo'          => $this->getPeriodoAcademico()
-    //     ];
-
-    //     // Renderizar y guardar
-    //     $pdf = Pdf::loadView('pdf.certificado', $pdfData)->setPaper('a4', 'landscape');
-
-    //     Storage::disk("local")->put($pdfFullPath, $pdf->output());
-
-    //     return Storage::disk("local")->path($pdfFullPath);
-    // }
-
     public function generatePDF(int $id)
     {
         $certificado = $this->certificadoRepository->findById($id);
@@ -141,62 +77,170 @@ class CertificadoService implements ICertificadoService
             throw new Exception("Certificado no encontrado para generar PDF");
         }
 
-        $institucion = $certificado->institucion;
+        Log::info("Obteniendo información de certificado", ['certificado' => $certificado]);
+
+        // Asegurar que la carpeta storage/fonts exista antes de invocar DomPDF
+        CertificadoHelper::ensureFontCacheDirExists();
+
+        // Obtener datos de programa y plantilla
         $programa = $certificado->programa;
         $plantilla = $certificado->plantilla;
 
-        $pdfFullPath = "{$certificado->path_file}/{$certificado->filename}";
-        $qrFullPath = $certificado->codigo_qr_path;
+        Log::info("Información de plantilla", ["plantilla" => $plantilla]);
 
-        $qrData = route('certificados.show', [
-            'id' => $certificado->id,
-            'verify' => $certificado->codigo_verificacion
-        ]);
+        $pdfRelativePath = "{$certificado->path_file}/{$certificado->filename}";
 
-        $qrRaw = QrCode::format('svg')->size(150)->margin(0)->generate($qrData);
+        Log::info("Información de pdf", ["pdfRelativePath" => $pdfRelativePath]);
 
-        Storage::disk("local")->put($qrFullPath, $qrRaw);
+        // Construir la URL pública de verificación accesible por el escáner del smartphone
+        $appUrl = rtrim(config('app.url'), '/');
+        $qrUrl = "{$appUrl}/validar-certificado/{$certificado->codigo_verificacion}";
 
-        $logoBase64 = null;
+        Log::info("URL de verificación para el código QR", ['qrUrl' => $qrUrl]);
 
-        $logoPath = $institucion->logo_path
-            ? storage_path("app/public/" . $institucion->logo_path)
-            : public_path("images/logo_default.png");
+        $this->generateCodeQR($qrUrl, $certificado->codigo_qr_path);
 
-        if (file_exists($logoPath)) {
-            $logoData = file_get_contents($logoPath);
-            $logoBase64 = 'data:image/' . pathinfo($logoPath, PATHINFO_EXTENSION) . ';base64,' . base64_encode($logoData);
-        }
+        // Obtener el QR persistido y convertirlo a Base64 para embeder en DomPDF
+        $qrBinary = Storage::disk('local')->get($certificado->codigo_qr_path);
+        $qrBase64 = "data:image/png;base64," . base64_encode($qrBinary);
 
+        // Cargar fondo de pantalla
         $templateBase64 = null;
-        $imgFondo = $plantilla->path_imagen ?? 'PLANTILLA_INNOVA.jpg';
-        $templatePath = storage_path("app/public/templates/{$imgFondo}");
 
-        if (file_exists($templatePath)) {
-            $templateBase64 = "data:image/jpeg;base64," . base64_encode(file_get_contents($templatePath));
+        $existPlantilla = $plantilla && $plantilla->path && Storage::disk('public')->exists($plantilla->path);
+        Log::info("Validando exists plantilla", ['existPlantilla' => $existPlantilla]);
+
+        if ($existPlantilla) {
+            Log::info('Validando ruta de plantilla', ['path' => $plantilla->path]);
+
+            $fileData = Storage::disk('public')->get($plantilla->path);
+
+            // Obtener la extensión y construir el mime type manualmente
+            $extension = strtolower(pathinfo($plantilla->path, PATHINFO_EXTENSION));
+
+            Log::info('Validando extension', ['extension' => $extension]);
+
+            $mime = match ($extension) {
+                'png'   => 'image/png',
+                'webp'  => 'image/webp',
+                'svg'   => 'image/svg+xml',
+                default => 'image/jpeg'
+            };
+
+            Log::info('Validando mime', ['mime' => $mime]);
+
+            $templateBase64 = "data:{$mime};base64," . base64_encode($fileData);
         }
 
-        $qrBase64 = "data:image/svg+xml;base64," . base64_encode($qrRaw);
-
-        $pdfData = [
-            'certificado'      => $certificado,
-            'nombre_impresion' => $certificado->nombre_impresion,
-            'programa'         => $programa->titulo ?? "Programa Académico",
-            'fecha_inicio'     => $programa ? Carbon::parse($programa->fecha_inicio)->format('d/m/Y') : '',
-            'fecha_fin'        => $programa ? Carbon::parse($programa->fecha_fin)->format('d/m/Y') : '',
-            'codigo_verif'     => $certificado->codigo_verificacion,
-            'qrCode'           => $qrBase64,
-            'logo'             => $logoBase64,
-            'fondo'            => $templateBase64,
-            'fecha_emision'    => Carbon::parse($certificado->created_at)->format('d/m/Y H:i A'),
-            'periodo'          => $this->getPeriodoAcademico()
+        // Definir fuentes
+        $fonts = [
+            'alumno' => CertificadoHelper::getFontBase64('GreatVibes-Regular.ttf'),
+            'programa' => CertificadoHelper::getFontBase64('Anton.ttf'),
+            'fechas' => CertificadoHelper::getFontBase64('Archivo-Regular.ttf'),
+            'director' => CertificadoHelper::getFontBase64('Archivo-Medium.ttf')
         ];
 
-        $pdf = Pdf::loadView('pdf.certificado', $pdfData)->setPaper('a4', 'landscape');
+        // Definir las fechas del evento en texto
+        $fechaInicio = CertificadoHelper::fechaEnLetras($programa->fecha_inicio ?? null);
+        $fechaFinal = CertificadoHelper::fechaEnLetras($programa->fecha_final ?? null);
+        $descFechasPrograma = ($fechaInicio && $fechaFinal) ? "Realizado del {$fechaInicio} al {$fechaFinal}" : "";
 
-        Storage::disk("local")->put($pdfFullPath, $pdf->output());
+        // Calcular los estilos dinámicos
+        $baseFontSizeAlumno = config('params.styles_pdfs.baseFontSize.alumno');
+        $baseFontSizePrograma = config('params.styles_pdfs.baseFontSize.programa');
+        $baseFontSizeFechas = config('params.styles_pdfs.baseFontSize.fechas');
+        $longitudMaxima = config('params.styles_pdfs.longitudMaxima');
 
-        return Storage::disk("local")->path($pdfFullPath);
+        Log::info('Evaluando parámetros de estilos', [
+            'baseFontSizeAlumno'   => $baseFontSizeAlumno,
+            'baseFontSizePrograma' => $baseFontSizePrograma,
+            'baseFontSizeFechas'   => $baseFontSizeFechas,
+            'longitudMaxima'       => $longitudMaxima,
+        ]);
+
+        $estilosAlumno = CertificadoHelper::calcularEstilosTexto($certificado->nombre_impresion, $baseFontSizeAlumno, $longitudMaxima);
+        $estilosPrograma = CertificadoHelper::calcularEstilosTexto($programa->titulo ?? '', $baseFontSizePrograma, $longitudMaxima);
+        $estilosFechas = CertificadoHelper::calcularEstilosTexto($descFechasPrograma, $baseFontSizeFechas, $longitudMaxima);
+
+        Log::info('Evaluando resultados de estilos calc', [
+            'estilosAlumno'   => $estilosAlumno,
+            'estilosPrograma' => $estilosPrograma,
+            'estilosFechas'   => $estilosFechas,
+        ]);
+
+        // Definiendo horas académicas
+        $horasAcademicasDefault = config('params.horas_academicas_default');
+
+        // Definiendo nombre director
+        Log::info('Evaluando objeto institución', ['institucion' => $plantilla->institucion]);
+
+        $nombreDirector = ($plantilla->institucion && $plantilla->institucion->nombre_director)
+            ? $plantilla->institucion->nombre_director
+            : "----";
+
+        // Definir tipo de programa
+        $tipoPrograma = $programa->tipoPrograma;
+
+        // Mapear objeto para la vista
+        $info = (object)[
+            'nombre_alumno'         => $certificado->nombre_impresion,
+            'estilos_alumno'        => $estilosAlumno,
+
+            'nombre_tipoprograma'   => $tipoPrograma->nombre ?? 'Programa Académico',
+            'nombre_director'       => $nombreDirector,
+
+            'titulo_programa'       => $programa->titulo ?? 'Programa Académico',
+            'estilos_programa'      => $estilosPrograma,
+
+            'fechas_programa'       => $descFechasPrograma,
+            'estilos_fechas'        => $estilosFechas,
+
+            'horas_academicas'      => $programa->horas_academicas ?? $horasAcademicasDefault,
+            'fecha_emision'         => CertificadoHelper::fechaEnLetras($certificado->fecha_crea),
+            'codigo_verificacion'   => $certificado->codigo_verificacion,
+            'qrCode'                => $qrBase64,
+            'fondo'                 => $templateBase64
+        ];
+
+        Log::info('Validando información que se creará en el certificado, variable $info', [
+            'nombre_alumno'         => $info->nombre_alumno,
+            'nombre_tipoprograma'   => $info->nombre_tipoprograma,
+            'nombre_director'       => $info->nombre_director,
+            'titulo_programa'       => $info->titulo_programa,
+            'fechas_programa'       => $info->fechas_programa,
+            'horas_academicas'      => $info->horas_academicas,
+            'fecha_emision'         => $info->fecha_emision,
+        ]);
+
+        // Determinar la plantilla/diseño correspondiente
+        $disenio = $plantilla->tipo_disenio;
+        $viewNameDefault = CertificadoHelper::resolveTemplateDefault($tipoPrograma->nombre_url);
+
+        Log::info('Validando viewNameDefault', ['viewNameDefault' => $viewNameDefault]);
+
+        // config('params.clases.horas_academicas_default');
+
+        // Definir los parámetros para obtener los estilos en el certificado
+        $nombreTipoPrograma = $programa->tipoPrograma->nombre_url;
+        $grupoEstilos = "params.styles_pdfs.{$nombreTipoPrograma}.{$disenio}";
+        $estilos = config($grupoEstilos);
+
+        Log::info("Validando mapeo de estilos", [
+            'nombreTipoPrograma' => $nombreTipoPrograma,
+            'grupoEstilos'       => $grupoEstilos,
+            'estilos'            => $estilos
+        ]);
+
+        $pdf = Pdf::loadView($viewNameDefault, [
+            'info' => $info,
+            'fonts' => $fonts,
+            'estilos' => $estilos
+        ])->setPaper('a4', 'landscape')
+            ->setOption('isFontSubsettingEnabled', false);
+
+        Storage::disk('local')->put($pdfRelativePath, $pdf->output());
+
+        return Storage::disk('local')->path($pdfRelativePath);
     }
 
     public function downloadCertificado(int $id): array
@@ -245,7 +289,7 @@ class CertificadoService implements ICertificadoService
 
         $numeroDocumento = $persona->numero_documento ?? $persona->numero_documento ?? 'sin_documento';
 
-        $yearMonthDocDir = 'certificados' . DIRECTORY_SEPARATOR . date('Y') . DIRECTORY_SEPARATOR . date('m') . DIRECTORY_SEPARATOR . $numeroDocumento;
+        $yearMonthDocDir = 'certificacion' . DIRECTORY_SEPARATOR . date('Y') . DIRECTORY_SEPARATOR . date('m') . DIRECTORY_SEPARATOR . $numeroDocumento;
         Storage::disk('local')->makeDirectory($yearMonthDocDir);
 
         $urlVerificacion = config('app.url') . "/validar-certificado/" . $codigoVerificacion;
@@ -358,22 +402,37 @@ class CertificadoService implements ICertificadoService
             $data['codigo_verificacion'] = strtoupper(Str::random(10));
         }
 
+        // Obtener la información requerida para construir las rutas jerárquicas
         $persona = $this->personaRepository->findById($data['id_persona']);
-        $nombreCompleto = "{$persona->nombres} {$persona->apellido_paterno} {$persona->apellido_materno}";
+        $programa = $this->programaRepository->findById($data['id_programa']);
+        $sucursal = $this->detalleRepository->findByCodigo($data['id_sucursal']);
 
-        $institucion = $this->institucionRepository->findById($data['id_institucion']);
-        $nombreInsSlug = Str::slug($institucion->nombre);
-        $dni = $persona->numero_documento;
+        if (!$persona) {
+            throw new Exception("La persona especificada no existe.", 404);
+        }
 
-        $folderPath = "certificados/{$anio}/{$nombreInsSlug}/{$dni}";
+        $slugTipoPrograma = Str::slug($programa->tipoPrograma->nombre_url ?? "tipo-programa");
+        $slugSucursal = Str::slug($sucursal->nombre ?? "sucursal");
+        $dniAlumno    = $persona->numero_documento;
+
+        // Estructura: /{slugTipoPrograma}/{anio}/{nombreSucursal}/{dniAlumno}
+        $folderPath = "{$slugTipoPrograma}/{$anio}/{$slugSucursal}/{$dniAlumno}";
         $fileName = "CERT-{$data['codigo_verificacion']}.pdf";
+        $qrFileName = "QR_{$data['codigo_verificacion']}.png";
 
-        $data['nombre_impresion'] = $nombreCompleto;
+        $data['nombre_impresion'] = $data['nombre_impresion'];
         $data['path_file'] = $folderPath;
         $data['filename'] = $fileName;
-        $data['codigo_qr_path'] = "{$folderPath}/QR_{$data['codigo_verificacion']}.svg";
+        $data['codigo_qr_path'] = "{$folderPath}/{$qrFileName}";
 
-        return $this->certificadoRepository->create($data);
+        // Guardar el registro en base de datos
+        $certificado = $this->certificadoRepository->create($data);
+
+        if (!$certificado) {
+            throw new Exception("No se pudo registrar la información del certificado en la base de datos.");
+        }
+
+        return $certificado;
     }
 
     public function updateCertificado(int $id, CertificadoUpdateDTO $dto): ?Certificado
@@ -396,13 +455,7 @@ class CertificadoService implements ICertificadoService
         return $this->certificadoRepository->delete($id);
     }
 
-    private function getPeriodoAcademico(): string
-    {
-        $mes = now()->month;
-        return now()->year . ($mes <= 7 ? ' - I' : ' - II');
-    }
-
-    private function generateCodeQR(string $url, string $codigo): string
+    private function generateCodeQR(string $url, string $savePath): string
     {
         $result = Builder::create()
             ->writer(new PngWriter())
@@ -414,9 +467,8 @@ class CertificadoService implements ICertificadoService
             ->roundBlockSizeMode(RoundBlockSizeMode::Margin)
             ->build();
 
-        $qrPath = "qrs/{$codigo}.png";
-        Storage::disk('local')->put($qrPath, $result->getString());
+        Storage::disk('local')->put($savePath, $result->getString());
 
-        return $qrPath;
+        return $savePath;
     }
 }

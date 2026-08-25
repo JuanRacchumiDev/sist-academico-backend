@@ -16,7 +16,7 @@ class Persona extends Model
     protected $table = 'persona';
 
     protected $fillable = [
-        'id_tipodocumento',
+        'codigo_tipodocumento',
         'numero_documento',
         'nombres',
         'apellido_paterno',
@@ -37,6 +37,9 @@ class Persona extends Model
         'foto',
         'sexo',
         'origen',
+        'fecha_crea',
+        'fecha_actualiza',
+        'fecha_elimina',
         'user_crea',
         'user_actualiza',
         'user_elimina',
@@ -57,7 +60,7 @@ class Persona extends Model
      */
     public function tipoDocumento(): BelongsTo
     {
-        return $this->belongsTo(DetalleParametro::class, 'id_tipodocumento', 'codigo');
+        return $this->belongsTo(DetalleParametro::class, 'codigo_tipodocumento', 'codigo');
     }
 
     public function grupos(): BelongsToMany
@@ -66,7 +69,7 @@ class Persona extends Model
             DetalleParametro::class,
             'grupo_persona',
             'id_persona',
-            'codigo_detalle_parametro'
+            'codigo_grupo'
         )->withTimestamps();
     }
 

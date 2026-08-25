@@ -66,7 +66,7 @@ class UserService implements IUserService
             Log::info('nuevo usuario', ['user' => $user]);
 
             // Enviamos el correo electrónico
-            Mail::to($user->email)->send(new UserWelcomeMail($user, $temporaryPassword));
+            // Mail::to($user->email)->send(new UserWelcomeMail($user, $temporaryPassword));
 
             return $user;
         });

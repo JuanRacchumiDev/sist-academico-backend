@@ -11,8 +11,8 @@ class Certificado extends Model
 
     protected $fillable = [
         'id_persona',
-        'id_tipocertificado',
-        'id_institucion',
+        'codigo_tipocertificado',
+        'id_sucursal',
         'id_plantilla',
         'id_programa',
         'id_modulo',
@@ -22,6 +22,11 @@ class Certificado extends Model
         'path_file',
         'filename',
         'nombre_impresion',
+
+        'fecha_crea',
+        'fecha_actualiza',
+        'fecha_elimina',
+
         'user_crea',
         'user_actualiza',
         'user_elimina',
@@ -51,16 +56,16 @@ class Certificado extends Model
      */
     public function tipoCertificado(): BelongsTo
     {
-        return $this->belongsTo(DetalleParametro::class, 'id_tipocertificado', 'codigo');
+        return $this->belongsTo(DetalleParametro::class, 'codigo_tipocertificado', 'codigo');
     }
 
     /**
      * Obtener la institución asociado a un certificado
-     * @return BelongsTo<Institucion, $this>
+     * @return BelongsTo<DetalleParametro, $this>
      */
-    public function institucion(): BelongsTo
+    public function sucursal(): BelongsTo
     {
-        return $this->belongsTo(Institucion::class, 'id_institucion', 'id');
+        return $this->belongsTo(DetalleParametro::class, 'id_sucursal', 'codigo');
     }
 
     /**

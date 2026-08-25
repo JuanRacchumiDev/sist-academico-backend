@@ -4,6 +4,7 @@ namespace App\Repositories\Eloquent;
 
 use App\Models\DetalleParametro;
 use App\Repositories\Contracts\IDetalleParametroRepository;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
@@ -15,7 +16,14 @@ class DetalleParametroRepository implements IDetalleParametroRepository
      */
     public function getAllByClase(int $parametro_clase): Collection
     {
-        return DetalleParametro::where('parametro_clase', $parametro_clase)->get();
+        return DetalleParametro::with([
+            'programasPorTipo',
+            'programasPorCategoria',
+            'programasPorSegmento',
+            'personas'
+        ])
+            ->where('parametro_clase', $parametro_clase)
+            ->get();
     }
 
     /**
@@ -25,77 +33,18 @@ class DetalleParametroRepository implements IDetalleParametroRepository
      */
     public function getAllFiltered(array $filters): Collection
     {
-        $query = DetalleParametro::query();
-
-        if (isset($filters['parametro_clase'])) {
-            $clases = is_array($filters['parametro_clase']) ? $filters['parametro_clase'] : [$filters['parametro_clase']];
-            $query->whereIn('parametro_clase', $clases);
-        }
-
-        if (isset($filters['en_persona'])) {
-            $query->where('en_persona', (bool)$filters['en_persona']);
-        }
-
-        if (isset($filters['en_empresa'])) {
-            $query->where('en_empresa', (bool)$filters['en_empresa']);
-        }
-
-        if (isset($filters['visible'])) {
-            $query->where('visible', (bool)$filters['visible']);
-        }
-
-        if (isset($filters['estado'])) {
-            $query->where('estado', (bool)$filters['estado']);
-        }
-
-        $query->orderBy('parametro_clase', 'asc')->orderBy('nombre', 'asc');
-
-        return $query->get();
+        return $this->applyFilters($filters)->get();
     }
 
     /**
-     * Obtiene DetalleParametros aplicando filtros dinámicos
+     * Obtiene DetalleParametros aplicando filtros dinámicos paginados
      * @param array<string, mixed> $filters
      * @param int $perPage
      * @return LengthAwarePaginator<DetalleParametro>
      */
     public function getAllFilteredPaginate(array $filters, int $perPage = 10): LengthAwarePaginator
     {
-        $query = DetalleParametro::query();
-
-        if (isset($filters['parametro_clase'])) {
-            $clases = is_array($filters['parametro_clase']) ? $filters['parametro_clase'] : [$filters['parametro_clase']];
-            $query->whereIn('parametro_clase', $clases);
-        }
-
-        if (isset($filters['en_persona'])) {
-            $query->where('en_persona', (bool)$filters['en_persona']);
-        }
-
-        if (isset($filters['en_empresa'])) {
-            $query->where('en_empresa', (bool)$filters['en_empresa']);
-        }
-
-        if (isset($filters['visible'])) {
-            $query->where('visible', (bool)$filters['visible']);
-        }
-
-        if (isset($filters['estado'])) {
-            $query->where('estado', (bool)$filters['estado']);
-        }
-
-        if (isset($filters['search'])) {
-            $search = '%' . strtolower($filters['search']) . '%';
-
-            $query->where(function ($q) use ($search) {
-                $q->whereRaw('LOWER(nombre) LIKE ?', [$search]);
-            });
-        }
-
-        $query->orderBy('parametro_clase', 'asc')->orderBy('nombre', 'asc');
-
-        // return $query->get();
-        return $query->paginate($perPage);
+        return $this->applyFilters($filters)->paginate($perPage);
     }
 
     /**
@@ -105,7 +54,12 @@ class DetalleParametroRepository implements IDetalleParametroRepository
      */
     public function findByCodigo(int $codigo): ?DetalleParametro
     {
-        return DetalleParametro::find($codigo);
+        return DetalleParametro::with([
+            'programasPorTipo',
+            'programasPorCategoria',
+            'programasPorSegmento',
+            'personas'
+        ])->where('codigo', $codigo)->first();
     }
 
     /**
@@ -113,33 +67,16 @@ class DetalleParametroRepository implements IDetalleParametroRepository
      * @param string $nombreUrl
      * @return DetalleParametro|null
      */
-    public function findByNombreUrl(string $nombreUrl): ?DetalleParametro
+    public function findByNombreUrl(int $parametroClase, string $nombreUrl): ?DetalleParametro
     {
-        return DetalleParametro::where('nombre_url', $nombreUrl)->first();
-    }
-
-    /**
-     * Busca un detalle de parámetro por codigo y parametro_clase
-     * @param int $parametro_clase
-     * @param int $codigo
-     * @return DetalleParametro|null
-     */
-    public function findByClaseAndCodigo(int $parametro_clase, int $codigo): ?DetalleParametro
-    {
-        return DetalleParametro::where('parametro_clase', $parametro_clase)
-            ->where('codigo', $codigo)
-            ->first();
-    }
-
-    /**
-     * Busca un detalle de parámetro por clase y nombre_url
-     * @param int $parametro_clase
-     * @param string $nombreUrl
-     * @return DetalleParametro|null
-     */
-    public function findByClaseAndNombreUrl(int $parametro_clase, string $nombreUrl): ?DetalleParametro
-    {
-        return DetalleParametro::where('parametro_clase', $parametro_clase)
+        return DetalleParametro::with(
+            [
+                'programasPorTipo',
+                'programasPorCategoria',
+                'programasPorSegmento',
+                'personas'
+            ]
+        )->where('parametro_clase', $parametroClase)
             ->where('nombre_url', $nombreUrl)
             ->first();
     }
@@ -180,9 +117,65 @@ class DetalleParametroRepository implements IDetalleParametroRepository
     public function delete(int $codigo): bool
     {
         $detalle = $this->findByCodigo($codigo);
+
         if ($detalle) {
             return $detalle->delete();
         }
+
         return false;
+    }
+
+    /**
+     * Aplica los filtros dinámicos y el ordenamiento a la consulta de DetalleParametro
+     * @param array<string, mixed> $filters
+     * @return Builder<DetalleParametro>
+     */
+    private function applyFilters(array $filters): Builder
+    {
+        // $query = DetalleParametro::query();
+        $query = DetalleParametro::with([
+            'programasPorTipo',
+            'programasPorCategoria',
+            'programasPorSegmento',
+            'personas'
+        ]);
+
+        // Filtro por parametro_clase (admite un valor individual o un array de valores)
+        if (isset($filters['parametro_clase']) && $filters['parametro_clase'] !== '') {
+            $clases = is_array($filters['parametro_clase']) ? $filters['parametro_clase'] : [$filters['parametro_clase']];
+            $query->whereIn('parametro_clase', $clases);
+        }
+
+        // Filtro booleano: en_persona
+        if (isset($filters['en_persona']) && $filters['en_persona'] !== '') {
+            $query->where('en_persona', (bool) $filters['en_persona']);
+        }
+
+        // Filtro booleano: en_empresa
+        if (isset($filters['en_empresa']) && $filters['en_empresa'] !== '') {
+            $query->where('en_empresa', (bool) $filters['en_empresa']);
+        }
+
+        // Filtro booleano: visible
+        if (isset($filters['visible']) && $filters['visible'] !== '') {
+            $query->where('visible', (bool) $filters['visible']);
+        }
+
+        // Filtro booleano: estado
+        if (isset($filters['estado']) && $filters['estado'] !== '') {
+            $query->where('estado', (bool) $filters['estado']);
+        }
+
+        // Búsqueda textual por nombre
+        if (!empty($filters['search'])) {
+            $search = '%' . strtolower($filters['search']) . '%';
+            $query->where(function (Builder $q) use ($search) {
+                $q->whereRaw('LOWER(nombre) LIKE ?', [$search]);
+            });
+        }
+
+        // Ordenamiento por defecto
+        return $query->orderBy('parametro_clase', 'asc')
+            ->orderBy('nombre', 'asc');
     }
 }

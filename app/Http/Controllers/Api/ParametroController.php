@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\DTOs\Parametro\ParametroCreateDTO;
 use App\DTOs\Parametro\ParametroUpdateDTO;
+use App\Helpers\FechaHelper;
 use App\Http\Controllers\Controller;
 use App\Services\Contracts\IParametroService;
 use Illuminate\Http\JsonResponse;
@@ -71,6 +72,9 @@ class ParametroController extends Controller
             $username = $usuarioAutenticado ? ($usuarioAutenticado->name) : 'systemapi';
             $data['user_crea'] = $username;
 
+            // Obteniendo la fecha actual
+            $data['fecha_crea'] = FechaHelper::obtenerFechaActual();
+
             $parametroCreateDTO = ParametroCreateDTO::from($data);
 
             $parametro = $this->parametroService->createParametro($parametroCreateDTO);
@@ -137,6 +141,9 @@ class ParametroController extends Controller
             $usuarioAutenticado = Auth::user();
             $username = $usuarioAutenticado ? ($usuarioAutenticado->name) : 'systemapi';
             $data['user_actualiza'] = $username;
+
+            // Obteniendo fecha actual
+            $data['fecha_actualiza'] = FechaHelper::obtenerFechaActual();
 
             $parametroUpdateDTO = ParametroUpdateDTO::from();
 

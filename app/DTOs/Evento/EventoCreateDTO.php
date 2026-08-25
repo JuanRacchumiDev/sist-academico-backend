@@ -1,4 +1,5 @@
 <?php
+
 namespace App\DTOs\Evento;
 
 use Illuminate\Validation\Rule;
@@ -8,8 +9,8 @@ use Illuminate\Support\Str;
 class EventoCreateDTO extends Data
 {
     public function __construct(
-        public int $id_tipoevento,
-        public int $id_categoriaevento,
+        public int $codigo_tipoevento,
+        public int $codigo_categoriaevento,
         public string $titulo,
         public string $titulo_url,
         public string $fecha_inicio,
@@ -23,10 +24,13 @@ class EventoCreateDTO extends Data
         public ?int $capacidad_minima = null,
         public ?int $capacidad_maxima = null,
         public ?int $cantidad_inscritos = null,
+        public ?string $fecha_crea = null,
+        public ?string $fecha_actualiza = null,
+        public ?string $fecha_elimina = null,
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null,
-    ){}
+    ) {}
 
     /**
      * Define los valores por defecto para los campos opcionales/booleanos
@@ -54,12 +58,12 @@ class EventoCreateDTO extends Data
     public static function rules(): array
     {
         return [
-            'id_tipoevento' => [
+            'codigo_tipoevento' => [
                 'required',
                 'integer',
                 'exists:detalle_parametro,codigo'
             ],
-            'id_categoriaevento' => [
+            'codigo_categoriaevento' => [
                 'required',
                 'integer',
                 'exists:detalle_parametro,codigo'
@@ -79,7 +83,7 @@ class EventoCreateDTO extends Data
             'descripcion' => [
                 'sometimes',
                 'string',
-                'max:100',
+                'max:120',
                 'nullable',
             ],
             'temario' => [
@@ -89,15 +93,18 @@ class EventoCreateDTO extends Data
             ],
             'fecha_inicio' => [
                 'required',
-                'string'
+                'string',
+                'max:10'
             ],
             'fecha_final' => [
                 'required',
-                'string'
+                'string',
+                'max:10'
             ],
             'duracion' => [
                 'required',
-                'string'
+                'string',
+                'max:20'
             ],
             'modalidad' => [
                 'required',
@@ -123,19 +130,40 @@ class EventoCreateDTO extends Data
                 'integer',
                 'nullable'
             ],
+            'fecha_crea' => [
+                'sometimes',
+                'string',
+                'max:10',
+                'nullable'
+            ],
+            'fecha_actualiza' => [
+                'sometimes',
+                'string',
+                'max:10',
+                'nullable'
+            ],
+            'fecha_elimina' => [
+                'sometimes',
+                'string',
+                'max:10',
+                'nullable'
+            ],
             'user_crea' => [
                 'sometimes',
                 'string',
+                'max:12',
                 'nullable'
             ],
             'user_actualiza' => [
                 'sometimes',
                 'string',
+                'max:12',
                 'nullable'
             ],
             'user_elimina' => [
                 'sometimes',
                 'string',
+                'max:12',
                 'nullable'
             ],
             'estado' => [

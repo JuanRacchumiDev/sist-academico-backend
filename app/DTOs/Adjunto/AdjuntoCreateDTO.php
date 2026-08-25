@@ -8,19 +8,25 @@ class AdjuntoCreateDTO extends Data
 {
     public function __construct(
         public string $titulo,
+        public bool $is_descargable = true,
+        public bool $is_visible = true,
+        public bool $estado = true,
+
+        public ?int $id_programa = null,
+        public ?int $id_modulo = null,
+        public ?int $id_sucursal = null,
         public ?string $titulo_url = null,
+        public ?string $descripcion = null,
         public ?string $filename = null,
         public ?string $originalname = null,
         public ?string $filepath = null,
         public ?string $mimetype = null,
         public ?int $size = null,
-        public bool $es_descargable = true,
-        public bool $es_visible = true,
-        public bool $estado = true,
-        public ?int $id_programa = null,
-        public ?int $id_modulo = null,
-        public ?int $id_institucion = null,
-        public ?string $descripcion = null,
+
+        public ?string $fecha_crea = null,
+        public ?string $fecha_actualiza = null,
+        public ?string $fecha_elimina = null,
+
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null,
@@ -29,8 +35,8 @@ class AdjuntoCreateDTO extends Data
     public static function withDefaults(): array
     {
         return [
-            'es_descargable' => true,
-            'es_visible' => true,
+            'is_descargable' => true,
+            'is_visible' => true,
             'estado' => true
         ];
     }
@@ -50,10 +56,10 @@ class AdjuntoCreateDTO extends Data
                 'exists:modulo,id',
                 'nullable'
             ],
-            'id_institucion' => [
+            'id_sucursal' => [
                 'sometimes',
                 'integer',
-                'exists:institucion,id',
+                'exists:detalle_parametro,codigo',
                 'nullable'
             ],
             'titulo' => [
@@ -107,14 +113,29 @@ class AdjuntoCreateDTO extends Data
                 'integer',
                 'nullable'
             ],
-            'es_descargable' => [
+            'is_descargable' => [
                 'sometimes',
                 'boolean',
                 'nullable'
             ],
-            'es_visible' => [
+            'is_visible' => [
                 'sometimes',
                 'boolean',
+                'nullable'
+            ],
+            'fecha_crea' => [
+                'sometimes',
+                'string',
+                'nullable'
+            ],
+            'fecha_actualiza' => [
+                'sometimes',
+                'string',
+                'nullable'
+            ],
+            'fecha_elimina' => [
+                'sometimes',
+                'string',
                 'nullable'
             ],
             'user_crea' => [
@@ -136,9 +157,8 @@ class AdjuntoCreateDTO extends Data
                 'nullable'
             ],
             'estado' => [
-                'sometimes',
-                'boolean',
-                'nullable'
+                'required',
+                'boolean'
             ]
         ];
     }

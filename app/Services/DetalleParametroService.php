@@ -9,8 +9,10 @@ use App\Repositories\Contracts\IDetalleParametroRepository;
 use App\Services\Contracts\IDetalleParametroService;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Override;
 
-class DetalleParametroService implements IDetalleParametroService {
+class DetalleParametroService implements IDetalleParametroService
+{
     protected IDetalleParametroRepository $repository;
 
     public function __construct(IDetalleParametroRepository $repository)
@@ -49,15 +51,30 @@ class DetalleParametroService implements IDetalleParametroService {
         return $this->repository->getAllFilteredPaginate($filters, $perPage);
     }
 
+    public function getUniqueByParams(array $filters): ?DetalleParametro
+    {
+        $parametroClase = isset($filters['parametro_clase']) ? $filters['parametro_clase'] : null;
+        $codigo = isset($filters['codigo']) ? $filters['codigo'] : null;
+        $nombreUrl = isset($filters['nombre_url']) ? $filters['nombre_url'] : null;
+
+        if ($codigo && !$nombreUrl) {
+            return $this->repository->findByCodigo($codigo);
+        } else if (!$codigo && $nombreUrl) {
+            return $this->repository->findByNombreUrl($parametroClase, $nombreUrl);
+        } else {
+            return null;
+        }
+    }
+
     /**
      * Obtiene un detalle por código
      * @param int $codigo
      * @return DetalleParametro|null
      */
-    public function getByCodigo(int $codigo): ?DetalleParametro
-    {
-        return $this->repository->findByCodigo($codigo);
-    }
+    // public function getByCodigo(int $codigo): ?DetalleParametro
+    // {
+    //     return $this->repository->findByCodigo($codigo);
+    // }
 
     /**
      * Obtiene un detalle por clase y código
@@ -65,10 +82,10 @@ class DetalleParametroService implements IDetalleParametroService {
      * @param int $codigo
      * @return DetalleParametro|null
      */
-    public function getByClaseAndCodigo(int $clase, int $codigo): ?DetalleParametro
-    {
-        return $this->repository->findByClaseAndCodigo($clase, $codigo);
-    }
+    // public function getByClaseAndCodigo(int $clase, int $codigo): ?DetalleParametro
+    // {
+    //     return $this->repository->findByClaseAndCodigo($clase, $codigo);
+    // }
 
     /**
      * Obtiene un detalle por clase y nombre_url
@@ -76,10 +93,10 @@ class DetalleParametroService implements IDetalleParametroService {
      * @param string $nombreUrl
      * @return DetalleParametro|null
      */
-    public function getByClaseAndNombreUrl(int $clase, string $nombreUrl): ?DetalleParametro
-    {
-        return $this->repository->findByClaseAndNombreUrl($clase, $nombreUrl);
-    }
+    // public function getByClaseAndNombreUrl(int $clase, string $nombreUrl): ?DetalleParametro
+    // {
+    //     return $this->repository->findByClaseAndNombreUrl($clase, $nombreUrl);
+    // }
 
     /**
      * Crea un detalle parámetro
@@ -102,7 +119,7 @@ class DetalleParametroService implements IDetalleParametroService {
     public function updateDetalle(int $id, DetalleParametroUpdateDTO $detalleParametroUpdateDTO): ?DetalleParametro
     {
         $data = array_filter($detalleParametroUpdateDTO->toArray(), fn($value) => !is_null($value));
-        
+
         return $this->repository->update($id, $data);
     }
 

@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Auth;
+use App\Helpers\FechaHelper;
 
 class PersonaController extends Controller
 {
@@ -30,7 +31,7 @@ class PersonaController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
-            $filters = $request->only(['search', 'id_tipodocumento', 'estado', 'grupo']);
+            $filters = $request->only(['search', 'codigo_tipodocumento', 'estado', 'grupo']);
             $perPage = (int)$request->input('per_page', 10);
 
             $personas = $this->personaService->getAllPersonasWithFilters($filters, $perPage);
@@ -84,7 +85,7 @@ class PersonaController extends Controller
     public function getFilteredPaginate(string $grupo, Request $request): JsonResponse
     {
         try {
-            $filters = $request->only(['search', 'id_tipodocumento', 'estado', 'numero_documento']);
+            $filters = $request->only(['search', 'codigo_tipodocumento', 'estado', 'numero_documento']);
             $filters['grupo'] = $grupo;
 
             $perPage = (int)$request->input('limit', 10);
@@ -121,7 +122,7 @@ class PersonaController extends Controller
             $data = $request->all();
 
             $filters = [
-                'id_tipodocumento' => $data['id_tipodocumento'],
+                'codigo_tipodocumento' => $data['codigo_tipodocumento'],
                 'numero_documento' => $data['numero_documento']
             ];
 
@@ -139,6 +140,7 @@ class PersonaController extends Controller
             $usuarioAutenticado = Auth::user();
             $username = $usuarioAutenticado ? ($usuarioAutenticado->name) : 'systemapi';
             $data['user_crea'] = $username;
+            $data['fecha_crea'] = FechaHelper::obtenerFechaActual();
 
             $personaCreateDTO = PersonaCreateDTO::from($data);
 
@@ -181,6 +183,7 @@ class PersonaController extends Controller
         $usuarioAutenticado = Auth::user();
         $username = $usuarioAutenticado ? ($usuarioAutenticado->name) : 'systemapi';
         $data['user_crea'] = $username;
+        $data['fecha_crea'] = FechaHelper::obtenerFechaActual();
 
         Log::info('Validando data desde API DNI', ['data' => $data]);
 
@@ -259,6 +262,7 @@ class PersonaController extends Controller
             $usuarioAutenticado = Auth::user();
             $username = $usuarioAutenticado ? ($usuarioAutenticado->name) : 'systemapi';
             $data['user_actualiza'] = $username;
+            $data['fecha_actualiza'] = FechaHelper::obtenerFechaActual();
 
             // Validando y transformado el DTO en un solo paso
             $personaUpdateDTO = PersonaUpdateDTO::from([

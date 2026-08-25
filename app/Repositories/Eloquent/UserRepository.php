@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Hash;
 
 class UserRepository implements IUserRepository
 {
-
     public function getAll(array $filters = []): Collection
     {
         $query = $this->applyFilters(User::query(), $filters);
@@ -49,7 +48,7 @@ class UserRepository implements IUserRepository
         $user = User::create([
             'name'      => $data['name'],
             'email'     => $data['email'],
-            'id_perfil' => $data['id_perfil'],
+            'codigo_perfil' => $data['codigo_perfil'],
             'password'  => Hash::make($data['password']),
             'id_persona' => $data['id_persona'] ?? null
         ]);
@@ -91,8 +90,8 @@ class UserRepository implements IUserRepository
             $query->where('id', $filters['id']);
         }
 
-        if (isset($filters['id_perfil'])) {
-            $query->where('id_perfil', $filters['id_perfil']);
+        if (isset($filters['codigo_perfil'])) {
+            $query->where('codigo_perfil', $filters['codigo_perfil']);
         }
 
         if (isset($filters['id_persona'])) {

@@ -11,9 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('persona', function(Blueprint $table) {
+        Schema::create('persona', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('id_tipodocumento');
+            $table->unsignedBigInteger('codigo_tipodocumento');
+
             $table->string('numero_documento', 13);
             $table->string('nombres', 30);
             $table->string('apellido_paterno', 30);
@@ -34,13 +35,19 @@ return new class extends Migration
             $table->string('foto', 100)->nullable();
             $table->enum('sexo', ['M', 'F'])->default('M');
             $table->enum('origen', ['API', 'WEB', 'APP'])->default('WEB');
+
+            $table->string('fecha_crea', 10)->nullable();
+            $table->string('fecha_actualiza', 10)->nullable();
+            $table->string('fecha_elimina', 10)->nullable();
+
             $table->string("user_crea", 12)->nullable();
             $table->string('user_actualiza', 12)->nullable();
             $table->string('user_elimina', 12)->nullable();
+
             $table->boolean('estado')->default(true);
             $table->timestamps();
 
-            $table->foreign('id_tipodocumento')
+            $table->foreign('codigo_tipodocumento')
                 ->references('codigo')
                 ->on('detalle_parametro');
         });
@@ -51,9 +58,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('persona', function(Blueprint $table) {
-            $table->dropForeign('id_tipodocumento');
-            $table->dropColumn('id_tipodocumento');
+        Schema::table('persona', function (Blueprint $table) {
+            $table->dropForeign('codigo_tipodocumento');
+            $table->dropColumn('codigo_tipodocumento');
         });
 
         Schema::dropIfExists('persona');

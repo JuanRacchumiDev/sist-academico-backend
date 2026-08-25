@@ -15,6 +15,7 @@ class EmpresaSeeder extends Seeder
     public function run(): void
     {
         $now = Carbon::now();
+        $fechaCrea = $now->format("Y-m-d");
 
         DB::table('empresa')->truncate();
 
@@ -28,6 +29,7 @@ class EmpresaSeeder extends Seeder
                 'origen' => 'WEB',
                 'telefonos' => '042-604894,922214846,957105145',
                 'horario_atencion' => 'LUNES A VIERNES: 08:00AM a 01:00PM; 02:00PM a 05:30 PM, SÁBADOS: 08:00AM a 01:00PM',
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ]

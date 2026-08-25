@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Institucion extends Model
 {
@@ -13,16 +14,23 @@ class Institucion extends Model
     protected $table = 'institucion';
 
     protected $fillable = [
+        'codigo_sede',
         'nombre',
         'sigla',
         'ruc',
-        'ubicacion',
+        'direccion',
         'telefono_contacto',
         'logo_path',
         'firma_digital',
         'color_primario',
-
-        'es_cliente',
+        'nombre_director',
+        'nombre_representante',
+        'firma_director_path',
+        'firma_representante_path',
+        'is_cliente',
+        'fecha_crea',
+        'fecha_actualiza',
+        'fecha_elimina',
         'user_crea',
         'user_actualiza',
         'user_elimina',
@@ -36,4 +44,13 @@ class Institucion extends Model
         'created_at',
         'updated_at'
     ];
+
+    protected $casts = [
+        'estado' => 'boolean'
+    ];
+
+    public function sede(): BelongsTo
+    {
+        return $this->belongsTo(DetalleParametro::class, 'codigo_sede', 'codigo');
+    }
 }

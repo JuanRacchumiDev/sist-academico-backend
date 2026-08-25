@@ -15,6 +15,7 @@ class ParametroSeeder extends Seeder
     public function run(): void
     {
         $now = Carbon::now();
+        $fechaCrea = $now->format('Y-m-d');
 
         DB::table('parametro')->truncate();
 
@@ -24,6 +25,7 @@ class ParametroSeeder extends Seeder
                 'nombre' => 'Tipo documento',
                 'nombre_url' => 'tipo-documento',
                 'descripcion' => 'Tipo de documentos para persona o empresa',
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
@@ -32,6 +34,7 @@ class ParametroSeeder extends Seeder
                 'nombre' => 'Perfil',
                 'nombre_url' => 'perfil',
                 'descripcion' => 'Perfil de usuario',
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
@@ -40,6 +43,7 @@ class ParametroSeeder extends Seeder
                 'nombre' => 'Tipo programa',
                 'nombre_url' => 'tipo-programa',
                 'descripcion' => 'Distintos tipos de programas',
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
@@ -48,14 +52,16 @@ class ParametroSeeder extends Seeder
                 'nombre' => 'Tipo certificado',
                 'nombre_url' => 'tipo-certificado',
                 'descripcion' => 'Tipo de certificado',
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
             [
                 'clase' => 1004,
-                'nombre' => 'Sede',
-                'nombre_url' => 'sede',
-                'descripcion' => 'Sede de instalaciones',
+                'nombre' => 'Sucursal',
+                'nombre_url' => 'sucursal',
+                'descripcion' => 'Sucursales institucionales',
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
@@ -64,6 +70,7 @@ class ParametroSeeder extends Seeder
                 'nombre' => 'Universidad',
                 'nombre_url' => 'universidad',
                 'descripcion' => 'Universidades públicas y privadas',
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
@@ -72,6 +79,7 @@ class ParametroSeeder extends Seeder
                 'nombre' => 'Segmento',
                 'nombre_url' => 'segmento',
                 'descripcion' => 'Segmentos aceptados',
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
@@ -80,6 +88,7 @@ class ParametroSeeder extends Seeder
                 'nombre' => 'Grupo',
                 'nombre_url' => 'grupo',
                 'descripcion' => 'Grupos aceptados',
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
@@ -88,6 +97,7 @@ class ParametroSeeder extends Seeder
                 'nombre' => 'Banco Cuenta',
                 'nombre_url' => 'banco-cuenta',
                 'descripcion' => 'Distintas cuentas de bancos',
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
@@ -96,6 +106,7 @@ class ParametroSeeder extends Seeder
                 'nombre' => 'Categoría programa',
                 'nombre_url' => 'categoria-programa',
                 'descripcion' => 'Distintas categorías de programa',
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
@@ -104,6 +115,7 @@ class ParametroSeeder extends Seeder
                 'nombre' => 'Estado matrícula',
                 'nombre_url' => 'estado-matricula',
                 'descripcion' => 'Distintos estados de matrícula',
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
@@ -112,6 +124,7 @@ class ParametroSeeder extends Seeder
                 'nombre' => 'Estado pago',
                 'nombre_url' => 'estado-pago',
                 'descripcion' => 'Distintos estados de pago',
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
@@ -120,6 +133,16 @@ class ParametroSeeder extends Seeder
                 'nombre' => 'Forma pago',
                 'nombre_url' => 'forma-pago',
                 'descripcion' => 'Distintas formas de pago',
+                'fecha_crea' => $fechaCrea,
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'clase' => 1013,
+                'nombre' => 'Sede',
+                'nombre_url' => 'sede',
+                'descripcion' => 'Distintos sedes',
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ]

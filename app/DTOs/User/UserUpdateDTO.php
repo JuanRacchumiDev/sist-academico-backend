@@ -13,7 +13,7 @@ class UserUpdateDTO extends Data
         public ?string $name = null,
         public ?string $email = null,
         public ?string $password = null,
-        public ?int $id_perfil = null,
+        public ?int $codigo_perfil = null,
         public ?int $id_persona = null,
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
@@ -46,7 +46,7 @@ class UserUpdateDTO extends Data
                 'string',
                 'nullable'
             ],
-            'id_perfil' => [
+            'codigo_perfil' => [
                 'sometimes',
                 'int',
                 'exists:detalle_parametro,codigo',

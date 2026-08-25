@@ -8,7 +8,7 @@ use Spatie\LaravelData\Data;
 class PersonaCreateDTO extends Data
 {
     public function __construct(
-        public int $id_tipodocumento,
+        public int $codigo_tipodocumento,
         public string $numero_documento,
         public string $nombres,
         public string $apellido_paterno,
@@ -31,6 +31,9 @@ class PersonaCreateDTO extends Data
         public ?string $fecha_nacimiento = null,
         public ?string $estado_civil = null,
         public ?string $foto = null,
+        public ?string $fecha_crea = null,
+        public ?string $fecha_actualiza = null,
+        public ?string $fecha_elimina = null,
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null
@@ -39,7 +42,7 @@ class PersonaCreateDTO extends Data
     public static function rules(): array
     {
         return [
-            'id_tipodocumento' => [
+            'codigo_tipodocumento' => [
                 'required',
                 'integer',
                 'exists:detalle_parametro,codigo'
@@ -163,6 +166,24 @@ class PersonaCreateDTO extends Data
             'nombre_grupo' => [
                 'required',
                 'string'
+            ],
+            'fecha_crea' => [
+                'sometimes',
+                'string',
+                'max:10',
+                'nullable'
+            ],
+            'fecha_actualiza' => [
+                'sometimes',
+                'string',
+                'max:10',
+                'nullable'
+            ],
+            'fecha_elimina' => [
+                'sometimes',
+                'string',
+                'max:10',
+                'nullable'
             ],
             'user_crea' => [
                 'sometimes',

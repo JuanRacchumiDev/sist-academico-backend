@@ -16,6 +16,9 @@ class Parametro extends Model
         "nombre",
         "nombre_url",
         "descripcion",
+        "fecha_crea",
+        "fecha_actualiza",
+        "fecha_elimina",
         "user_crea",
         "user_actualiza",
         "user_elimina",
@@ -26,7 +29,8 @@ class Parametro extends Model
      * Obtener el detalle de un parámetro
      * @return HasMany<DetalleParametro, $this>
      */
-    public function detalle(): HasMany {
+    public function detalle(): HasMany
+    {
         return $this->hasMany(DetalleParametro::class, 'parametro_clase', 'clase');
     }
 }

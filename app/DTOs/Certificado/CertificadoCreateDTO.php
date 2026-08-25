@@ -9,8 +9,8 @@ class CertificadoCreateDTO extends Data
 {
     public function __construct(
         public int $id_persona,
-        public int $id_tipocertificado,
-        public int $id_institucion,
+        public int $codigo_tipocertificado,
+        public int $id_sucursal,
         public bool $estado,
         public ?int $id_plantilla = null,
         public ?int $id_programa = null,
@@ -20,6 +20,9 @@ class CertificadoCreateDTO extends Data
         public ?string $filename = null,
         public ?string $nombre_impresion = null,
         public ?string $codigo_qr_path = null,
+        public ?string $fecha_crea = null,
+        public ?string $fecha_actualiza = null,
+        public ?string $fecha_elimina = null,
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null
@@ -43,15 +46,16 @@ class CertificadoCreateDTO extends Data
                 'integer',
                 'exists:persona,id'
             ],
-            'id_tipocertificado' => [
+            'codigo_tipocertificado' => [
                 'required',
                 'integer',
                 'exists:detalle_parametro,codigo'
             ],
-            'id_institucion' => [
-                'required',
+            'id_sucursal' => [
+                'sometimes',
                 'integer',
-                'exists:institucion.id'
+                'exists:detalle_parametro,codigo',
+                'nullable'
             ],
             'id_plantilla' => [
                 'sometimes',
@@ -101,6 +105,21 @@ class CertificadoCreateDTO extends Data
                 'sometimes',
                 'string',
                 'max:150',
+                'nullable'
+            ],
+            'fecha_crea' => [
+                'sometimes',
+                'string:10',
+                'nullable'
+            ],
+            'fecha_actualiza' => [
+                'sometimes',
+                'string:10',
+                'nullable'
+            ],
+            'fecha_elimina' => [
+                'sometimes',
+                'string:10',
                 'nullable'
             ],
             'user_crea' => [

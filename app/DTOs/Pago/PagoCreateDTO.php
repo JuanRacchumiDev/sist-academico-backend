@@ -8,14 +8,14 @@ class PagoCreateDTO extends Data
 {
     public function __construct(
         public int $id_matricula,
-        public int $id_formapago,
-        public int $id_institucion,
+        public int $codigo_formapago,
+        public int $id_sucursal,
 
         public string $concepto,
         public bool $estado,
 
         public ?int $id_modulo = null,
-        public ?int $id_estadopago = null,
+        public ?int $codigo_estadopago = null,
 
         public ?int $numero_modulo = null,
         public ?string $numero_operacion = null,
@@ -23,6 +23,10 @@ class PagoCreateDTO extends Data
         public ?string $fecha_vencimiento = null,
         public ?float $cantidad_efectivo = null,
         public ?float $cantidad_operacion = null,
+
+        public ?string $fecha_crea = null,
+        public ?string $fecha_actualiza = null,
+        public ?string $fecha_elimina = null,
 
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
@@ -37,15 +41,15 @@ class PagoCreateDTO extends Data
                 'integer',
                 'exists:matricula,id'
             ],
-            'id_formapago' => [
+            'codigo_formapago' => [
                 'required',
                 'integer',
                 'exists:detalle_parametro,codigo'
             ],
-            'id_institucion' => [
+            'id_sucursal' => [
                 'required',
                 'integer',
-                'exists:institucion,id'
+                'exists:detalle_parametro,codigo'
             ],
             'id_modulo' => [
                 'sometimes',
@@ -53,7 +57,7 @@ class PagoCreateDTO extends Data
                 'exists:modulo,id',
                 'nullable',
             ],
-            'id_estadopago' => [
+            'codigo_estadopago' => [
                 'sometimes',
                 'integer',
                 'exists:detalle_parametro,codigo',
@@ -94,6 +98,24 @@ class PagoCreateDTO extends Data
                 'sometimes',
                 'numeric',
                 'min:0',
+                'nullable'
+            ],
+            'fecha_crea' => [
+                'sometimes',
+                'string',
+                'max:10',
+                'nullable'
+            ],
+            'fecha_actualiza' => [
+                'sometimes',
+                'string',
+                'max:10',
+                'nullable'
+            ],
+            'fecha_elimina' => [
+                'sometimes',
+                'string',
+                'max:10',
                 'nullable'
             ],
             'user_crea' => [

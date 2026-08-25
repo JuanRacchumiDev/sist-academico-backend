@@ -21,7 +21,7 @@ interface IDetalleParametroRepository
      * @return Collection<int, DetalleParametro>
      */
     public function getAllFiltered(array $filters): Collection;
-    
+
     /**
      * Obtiene DetalleParametros aplicando filtros dinámicos
      * @param array<string, mixed> $filters
@@ -42,7 +42,7 @@ interface IDetalleParametroRepository
      * @param string $nombreUrl
      * @return DetalleParametro|null
      */
-    public function findByNombreUrl(string $nombreUrl): ?DetalleParametro;
+    public function findByNombreUrl(int $parametroClase, string $nombreUrl): ?DetalleParametro;
 
     /**
      * Obtener un detalle de parámetro por codigo y parametro_clase
@@ -50,15 +50,15 @@ interface IDetalleParametroRepository
      * @param int $codigo
      * @return DetalleParametro|null
      */
-    public function findByClaseAndCodigo(int $parametro_clase, int $codigo): ?DetalleParametro;
+    // public function findByClaseAndCodigo(int $parametro_clase, int $codigo): ?DetalleParametro;
 
     /**
-     * Obtener un detalle de parámetro por clase y nombre_url
+     * Obtener un detalle de parámetro por clase y nombreUrl
      * @param int $parametro_clase
-     * @param string $nombre_url
+     * @param string $nombreUrl
      * @return DetalleParametro|null
      */
-    public function findByClaseAndNombreUrl(int $parametro_clase, string $nombreUrl): ?DetalleParametro;
+    // public function findByClaseAndNombreUrl(int $parametro_clase, string $nombreUrl): ?DetalleParametro;
 
     /**
      * Crea un detalle parámetro

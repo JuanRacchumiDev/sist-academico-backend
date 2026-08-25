@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('programa', function (Blueprint $table) {
             $table->id();
 
-            $table->unsignedBigInteger('id_segmento')->nullable();
-            $table->unsignedBigInteger('id_tipoprograma')->nullable();
-            $table->unsignedBigInteger('id_categoriaprograma')->nullable();
-            $table->unsignedBigInteger('id_institucion')->nullable();
+            $table->unsignedBigInteger('codigo_segmento')->nullable();
+            $table->unsignedBigInteger('codigo_tipoprograma')->nullable();
+            $table->unsignedBigInteger('codigo_categoriaprograma')->nullable();
+            $table->unsignedBigInteger('id_sucursal')->nullable();
 
             $table->string('codigo_old', 10)->nullable();
             $table->string('sigla', 10)->nullable();
@@ -38,27 +38,33 @@ return new class extends Migration
             $table->integer('cantidad_inscritos')->nullable();
             $table->decimal('precio_modulo', 10, 2)->nullable();
             $table->boolean('is_vigente')->default(true);
+
+            $table->string('fecha_crea', 10)->nullable();
+            $table->string('fecha_actualiza', 10)->nullable();
+            $table->string('fecha_elimina', 10)->nullable();
+
             $table->string('user_crea', 12)->nullable();
             $table->string('user_actualiza', 12)->nullable();
             $table->string('user_elimina', 12)->nullable();
+
             $table->boolean('estado')->default(true);
             $table->timestamps();
 
-            $table->foreign('id_segmento')
+            $table->foreign('codigo_segmento')
                 ->references('codigo')
                 ->on('detalle_parametro');
 
-            $table->foreign('id_tipoprograma')
+            $table->foreign('codigo_tipoprograma')
                 ->references('codigo')
                 ->on('detalle_parametro');
 
-            $table->foreign('id_categoriaprograma')
+            $table->foreign('codigo_categoriaprograma')
                 ->references('codigo')
                 ->on('detalle_parametro');
 
-            $table->foreign('id_institucion')
-                ->references('id')
-                ->on('institucion');
+            $table->foreign('id_sucursal')
+                ->references('codigo')
+                ->on('detalle_parametro');
         });
     }
 
@@ -68,17 +74,17 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('programa', function (Blueprint $table) {
-            $table->dropForeign('id_segmento');
-            $table->dropColumn('id_segmento');
+            $table->dropForeign('codigo_segmento');
+            $table->dropColumn('codigo_segmento');
 
-            $table->dropForeign('id_tipoprograma');
-            $table->dropColumn('id_tipoprograma');
+            $table->dropForeign('codigo_tipoprograma');
+            $table->dropColumn('codigo_tipoprograma');
 
-            $table->dropForeign('id_categoriaprograma');
-            $table->dropColumn('id_categoriaprograma');
+            $table->dropForeign('codigo_categoriaprograma');
+            $table->dropColumn('codigo_categoriaprograma');
 
-            $table->dropForeign('id_institucion');
-            $table->dropColumn('id_institucion');
+            $table->dropForeign('id_sucursal');
+            $table->dropColumn('id_sucursal');
         });
 
         Schema::dropIfExists('programa');

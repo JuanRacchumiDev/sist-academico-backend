@@ -1,4 +1,5 @@
 <?php
+
 namespace App\DTOs\Parametro;
 
 use Illuminate\Validation\Rule;
@@ -11,37 +12,55 @@ class ParametroUpdateDTO extends Data
     public function __construct(
         public ?string $nombre = null,
         public ?string $nombre_url = null,
+        public ?bool $estado = null,
         public ?string $descripcion = null,
+        public ?string $fecha_crea = null,
+        public ?string $fecha_actualiza = null,
+        public ?string $fecha_elimina = null,
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null,
-        public ?bool $estado = null
-    ){}
+    ) {}
 
     public static function rules(): array
     {
-        $data = app(self::class);
-        $clase = $data->clase ?? null;
-
         return [
             'nombre' => [
                 'sometimes',
                 'string',
                 'max:100',
-                Rule::unique('parametro', 'nombre')->ignore($clase, 'clase'),
+                Rule::unique('parametro', 'nombre'),
                 'nullable'
             ],
             'nombre_url' => [
                 'sometimes',
                 'string',
                 'max:120',
-                Rule::unique('parametro', 'nombre_url')->ignore($clase, 'clase'),
+                Rule::unique('parametro', 'nombre_url'),
                 'nullable'
             ],
             'descripcion' => [
                 'sometimes',
                 'string',
                 'max: 100',
+                'nullable'
+            ],
+            'fecha_crea' => [
+                'sometimes',
+                'string',
+                'max:10',
+                'nullable'
+            ],
+            'fecha_actualiza' => [
+                'sometimes',
+                'string',
+                'max:10',
+                'nullable'
+            ],
+            'fecha_elimina' => [
+                'sometimes',
+                'string',
+                'max:10',
                 'nullable'
             ],
             'user_crea' => [

@@ -23,6 +23,10 @@ return new class extends Migration
             $table->decimal('puntaje_total', 5, 2)->nullable();
             $table->enum('estado_intento', ['EN_PROCESO', 'FINALIZADO', 'CORREGIDO'])->default('EN_PROCESO');
 
+            $table->string('fecha_crea', 10)->nullable();
+            $table->string('fecha_actualiza', 10)->nullable();
+            $table->string('fecha_elimina', 10)->nullable();
+
             $table->string('user_crea', 12)->nullable();
             $table->string('user_actualiza', 12)->nullable();
             $table->string('user_elimina', 12)->nullable();

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('empresa', function(Blueprint $table) {
+        Schema::create('empresa', function (Blueprint $table) {
             $table->id();
 
             $table->string('numero_ruc', 15);
@@ -28,9 +28,15 @@ return new class extends Migration
             $table->enum('origen', ['API', 'WEB', 'APP'])->default('WEB');
             $table->string('telefonos', 50)->nullable();
             $table->string('horario_atencion', 100)->nullable();
+
+            $table->string('fecha_crea', 10)->nullable();
+            $table->string('fecha_actualiza', 10)->nullable();
+            $table->string('fecha_elimina', 10)->nullable();
+
             $table->string('user_crea', 12)->nullable();
             $table->string('user_actualiza', 12)->nullable();
             $table->string('user_elimina', 12)->nullable();
+
             $table->boolean('estado')->default(true);
             $table->timestamps();
         });

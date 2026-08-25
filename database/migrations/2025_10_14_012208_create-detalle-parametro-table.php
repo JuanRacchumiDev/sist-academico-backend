@@ -11,9 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('detalle_parametro', function(Blueprint $table) {
+        Schema::create('detalle_parametro', function (Blueprint $table) {
             $table->id('codigo');
-            $table->integer('parametro_clase');
+            $table->unsignedBigInteger('parametro_clase');
+
             $table->string('nombre', 100);
             $table->string('nombre_url', 120);
             $table->string('descripcion', 150)->nullable();
@@ -25,9 +26,15 @@ return new class extends Migration
             $table->boolean('compra')->default(false);
             $table->boolean('venta')->default(false);
             $table->boolean('visible')->default(false);
+
+            $table->string('fecha_crea', 10)->nullable();
+            $table->string('fecha_actualiza', 10)->nullable();
+            $table->string('fecha_elimina', 10)->nullable();
+
             $table->string('user_crea', 12)->nullable();
             $table->string('user_actualiza', 12)->nullable();
             $table->string('user_elimina', 12)->nullable();
+
             $table->boolean('estado')->default(true);
             $table->timestamps();
 

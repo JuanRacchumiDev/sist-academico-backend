@@ -12,7 +12,7 @@ class Adjunto extends Model
     protected $fillable = [
         'id_programa',
         'id_modulo',
-        'id_institucion',
+        'id_sucursal',
 
         'titulo',
         'titulo_url',
@@ -22,8 +22,11 @@ class Adjunto extends Model
         'filepath',
         'mimetype',
         'size',
-        'es_descargable',
-        'es_visible',
+        'is_descargable',
+        'is_visible',
+        'fecha_crea',
+        'fecha_actualiza',
+        'fecha_elimina',
         'user_crea',
         'user_actualiza',
         'user_elimina',
@@ -52,7 +55,7 @@ class Adjunto extends Model
 
     public function institucion(): BelongsTo
     {
-        return $this->belongsTo(Institucion::class, 'id_institucion', 'id');
+        return $this->belongsTo(Institucion::class, 'id_sucursal', 'id');
     }
 
     /**

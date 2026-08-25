@@ -108,20 +108,20 @@ class ProgramaRepository implements IProgramaRepository
 
     private function applyFilters(Builder $query, array $filters): Builder
     {
-        if (isset($filters['id_segmento'])) {
-            $query->where('id_segmento', $filters['id_segmento']);
+        if (isset($filters['codigo_segmento'])) {
+            $query->where('codigo_segmento', $filters['codigo_segmento']);
         }
 
-        if (isset($filters['id_tipoprograma'])) {
-            $query->where('id_tipoprograma', $filters['id_tipoprograma']);
+        if (isset($filters['codigo_tipoprograma'])) {
+            $query->where('codigo_tipoprograma', $filters['codigo_tipoprograma']);
         }
 
-        if (isset($filters['id_categoriaprograma'])) {
-            $query->where('id_categoriaprograma', $filters['id_categoriaprograma']);
+        if (isset($filters['codigo_categoriaprograma'])) {
+            $query->where('codigo_categoriaprograma', $filters['codigo_categoriaprograma']);
         }
 
-        if (isset($filters['id_institucion'])) {
-            $query->where('id_institucion', $filters['id_institucion']);
+        if (isset($filters['id_sucursal'])) {
+            $query->where('id_sucursal', $filters['id_sucursal']);
         }
 
         if (isset($filters['titulo'])) {

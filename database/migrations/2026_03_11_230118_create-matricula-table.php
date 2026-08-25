@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
 
             $table->unsignedBigInteger('id_persona');
-            $table->unsignedBigInteger('id_estadomatricula');
-            $table->unsignedBigInteger('id_institucion');
+            $table->unsignedBigInteger('codigo_estadomatricula');
+            $table->unsignedBigInteger('id_sucursal');
 
             $table->integer('numero_modulos');
 
@@ -36,13 +36,13 @@ return new class extends Migration
                 ->references('id')
                 ->on('persona');
 
-            $table->foreign('id_estadomatricula')
+            $table->foreign('codigo_estadomatricula')
                 ->references('codigo')
                 ->on('detalle_parametro');
 
-            $table->foreign('id_institucion')
-                ->references('id')
-                ->on('institucion');
+            $table->foreign('id_sucursal')
+                ->references('codigo')
+                ->on('detalle_parametro');
         });
     }
 
@@ -55,11 +55,11 @@ return new class extends Migration
             $table->dropForeign('id_persona');
             $table->dropColumn('id_persona');
 
-            $table->dropForeign('id_estadomatricula');
-            $table->dropColumn('id_estadomatricula');
+            $table->dropForeign('codigo_estadomatricula');
+            $table->dropColumn('codigo_estadomatricula');
 
-            $table->dropForeign('id_institucion');
-            $table->dropColumn('id_institucion');
+            $table->dropForeign('id_sucursal');
+            $table->dropColumn('id_sucursal');
         });
 
         Schema::dropIfExists('matricula');

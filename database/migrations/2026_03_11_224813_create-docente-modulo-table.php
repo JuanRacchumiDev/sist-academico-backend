@@ -11,14 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('docente_modulo', function(Blueprint $table) {
+        Schema::create('docente_modulo', function (Blueprint $table) {
             $table->unsignedBigInteger('id_persona');
             $table->unsignedBigInteger('id_modulo');
+
+            $table->string('fecha_crea', 10)->nullable();
+            $table->string('fecha_actualiza', 10)->nullable();
+            $table->string('fecha_elimina', 10)->nullable();
 
             $table->string('user_crea', 12)->nullable();
             $table->string('user_actualiza', 12)->nullable();
             $table->string('user_elimina', 12)->nullable();
-            
+
+            $table->boolean('estado')->default(true);
+
             $table->timestamps();
 
             $table->foreign('id_persona')
@@ -36,6 +42,14 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::table('docente_programa', function (Blueprint $table) {
+            $table->dropForeign('id_persona');
+            $table->dropColumn('id_persona');
+
+            $table->dropForeign('id_modulo');
+            $table->dropColumn('id_modulo');
+        });
+
         Schema::dropIfExists('docente_modulo');
     }
 };

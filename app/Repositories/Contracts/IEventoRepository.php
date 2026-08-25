@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Repositories\Contracts;
 
 use App\Models\Evento;
@@ -24,17 +25,17 @@ interface IEventoRepository
 
     /**
      * Obtener eventos por tipo de evento
-     * @param int $id_tipoevento
+     * @param int $codigo_tipoevento
      * @return Collection<int, Evento>
      */
-    public function getAllByTipoEvento(int $id_tipoevento): Collection;
+    public function getAllByTipoEvento(int $codigo_tipoevento): Collection;
 
     /**
      * Obtener eventos por categoría de evento
-     * @param int $id_categoriaevento
+     * @param int $codigo_categoriaevento
      * @return Collection<int, Evento>
      */
-    public function getAllByCategoriaEvento(int $id_categoriaevento): Collection;
+    public function getAllByCategoriaEvento(int $codigo_categoriaevento): Collection;
 
     /**
      * Obtener evento por id

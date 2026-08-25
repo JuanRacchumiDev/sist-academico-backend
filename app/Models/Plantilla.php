@@ -13,11 +13,16 @@ class Plantilla extends Model
 
     protected $fillable = [
         'id_institucion',
-
         'nombre',
         'descripcion',
-        'imagen',
-        'path',
+        'path_imagen_fondo',
+        'path_imagen_publica',
+        'path_pdf_fondo',
+        'tipo_disenio',
+        'disenio_default',
+        'fecha_crea',
+        'fecha_actualiza',
+        'fecha_elimina',
         'user_crea',
         'user_actualiza',
         'user_elimina',

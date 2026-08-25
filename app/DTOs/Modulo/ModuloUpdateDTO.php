@@ -8,16 +8,17 @@ use Spatie\LaravelData\Data;
 class ModuloUpdateDTO extends Data
 {
     public function __construct(
-        public ?int $id = null,
-        public ?int $id_programa = null,
-        public ?int $id_institucion = null,
         public ?string $titulo = null,
         public ?string $titulo_url = null,
         public ?int $orden = null,
-        public ?bool $estado = true,
+        public ?bool $estado = null,
+        public ?int $id_programa = null,
         public ?string $descripcion = null,
         public ?string $temario = null,
         public ?float $nota = null,
+        public ?string $fecha_crea = null,
+        public ?string $fecha_actualiza = null,
+        public ?string $fecha_elimina = null,
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null
@@ -26,36 +27,24 @@ class ModuloUpdateDTO extends Data
     public static function rules(): array
     {
         return [
-            'id' => [
-                'sometimes',
-                'integer',
-                'exists:modulo,id',
-                'nullable'
-            ],
             'id_programa' => [
                 'sometimes',
                 'integer',
                 'exists:programa,id',
                 'nullable'
             ],
-            'id_institucion' => [
-                'sometimes',
-                'integer',
-                'exists:institucion,id',
-                'nullable'
-            ],
             'titulo' => [
                 'sometimes',
                 'string',
                 'max:100',
-                // Rule::unique('modulo', 'titulo'),
+                Rule::unique('modulo', 'titulo'),
                 'nullable'
             ],
             'titulo_url' => [
                 'sometimes',
                 'string',
                 'max:120',
-                // Rule::unique('modulo', 'titulo_url'),
+                Rule::unique('modulo', 'titulo_url'),
                 'nullable'
             ],
             'descripcion' => [
@@ -80,22 +69,40 @@ class ModuloUpdateDTO extends Data
                 'integer',
                 'nullable'
             ],
+            'fecha_crea' => [
+                'sometimes',
+                'string',
+                'max:10',
+                'nullable'
+            ],
+            'fecha_actualiza' => [
+                'sometimes',
+                'string',
+                'max:10',
+                'nullable'
+            ],
+            'fecha_elimina' => [
+                'sometimes',
+                'string',
+                'max:10',
+                'nullable'
+            ],
             'user_crea' => [
                 'sometimes',
                 'string',
-                'max:12',
+                'max:10',
                 'nullable'
             ],
             'user_actualiza' => [
                 'sometimes',
                 'string',
-                'max:12',
+                'max:10',
                 'nullable'
             ],
             'user_elimina' => [
                 'sometimes',
                 'string',
-                'max:12',
+                'max:10',
                 'nullable'
             ],
             'estado' => [

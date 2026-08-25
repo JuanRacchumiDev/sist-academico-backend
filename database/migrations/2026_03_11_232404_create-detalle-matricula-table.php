@@ -20,6 +20,10 @@ return new class extends Migration
             $table->decimal('valor_matricula', 10, 2)->nullable();
             $table->decimal('valor_modulo', 10, 2)->nullable();
 
+            $table->string('fecha_crea', 10)->nullable();
+            $table->string('fecha_actualiza', 10)->nullable();
+            $table->string('fecha_elimina', 10)->nullable();
+
             $table->string('user_crea', 12)->nullable();
             $table->string('user_actualiza', 12)->nullable();
             $table->string('user_elimina', 12)->nullable();

@@ -45,9 +45,10 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('parametros', ParametroController::class);
 
         Route::prefix('catalogos')->group(function () {
-            Route::get('/', [DetalleParametroController::class, 'getFiltered'])->name('catalogos.all');
-            Route::get('/{clase}/{nParDetCodigo}', [DetalleParametroController::class, 'show'])->name('catalogos.show');
-            Route::get('/{clase}', [DetalleParametroController::class, 'getFilteredPaginate'])->name('catalogos.paginate');
+            Route::get('/clase/{clase}', [DetalleParametroController::class, 'index'])->name('catalogos.porclase');
+            Route::get('/', [DetalleParametroController::class, 'getFiltered'])->name('catalogos');
+            Route::get('/paginate', [DetalleParametroController::class, 'getFilteredPaginate'])->name('catalogos.paginate');
+            Route::get('/show', [DetalleParametroController::class, 'showByParams'])->name('catalogos.show');
             Route::post('/{clase}', [DetalleParametroController::class, 'store'])->name('catalogos.store');
             Route::patch('/{clase}/{nParDetCodigo}', [DetalleParametroController::class, 'update'])->name('catalogos.update');
         });
@@ -63,8 +64,12 @@ Route::prefix('v1')->group(function () {
             Route::delete('/{id}', [PersonaController::class, 'destroy'])->name('personas.destroy');
         });
 
-        Route::prefix('plantillas')->group(function () {
-            Route::post('/', [PlantillaController::class, 'store'])->name('plantillas.store');
+        Route::prefix('plantillas')->name('plantillas.')->group(function () {
+            Route::get('/', [PlantillaController::class, 'index'])->name('index');
+            Route::post('/', [PlantillaController::class, 'store'])->name('store');
+            Route::get('/{id}', [PlantillaController::class, 'show'])->name('show');
+            Route::put('/{id}', [PlantillaController::class, 'update'])->name('update');
+            Route::delete('/{id}', [PlantillaController::class, 'destroy'])->name('destroy');
         });
 
         Route::prefix('programas')->group(function () {
@@ -88,11 +93,9 @@ Route::prefix('v1')->group(function () {
         Route::prefix('matriculas')->group(function () {
             Route::get('{id}/modulos-por-pagar', [MatriculaController::class, 'getModulosPorPagar'])->name('matriculas.modulosporpagar');
             Route::get('{id}/modulos-pagados', [MatriculaController::class, 'getModulosPagados'])->name('matriculas.modulospagados');
-            // Route::get('/certificado', [MatriculaController::class, 'downloadCertificado'])->name('matriculas.certificado');
             Route::get('/cronograma-pagos', [MatriculaController::class, 'downloadCronograma'])->name('matriculas.cronogramapagos');
             Route::get('/paginate', [MatriculaController::class, 'getFilteredPaginate'])->name('matriculas.paginate');
             Route::get('/{id}', [MatriculaController::class, 'show'])->name('matriculas.show');
-            // Route::get('/{id}/pdf', [MatriculaController::class, 'downloadFicha'])->name('matriculas.pdf');
             Route::get('/', [MatriculaController::class, 'index'])->name('matriculas');
             Route::post('/', [MatriculaController::class, 'store'])->name('matriculas.store');
             Route::patch('/{id}', [MatriculaController::class, 'update'])->name('matriculas.update');
@@ -100,7 +103,11 @@ Route::prefix('v1')->group(function () {
         });
 
         Route::prefix('instituciones')->group(function () {
-            Route::get('/', [InstitucionController::class, 'index'])->name('instituciones');
+            Route::get('/paginate', [InstitucionController::class, 'getFilteredPaginate'])->name('instituciones.paginate');
+            Route::get('/{id}', [InstitucionController::class, 'show'])->name('instituciones.show');
+            Route::get('/', [InstitucionController::class, 'getFiltered'])->name('instituciones');
+            Route::post('/', [InstitucionController::class, 'store'])->name('instituciones.store');
+            Route::patch('/{id}', [InstitucionController::class, 'update'])->name('instituciones.update');
         });
 
         Route::prefix('pagos')->group(function () {
@@ -128,6 +135,7 @@ Route::prefix('v1')->group(function () {
             Route::get('/paginate', [AdjuntoController::class, 'getFilteredPaginate'])->name('adjuntos.paginate');
             Route::get('/', [AdjuntoController::class, 'index'])->name('adjuntos');
             Route::post('/verificar', [AdjuntoController::class, 'verificarExistencia'])->name('adjuntos.verificar');
+            Route::get('/{id}/download', [AdjuntoController::class, 'download'])->name('adjuntos.download');
             Route::get('/{id}', [AdjuntoController::class, 'show'])->name('adjuntos.show');
             Route::post('/', [AdjuntoController::class, 'store'])->name('adjuntos.store');
             Route::patch('/{id}', [AdjuntoController::class, 'update'])->name('adjuntos.update');

@@ -34,6 +34,8 @@ class PagoService implements IPagoService
 
     public function getAllPagosWithFilters(array $filters, int $perPage): LengthAwarePaginator
     {
+        Log::info('Obteniendo filtros para pago', ['filters' => $filters]);
+
         return $this->pagoRepository->getAllFiltered($filters, $perPage);
     }
 

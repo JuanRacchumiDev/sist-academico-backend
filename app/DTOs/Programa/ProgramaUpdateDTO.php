@@ -9,10 +9,10 @@ use Illuminate\Http\UploadedFile;
 class ProgramaUpdateDTO extends Data
 {
     public function __construct(
-        public ?int $id_segmento = null,
-        public ?int $id_tipoprograma = null,
-        public ?int $id_categoriaprograma = null,
-        public ?int $id_institucion = null,
+        public ?int $codigo_segmento = null,
+        public ?int $codigo_tipoprograma = null,
+        public ?int $codigo_categoriaprograma = null,
+        public ?int $id_sucursal = null,
         public ?string $codigo_old = null,
         public ?string $sigla = null,
         public ?string $titulo = null,
@@ -26,12 +26,15 @@ class ProgramaUpdateDTO extends Data
         public ?int $numero_modulos = null,
         public ?int $creditos = null,
         public ?string $plan = null,
-        public ?string $modalidad,
+        public ?string $modalidad = null,
         public ?int $capacidad_minima = null,
         public ?int $capacidad_maxima = null,
         public ?int $cantidad_inscritos = null,
         public ?int $precio_modulo = null,
-        public ?bool $is_vigente,
+        public ?bool $is_vigente = null,
+        public ?string $fecha_crea = null,
+        public ?string $fecha_actualiza = null,
+        public ?string $fecha_elimina = null,
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null,
@@ -41,25 +44,25 @@ class ProgramaUpdateDTO extends Data
     public static function rules(): array
     {
         return [
-            'id_segmento' => [
+            'codigo_segmento' => [
                 'sometimes',
                 'integer',
                 'exists:detalle_parametro,codigo',
                 'nullable'
             ],
-            'id_tipoprograma' => [
+            'codigo_tipoprograma' => [
                 'sometimes',
                 'integer',
                 'exists:detalle_parametro,codigo',
                 'nullable'
             ],
-            'id_categoriaprograma' => [
+            'codigo_categoriaprograma' => [
                 'sometimes',
                 'integer',
                 'exists:detalle_parametro,codigo',
                 'nullable'
             ],
-            'id_institucion' => [
+            'id_sucursal' => [
                 'sometimes',
                 'integer',
                 'exists:institucion,id',
@@ -169,6 +172,24 @@ class ProgramaUpdateDTO extends Data
             'is_vigente' => [
                 'sometimes',
                 'boolean',
+                'nullable'
+            ],
+            'fecha_crea' => [
+                'sometimes',
+                'string',
+                'max:10',
+                'nullable'
+            ],
+            'fecha_actualiza' => [
+                'sometimes',
+                'string',
+                'max:10',
+                'nullable'
+            ],
+            'fecha_elimina' => [
+                'sometimes',
+                'string',
+                'max:10',
                 'nullable'
             ],
             'user_crea' => [

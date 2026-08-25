@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
 
             $table->unsignedBigInteger('id_persona');
-            $table->unsignedBigInteger('id_tipocertificado');
-            $table->unsignedBigInteger('id_institucion');
+            $table->unsignedBigInteger('codigo_tipocertificado');
+            $table->unsignedBigInteger('id_sucursal')->nullable();
             $table->unsignedBigInteger('id_plantilla')->nullable();
             $table->unsignedBigInteger('id_programa')->nullable();
             $table->unsignedBigInteger('id_modulo')->nullable();
@@ -26,6 +26,10 @@ return new class extends Migration
             $table->string('path_file', 350)->nullable();
             $table->string('filename', 150)->nullable();
             $table->string('nombre_impresion', 150)->nullable();
+
+            $table->string('fecha_crea', 10)->nullable();
+            $table->string('fecha_actualiza', 10)->nullable();
+            $table->string('fecha_elimina', 10)->nullable();
 
             $table->string('user_crea', 12)->nullable();
             $table->string('user_actualiza', 12)->nullable();
@@ -38,13 +42,13 @@ return new class extends Migration
                 ->references('id')
                 ->on('persona');
 
-            $table->foreign('id_tipocertificado')
+            $table->foreign('codigo_tipocertificado')
                 ->references('codigo')
                 ->on('detalle_parametro');
 
-            $table->foreign('id_institucion')
-                ->references('id')
-                ->on('institucion');
+            $table->foreign('id_sucursal')
+                ->references('codigo')
+                ->on('detalle_parametro');
 
             $table->foreign('id_plantilla')
                 ->references('id')
@@ -69,11 +73,11 @@ return new class extends Migration
             $table->dropForeign('id_persona');
             $table->dropColumn('id_persona');
 
-            $table->dropForeign('id_tipocertificado');
-            $table->dropColumn('id_tipocertificado');
+            $table->dropForeign('codigo_tipocertificado');
+            $table->dropColumn('codigo_tipocertificado');
 
-            $table->dropForeign('id_institucion');
-            $table->dropColumn('id_institucion');
+            $table->dropForeign('id_sucursal');
+            $table->dropColumn('id_sucursal');
 
             $table->dropForeign('id_plantilla');
             $table->dropColumn('id_plantilla');

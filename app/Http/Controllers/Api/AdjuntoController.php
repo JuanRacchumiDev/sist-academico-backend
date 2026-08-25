@@ -11,6 +11,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Exception;
 
 class AdjuntoController extends Controller
 {
@@ -55,7 +57,8 @@ class AdjuntoController extends Controller
     public function getFilteredPaginate(Request $request): JsonResponse
     {
         try {
-            $filters = $request->only(['search', 'id_programa', 'id_modulo', 'id_institucion']);
+            $filters = $request->only(['codigo_tipoprograma', 'search', 'fecha_inicio', 'fecha_final']);
+
             $perPage = (int)$request->input('per_page', 10);
 
             $adjuntos = $this->adjuntoService->getAllAdjuntosWithFilters($filters, $perPage);
@@ -90,6 +93,27 @@ class AdjuntoController extends Controller
         }
     }
 
+    public function download(string $id): BinaryFileResponse | JsonResponse
+    {
+        try {
+            $downloadData = $this->adjuntoService->getDownloadData((int)$id);
+
+            return response()->download(
+                $downloadData['fullpath'],
+                $downloadData['filename']
+            );
+        } catch (Exception $ex) {
+            Log::error("Error al descargar adjunto (id: {$id}): " . $ex->getMessage());
+
+            $statusCode = $ex->getCode() >= 400 && $ex->getCode() < 600 ? $ex->getCode() : 500;
+
+            return response()->json([
+                'result' => false,
+                'message' => $ex->getMessage() ?: 'Error al procesar la descarga'
+            ], $statusCode);
+        }
+    }
+
     public function verificarExistencia(Request $request): JsonResponse
     {
         try {
@@ -99,7 +123,7 @@ class AdjuntoController extends Controller
                 'titulo' => 'required|string|max:100'
             ]);
 
-            $adjuntoExistente = $this->adjuntoService->obtenerAdjunto(
+            $adjuntoExistente = $this->adjuntoService->obtenerAdjuntoByParams(
                 $filters['id_programa'],
                 $filters['id_modulo'] ?? null,
                 $filters['titulo']
@@ -142,7 +166,7 @@ class AdjuntoController extends Controller
             $titulo = $dto->titulo;
 
             // $adjuntoExistente = $this->adjuntoService->getAllAdjuntos($filters)->first();
-            $adjuntoExistente = $this->adjuntoService->obtenerAdjunto($idPrograma, $idModulo, $titulo);
+            $adjuntoExistente = $this->adjuntoService->obtenerAdjuntoByParams($idPrograma, $idModulo, $titulo);
 
             if ($adjuntoExistente) {
                 return response()->json([

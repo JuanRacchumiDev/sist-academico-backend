@@ -9,7 +9,7 @@ class PersonaUpdateNestedDTO extends Data
 {
     public function __construct(
         public int $id,
-        public ?int $id_tipodocumento = null,
+        public ?int $codigo_tipodocumento = null,
         public ?string $numero_documento = null,
         public ?string $nombres = null,
         public ?string $apellido_paterno = null,
@@ -30,6 +30,9 @@ class PersonaUpdateNestedDTO extends Data
         public ?string $foto = null,
         public ?string $sexo = null,
         public ?string $origen = "WEB",
+        public ?string $fecha_crea = null,
+        public ?string $fecha_actualiza = null,
+        public ?string $fecha_elimina = null,
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null,
@@ -41,7 +44,7 @@ class PersonaUpdateNestedDTO extends Data
         $personaId = request()->route('persona');
 
         return [
-            'id_tipodocumento' => [
+            'codigo_tipodocumento' => [
                 'sometimes',
                 'integer',
                 'exists:detalle_parametro,codigo',
@@ -156,6 +159,24 @@ class PersonaUpdateNestedDTO extends Data
                 'sometimes',
                 'string',
                 'exists:detalle_parametro,codigo',
+                'nullable'
+            ],
+            'fecha_crea' => [
+                'sometimes',
+                'string',
+                'max:10',
+                'nullable'
+            ],
+            'fecha_actualiza' => [
+                'sometimes',
+                'string',
+                'max:10',
+                'nullable'
+            ],
+            'fecha_elimina' => [
+                'sometimes',
+                'string',
+                'max:10',
                 'nullable'
             ],
             'user_crea' => [

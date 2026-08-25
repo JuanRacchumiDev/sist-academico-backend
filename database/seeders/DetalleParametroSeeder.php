@@ -14,6 +14,7 @@ class DetalleParametroSeeder extends Seeder
     public function run(): void
     {
         $now = Carbon::now();
+        $fechaCrea = $now->format("Y-m-d");
 
         DB::table('detalle_parametro')->truncate();
 
@@ -29,6 +30,7 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
@@ -43,6 +45,22 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'parametro_clase' => 1000,
+                'nombre' => 'RUC',
+                'nombre_url' => 'ruc',
+                'descripcion' => 'REGISTRO ÚNICO DE CONTRIBUYENTE',
+                'abreviatura' => 'RUC',
+                'longitud' => 13,
+                'en_persona' => false,
+                'en_empresa' => true,
+                'compra' => false,
+                'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ]
@@ -59,6 +77,7 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
@@ -72,6 +91,7 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
@@ -85,6 +105,7 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
@@ -98,6 +119,7 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
@@ -111,6 +133,7 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
@@ -124,6 +147,7 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ]
@@ -141,6 +165,7 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
@@ -155,6 +180,7 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
@@ -169,6 +195,7 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
@@ -183,6 +210,7 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
@@ -197,6 +225,22 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'parametro_clase' => 1002,
+                'nombre' => 'CONGRESO',
+                'nombre_url' => 'congreso',
+                'descripcion' => 'CONGRESO',
+                'abreviatura' => 'CO',
+                'longitud' => null,
+                'en_persona' => false,
+                'en_empresa' => false,
+                'compra' => false,
+                'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ]
@@ -212,6 +256,7 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
@@ -224,6 +269,7 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
@@ -236,6 +282,7 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
@@ -248,6 +295,7 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
@@ -260,6 +308,7 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ]
@@ -275,6 +324,7 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ]
@@ -290,6 +340,7 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ]
@@ -305,6 +356,7 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ]
@@ -321,6 +373,7 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ]
@@ -337,6 +390,7 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
@@ -350,6 +404,7 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
@@ -363,6 +418,7 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
@@ -376,6 +432,7 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
@@ -389,6 +446,7 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
@@ -402,6 +460,7 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
@@ -415,6 +474,7 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
@@ -428,6 +488,7 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ]
@@ -445,6 +506,7 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
@@ -459,6 +521,7 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
@@ -473,6 +536,7 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
@@ -487,6 +551,7 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ]
@@ -504,6 +569,7 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
@@ -518,6 +584,7 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ]
@@ -534,6 +601,7 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
@@ -547,6 +615,7 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
@@ -560,6 +629,7 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ]
@@ -576,6 +646,7 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
@@ -589,6 +660,7 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
@@ -602,6 +674,7 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
@@ -615,6 +688,7 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
@@ -628,6 +702,7 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
@@ -641,6 +716,7 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
@@ -654,6 +730,7 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
@@ -667,6 +744,38 @@ class DetalleParametroSeeder extends Seeder
                 'en_empresa' => false,
                 'compra' => false,
                 'venta' => false,
+                'fecha_crea' => $fechaCrea,
+                'created_at' => $now,
+                'updated_at' => $now
+            ]
+        ]);
+
+        DB::table('detalle_parametro')->insert([
+            [
+                'parametro_clase' => 1013,
+                'nombre' => 'San Martín',
+                'nombre_url' => 'san-martin',
+                'abreviatura' => null,
+                'longitud' => null,
+                'en_persona' => false,
+                'en_empresa' => false,
+                'compra' => false,
+                'venta' => false,
+                'fecha_crea' => $fechaCrea,
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'parametro_clase' => 1013,
+                'nombre' => 'Moyobamba',
+                'nombre_url' => 'moyobamba',
+                'abreviatura' => null,
+                'longitud' => null,
+                'en_persona' => false,
+                'en_empresa' => false,
+                'compra' => false,
+                'venta' => false,
+                'fecha_crea' => $fechaCrea,
                 'created_at' => $now,
                 'updated_at' => $now
             ]

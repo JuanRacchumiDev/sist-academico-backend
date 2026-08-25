@@ -78,6 +78,8 @@ class PersonaService implements IPersonaService
     public function createPersona(PersonaCreateDTO $personaCreateDTO): Persona
     {
         return DB::transaction(function () use ($personaCreateDTO) {
+            $clase = 'grupo';
+
             Log::info('Evaluando variable $personaCreateDTO', ['personaCreateDTO' => $personaCreateDTO]);
 
             $dataToCreate = $personaCreateDTO->toArray();
@@ -97,8 +99,10 @@ class PersonaService implements IPersonaService
             /** @var Persona $persona */
             $persona = $this->personaRepository->create($data);
 
+            $parametroClase = config('params.clases.' . $clase);
+
             // Obteniendo grupo
-            $grupo = $this->detalleRepository->findByNombreUrl($nombreGrupo);
+            $grupo = $this->detalleRepository->findByNombreUrl($parametroClase, $nombreGrupo);
 
             // Adjuntar el grupo (si existe el código)
             if ($grupo) {

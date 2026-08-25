@@ -2,32 +2,45 @@
 
 namespace App\DTOs\Evento;
 
+use Illuminate\Validation\Rule;
 use Spatie\LaravelData\Data;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rule;
 
 class EventoUpdateDTO extends Data
 {
     public function __construct(
-        public ?int $id_tipoevento = null,
-        public ?int $id_categoriaevento = null,
+        public ?int $codigo_tipoevento = null,
+        public ?int $codigo_categoriaevento = null,
         public ?string $titulo = null,
         public ?string $titulo_url = null,
-        public ?string $descripcion = null,
-        public ?string $temario = null,
         public ?string $fecha_inicio = null,
         public ?string $fecha_final = null,
         public ?string $duracion = null,
         public ?string $modalidad = null,
+        public ?bool $estado = null,
+        public ?string $descripcion = null,
+        public ?string $temario = null,
         public ?float $precio = null,
         public ?int $capacidad_minima = null,
         public ?int $capacidad_maxima = null,
         public ?int $cantidad_inscritos = null,
+        public ?string $fecha_crea = null,
+        public ?string $fecha_actualiza = null,
+        public ?string $fecha_elimina = null,
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null,
-        public ?bool $estado = null
     ) {}
+
+    /**
+     * Define los valores por defecto para los campos opcionales/booleanos
+     */
+    public static function withDefaults(): array
+    {
+        return [
+            'estado' => true
+        ];
+    }
 
     /**
      * Manipula los datos de la validación
@@ -35,8 +48,8 @@ class EventoUpdateDTO extends Data
     public static function prepareForValidation(array $payload): array
     {
         // Verificamos si el campo nombre está en la petición
-        if (isset($payload['titulo'])) {
-            $payload['titulo_url'] = Str::slug($payload['titulo']);
+        if (isset($payload['nombre'])) {
+            $payload['nombre_url'] = Str::slug($payload['nombre']);
         }
 
         return $payload;
@@ -44,16 +57,14 @@ class EventoUpdateDTO extends Data
 
     public static function rules(): array
     {
-        $eventoId = request()->route('evento');
-
         return [
-            'id_tipoevento' => [
+            'codigo_tipoevento' => [
                 'sometimes',
                 'integer',
                 'exists:detalle_parametro,codigo',
                 'nullable'
             ],
-            'id_categoriaevento' => [
+            'codigo_categoriaevento' => [
                 'sometimes',
                 'integer',
                 'exists:detalle_parametro,codigo',
@@ -63,21 +74,21 @@ class EventoUpdateDTO extends Data
                 'sometimes',
                 'string',
                 'max:100',
-                Rule::unique('evento', 'titulo')->ignore($eventoId),
+                Rule::unique('evento', 'titulo'),
                 'nullable'
             ],
             'titulo_url' => [
                 'sometimes',
                 'string',
                 'max:120',
-                Rule::unique('evento', 'titulo_url')->ignore($eventoId),
+                Rule::unique('evento', 'titulo_url'),
                 'nullable'
             ],
             'descripcion' => [
                 'sometimes',
                 'string',
-                'max:100',
-                'nullable'
+                'max:120',
+                'nullable',
             ],
             'temario' => [
                 'sometimes',
@@ -87,16 +98,19 @@ class EventoUpdateDTO extends Data
             'fecha_inicio' => [
                 'sometimes',
                 'string',
+                'max:10',
                 'nullable'
             ],
             'fecha_final' => [
                 'sometimes',
                 'string',
+                'max:10',
                 'nullable'
             ],
             'duracion' => [
                 'sometimes',
                 'string',
+                'max:20',
                 'nullable'
             ],
             'modalidad' => [
@@ -124,19 +138,40 @@ class EventoUpdateDTO extends Data
                 'integer',
                 'nullable'
             ],
+            'fecha_crea' => [
+                'sometimes',
+                'string',
+                'max:10',
+                'nullable'
+            ],
+            'fecha_actualiza' => [
+                'sometimes',
+                'string',
+                'max:10',
+                'nullable'
+            ],
+            'fecha_elimina' => [
+                'sometimes',
+                'string',
+                'max:10',
+                'nullable'
+            ],
             'user_crea' => [
                 'sometimes',
                 'string',
+                'max:12',
                 'nullable'
             ],
             'user_actualiza' => [
                 'sometimes',
                 'string',
+                'max:12',
                 'nullable'
             ],
             'user_elimina' => [
                 'sometimes',
                 'string',
+                'max:12',
                 'nullable'
             ],
             'estado' => [

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\DTOs\Persona;
 
 use Illuminate\Validation\Rule;
@@ -7,7 +8,7 @@ use Spatie\LaravelData\Data;
 class PersonaUpdateDTO extends Data
 {
     public function __construct(
-        public ?int $id_tipodocumento = null,
+        public ?int $codigo_tipodocumento = null,
         public ?string $numero_documento = null,
         public ?string $nombres = null,
         public ?string $apellido_paterno = null,
@@ -28,11 +29,14 @@ class PersonaUpdateDTO extends Data
         public ?string $foto = null,
         public ?string $sexo = null,
         public ?string $origen = null,
+        public ?string $fecha_crea = null,
+        public ?string $fecha_actualiza = null,
+        public ?string $fecha_elimina = null,
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null,
         public ?bool $estado = null
-    ){}
+    ) {}
 
     public static function rules(): array
     {
@@ -40,7 +44,7 @@ class PersonaUpdateDTO extends Data
         $id = request()->route('id') ?? request()->id;
 
         return [
-            'id_tipodocumento' => [
+            'codigo_tipodocumento' => [
                 'sometimes',
                 'integer',
                 'exists:detalle_parametro,codigo',
@@ -98,7 +102,7 @@ class PersonaUpdateDTO extends Data
             'direccion' => [
                 'sometimes',
                 'string',
-                'max:6',
+                'max:60',
                 'nullable'
             ],
             'direccion_completa' => [
@@ -167,6 +171,24 @@ class PersonaUpdateDTO extends Data
                 'sometimes',
                 'string',
                 Rule::in(['M', 'F']),
+                'nullable'
+            ],
+            'fecha_crea' => [
+                'sometimes',
+                'string',
+                'max:10',
+                'nullable'
+            ],
+            'fecha_actualiza' => [
+                'sometimes',
+                'string',
+                'max:10',
+                'nullable'
+            ],
+            'fecha_elimina' => [
+                'sometimes',
+                'string',
+                'max:10',
                 'nullable'
             ],
             'user_crea' => [

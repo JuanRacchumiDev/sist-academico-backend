@@ -14,10 +14,10 @@ class ProgramaCreateDTO extends Data
         public string $modalidad,
         public bool $is_vigente,
         public bool $estado,
-        public ?int $id_segmento = null,
-        public ?int $id_tipoprograma = null,
-        public ?int $id_categoriaprograma = null,
-        public ?int $id_institucion = null,
+        public ?int $codigo_segmento = null,
+        public ?int $codigo_tipoprograma = null,
+        public ?int $codigo_categoriaprograma = null,
+        public ?int $id_sucursal = null,
         public ?string $codigo_old = null,
         public ?string $sigla = null,
         public ?string $descripcion = null,
@@ -33,6 +33,9 @@ class ProgramaCreateDTO extends Data
         public ?int $capacidad_maxima = null,
         public ?int $cantidad_inscritos = null,
         public ?float $precio_modulo = null,
+        public ?string $fecha_crea = null,
+        public ?string $fecha_actualiza = null,
+        public ?string $fecha_elimina = null,
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null
@@ -41,28 +44,28 @@ class ProgramaCreateDTO extends Data
     public static function rules(): array
     {
         return [
-            'id_segmento' => [
+            'codigo_segmento' => [
                 'sometimes',
                 'integer',
                 'exists:detalle_parametro,codigo',
                 'nullable'
             ],
-            'id_tipoprograma' => [
+            'codigo_tipoprograma' => [
                 'sometimes',
                 'integer',
                 'exists:detalle_parametro,codigo',
                 'nullable'
             ],
-            'id_categoriaprograma' => [
+            'codigo_categoriaprograma' => [
                 'sometimes',
                 'integer',
                 'exists:detalle_parametro,codigo',
                 'nullable'
             ],
-            'id_institucion' => [
+            'id_sucursal' => [
                 'sometimes',
                 'integer',
-                'exists:institucion,id',
+                'exists:detalle_parametro,codigo',
                 'nullable'
             ],
             'codigo_old' => [
@@ -167,6 +170,24 @@ class ProgramaCreateDTO extends Data
                 'required',
                 'boolean'
             ],
+            'fecha_crea' => [
+                'sometimes',
+                'string',
+                'max:10',
+                'nullable'
+            ],
+            'fecha_actualiza' => [
+                'sometimes',
+                'string',
+                'max:10',
+                'nullable'
+            ],
+            'fecha_elimina' => [
+                'sometimes',
+                'string',
+                'max:10',
+                'nullable'
+            ],
             'user_crea' => [
                 'sometimes',
                 'string',
@@ -186,9 +207,8 @@ class ProgramaCreateDTO extends Data
                 'nullable'
             ],
             'estado' => [
-                'sometimes',
+                'required',
                 'boolean',
-                'nullable'
             ],
         ];
     }

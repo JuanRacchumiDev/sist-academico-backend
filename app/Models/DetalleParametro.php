@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class DetalleParametro extends Model
 {
@@ -25,6 +26,9 @@ class DetalleParametro extends Model
         'compra',
         'venta',
         'visible',
+        'fecha_crea',
+        'fecha_actualiza',
+        'fecha_elimina',
         'user_crea',
         'user_actualiza',
         'user_elimina',
@@ -51,15 +55,42 @@ class DetalleParametro extends Model
     /**
      * The roles that belong to the DetalleParametro
      *
-     * @return BelongsToMany<Persona, $this, Pivot>
+     * @return BelongsToMany<Persona, $this>
      */
     public function personas(): BelongsToMany
     {
         return $this->belongsToMany(
             Persona::class,
             'grupo_persona',
-            'codigo_detalle_parametro',
+            'codigo_grupo',
             'id_persona'
         )->withTimestamps();
+    }
+
+    /**
+     * Programas asociados por tipo de programa
+     * @return HasMany<Programa, $this>
+     */
+    public function programasPorTipo(): HasMany
+    {
+        return $this->hasMany(Programa::class, 'codigo_tipoprograma', 'codigo');
+    }
+
+    /**
+     * Programas asociados por categoría de programa
+     * @return HasMany<Programa, $this>
+     */
+    public function programasPorCategoria(): HasMany
+    {
+        return $this->hasMany(Programa::class, 'codigo_categoriaprograma', 'codigo');
+    }
+
+    /**
+     * Programas asociados por segmento
+     * @return HasMany<Programa, $this>
+     */
+    public function programasPorSegmento(): HasMany
+    {
+        return $this->hasMany(Programa::class, 'codigo_segmento', 'codigo');
     }
 }

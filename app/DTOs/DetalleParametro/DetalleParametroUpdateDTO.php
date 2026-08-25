@@ -11,6 +11,7 @@ class DetalleParametroUpdateDTO extends Data
         public ?int $parametro_clase = null,
         public ?string $nombre = null,
         public ?string $nombre_url = null,
+        public ?bool $estado = null,
         public ?string $descripcion = null,
         public ?string $valor = null,
         public ?string $abreviatura = null,
@@ -20,35 +21,52 @@ class DetalleParametroUpdateDTO extends Data
         public ?bool $compra = null,
         public ?bool $venta = null,
         public ?bool $visible = null,
+        public ?string $fecha_crea = null,
+        public ?string $fecha_actualiza = null,
+        public ?string $fecha_elimina = null,
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null,
-        public ?bool $estado = null
     ) {}
+
+    /**
+     * Define los valores por defecto que se aplicarían si el campo no está presente
+     * en el array de entrada
+     */
+    public static function withDefaults(): array
+    {
+        return [
+            'en_persona' => false,
+            'en_empresa' => false,
+            'compra' => false,
+            'venta' => false,
+            'estado' => true,
+            'visible' => true
+        ];
+    }
 
     public static function rules(): array
     {
-        $detalleParametroId = request()->route('detalleParametro');
-
         return [
             'parametro_clase' => [
-                'required',
+                'sometimes',
                 'integer',
-                'exists:parametro,clase'
+                'exists:parametro,clase',
+                'nullable'
             ],
             'nombre' => [
                 'sometimes',
                 'string',
                 'max:100',
-                Rule::unique('detalle_parametro', 'nombre')
-                    ->ignore($detalleParametroId)
+                Rule::unique('parametro', 'nombre'),
+                'nullable'
             ],
             'nombre_url' => [
                 'sometimes',
                 'string',
                 'max:120',
-                Rule::unique('detalle_parametro', 'nombre_url')
-                    ->ignore($detalleParametroId)
+                Rule::unique('detalle_parametro', 'nombre_url'),
+                'nullable'
             ],
             'descripcion' => [
                 'sometimes',
@@ -65,7 +83,7 @@ class DetalleParametroUpdateDTO extends Data
             'abreviatura' => [
                 'sometimes',
                 'string',
-                'max: 10',
+                'max:10',
                 'nullable'
             ],
             'longitud' => [
@@ -80,7 +98,8 @@ class DetalleParametroUpdateDTO extends Data
             ],
             'en_empresa' => [
                 'sometimes',
-                'boolean'
+                'boolean',
+                'nullable'
             ],
             'compra' => [
                 'sometimes',
@@ -97,19 +116,34 @@ class DetalleParametroUpdateDTO extends Data
                 'boolean',
                 'nullable'
             ],
+            'fecha_crea' => [
+                'sometimes',
+                'string:10',
+                'nullable'
+            ],
+            'fecha_actualiza' => [
+                'sometimes',
+                'string:10',
+                'nullable'
+            ],
+            'fecha_elimina' => [
+                'sometimes',
+                'string:10',
+                'nullable'
+            ],
             'user_crea' => [
                 'sometimes',
-                'string',
+                'string:12',
                 'nullable'
             ],
             'user_actualiza' => [
                 'sometimes',
-                'string',
+                'string:12',
                 'nullable'
             ],
             'user_elimina' => [
                 'sometimes',
-                'string',
+                'string:12',
                 'nullable'
             ],
             'estado' => [

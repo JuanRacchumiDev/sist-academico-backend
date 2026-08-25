@@ -8,7 +8,8 @@ use App\Models\DetalleParametro;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
-interface IDetalleParametroService {
+interface IDetalleParametroService
+{
 
     /**
      * Obtiene todos los registros relacionados a un parámetro por clase
@@ -33,25 +34,32 @@ interface IDetalleParametroService {
     public function getAllFilteredPaginate(array $filters, int $perPage): LengthAwarePaginator;
 
     /**
+     * Obtiene un DetalleParametro por filtros
+     * @param array<int, mixed> $filters
+     * @return DetalleParametro | null
+     */
+    public function getUniqueByParams(array $filters): ?DetalleParametro;
+
+    /**
      * Obtiene un detalle por ID
      * @param int $codigo
      * @return DetalleParametro|null
      */
-    public function getByCodigo(int $codigo): ?DetalleParametro;
+    // public function getByCodigo(int $codigo): ?DetalleParametro;
 
     /**
      * Obtiene un detalle por clase y código
      * @param int $clase
      * @param int $codigo
      */
-    public function getByClaseAndCodigo(int $clase, int $codigo): ?DetalleParametro;
+    // public function getByClaseAndCodigo(int $clase, int $codigo): ?DetalleParametro;
 
     /**
      * Obtiene un detalle por clase y nombre_url
      * @param int $clase
      * @param string $nombreUrl
      */
-    public function getByClaseAndNombreUrl(int $clase, string $nombreUrl): ?DetalleParametro;
+    // public function getByClaseAndNombreUrl(int $clase, string $nombreUrl): ?DetalleParametro;
 
     /**
      * Crea un nuevo detalle parámetro

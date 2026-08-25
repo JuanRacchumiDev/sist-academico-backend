@@ -12,8 +12,8 @@ class Evento extends Model
     protected $guarded = ['id'];
 
     protected $fillable = [
-        'id_tipoevento',
-        'id_categoriaevento',
+        'codigo_tipoevento',
+        'codigo_categoriaevento',
         'titulo',
         'titulo_url',
         'descripcion',
@@ -50,7 +50,7 @@ class Evento extends Model
      */
     public function tipoEvento(): BelongsTo
     {
-        return $this->belongsTo(DetalleParametro::class, 'id_tipoevento', 'codigo');
+        return $this->belongsTo(DetalleParametro::class, 'codigo_tipoevento', 'codigo');
     }
 
     /**
@@ -59,6 +59,6 @@ class Evento extends Model
      */
     public function categoriaEvento(): BelongsTo
     {
-        return $this->belongsTo(DetalleParametro::class, 'id_categoriaevento', 'codigo');
+        return $this->belongsTo(DetalleParametro::class, 'codigo_categoriaevento', 'codigo');
     }
 }

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\DTOs\Certificado\CertificadoCreateDTO;
 use App\DTOs\Certificado\CertificadoUpdateDTO;
+use App\Helpers\FechaHelper;
 use App\Services\Contracts\ICertificadoService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
@@ -67,35 +68,35 @@ class CertificadoController extends Controller
     {
         try {
             $filters = $request->only([
+                'codigo_tipocertificado',
+                'id_sucursal',
+                'id_programa',
+                'id_modulo',
                 'fecha_inicio',
                 'fecha_final',
+                'fechaInicio',
+                'fechaFinal',
                 'search'
             ]);
 
-            $perPage = $request->input('per_page', 10);
+            // Normalización de claves provenientes del frontend en camelCase
+            if (isset($filters['fechaInicio']) && empty($filters['fecha_inicio'])) {
+                $filters['fecha_inicio'] = $filters['fechaInicio'];
+            }
+            if (isset($filters['fechaFinal']) && empty($filters['fecha_final'])) {
+                $filters['fecha_final'] = $filters['fechaFinal'];
+            }
+
+            $perPage = (int) $request->input('per_page', $request->input('limit', 10));
 
             $certificados = $this->certificadoService->getAllCertificadosWithFilters($filters, $perPage);
-
-            if ($certificados->isEmpty()) {
-                return response()->json([
-                    'result' => false,
-                    'data' => [],
-                    'message' => 'No se encontraron certificados'
-                ], 200);
-            }
 
             return response()->json([
                 'result' => true,
                 'data' => $certificados,
-                'message' => 'Resultados encontrados correctamente',
-                'pagination' => [
-                    'total' => $certificados->total(),
-                    'per_page' => $certificados->perPage(),
-                    'current_page' => $certificados->currentPage(),
-                    'last_page' => $certificados->lastPage(),
-                    'from' => $certificados->firstItem(),
-                    'to' => $certificados->lastItem()
-                ]
+                'message' => $certificados->isEmpty()
+                    ? 'No se encontraron certificados'
+                    : 'Resultados encontrados correctamente'
             ], 200);
         } catch (\Exception $e) {
             Log::error("Error filtering certificados: " . $e->getMessage());
@@ -157,33 +158,62 @@ class CertificadoController extends Controller
             $usuarioAutenticado = Auth::user();
             $username = $usuarioAutenticado ? ($usuarioAutenticado->name) : 'systemapi';
             $data['user_crea'] = $username;
+            $data['fecha_crea'] = FechaHelper::obtenerFechaActual();
 
             $dto = CertificadoCreateDTO::from($data);
 
-            $certificado = $this->certificadoService->createCertificado($dto);
+            // Intentar registrar certificado
+            try {
+                $certificado = $this->certificadoService->createCertificado($dto);
+            } catch (Exception $e) {
+                Log::error("Error al registrar el certificado: " . $e->getMessage());
 
-            $this->certificadoService->generatePDF($certificado->id);
+                return response()->json([
+                    'result' => false,
+                    'message' => 'No se pudo crear el certificado: ' . $e->getMessage(),
+                    'code' => 'CERTIFICADO_CREATE_ERROR'
+                ]);
+            }
 
+            // Intentar generar el PDF y QR asociados al certificado guardado
+            try {
+                $this->certificadoService->generatePDF($certificado->id);
+            } catch (Exception $e) {
+                Log::error("Error al generar el PDF del certificado [ID: {$certificado->id}]: " . $e->getMessage(), [
+                    'file'  => $e->getFile(),
+                    'line'  => $e->getLine(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+
+                return response()->json([
+                    'result'  => false,
+                    'data'    => $certificado,
+                    'message' => 'El certificado fue registrado correctamente, pero ocurrió un error al generar el archivo PDF.',
+                    'code'    => 'PDF_GENERATION_ERROR'
+                ], 500);
+            }
+
+            // Respuesta en caso de éxito total
             return response()->json([
                 'result'  => true,
                 'data'    => $certificado,
-                'message' => 'Certificado y PDF generados exitosamente',
+                'message' => 'Certificado y archivo PDF generados exitosamente.',
                 'code'    => 'CORRECT_RECORDED'
             ], 201);
         } catch (ValidationException $e) {
             return response()->json([
                 'result'  => false,
-                'message' => 'Validation error',
+                'message' => 'Error de validación en los datos enviados.',
                 'errors'  => $e->errors(),
                 'code'    => 'INVALID_RECORD'
             ], 422);
         } catch (Exception $e) {
-            Log::error("Error al crear el certificado: " . $e->getMessage());
+            Log::error("Error inesperado en store Certificado: " . $e->getMessage());
 
             return response()->json([
                 'result'  => false,
-                'message' => 'Error al crear el certificado: ' . $e->getMessage(),
-                'code'    => 'INVALID_RECORD'
+                'message' => 'Ocurrió un error inesperado al procesar la solicitud.',
+                'code'    => 'SERVER_ERROR'
             ], 500);
         }
     }
@@ -194,8 +224,8 @@ class CertificadoController extends Controller
             'id_persona'         => 'required|integer|exists:persona,id',
             'id_modulo'          => 'required|integer|exists:modulo,id',
             'id_plantilla'       => 'required|integer|exists:plantilla,id',
-            'id_institucion'     => 'required|integer|exists:institucion,id',
-            'id_tipocertificado' => 'required|integer',
+            'id_sucursal'     => 'required|integer|exists:institucion,id',
+            'codigo_tipocertificado' => 'required|integer',
             'id_programa'        => 'required|integer|exists:programa,id',
         ]);
 
@@ -252,6 +282,8 @@ class CertificadoController extends Controller
     {
         try {
             $certificado = $this->certificadoService->getCertificadoById($id);
+
+            Log::info('Información de certificado obtenido', ['certificado' => $certificado]);
 
             if (!$certificado) {
                 return response()->json([

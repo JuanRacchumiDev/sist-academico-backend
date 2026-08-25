@@ -13,10 +13,10 @@ class Pago extends Model
 
     protected $fillable = [
         'id_matricula',
-        // 'id_modulo',
-        'id_estadopago',
-        'id_formapago',
-        'id_institucion',
+        'id_modulo',
+        'codigo_estadopago',
+        'codigo_formapago',
+        'id_sucursal',
         'concepto',
         'numero_modulo',
         'numero_operacion',
@@ -24,6 +24,9 @@ class Pago extends Model
         'fecha_vencimiento',
         'cantidad_efectivo',
         'cantidad_operacion',
+        'fecha_crea',
+        'fecha_actualiza',
+        'fecha_elimina',
         'user_crea',
         'user_actualiza',
         'user_elimina',
@@ -55,16 +58,16 @@ class Pago extends Model
 
     public function estadoPago(): BelongsTo
     {
-        return $this->belongsTo(DetalleParametro::class, 'id_estadopago', 'codigo');
+        return $this->belongsTo(DetalleParametro::class, 'codigo_estadopago', 'codigo');
     }
 
     public function formaPago(): BelongsTo
     {
-        return $this->belongsTo(DetalleParametro::class, 'id_formapago', 'codigo');
+        return $this->belongsTo(DetalleParametro::class, 'codigo_formapago', 'codigo');
     }
 
     public function institucion(): BelongsTo
     {
-        return $this->belongsTo(Institucion::class, 'id_institucion', 'id');
+        return $this->belongsTo(Institucion::class, 'id_sucursal', 'id');
     }
 }

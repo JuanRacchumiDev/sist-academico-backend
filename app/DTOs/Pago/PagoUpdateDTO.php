@@ -8,15 +8,26 @@ class PagoUpdateDTO extends Data
 {
     public function __construct(
         public ?int $id_matricula = null,
-        public ?int $id_modulo = null,
-        public ?int $id_estadopago = null,
-        public ?int $id_formapago = null,
+        public ?int $codigo_formapago = null,
+        public ?int $id_sucursal = null,
+
         public ?string $concepto = null,
-        public ?int $id_institucion,
-        public ?bool $estado = true,
+        public ?bool $estado = null,
+
+        public ?int $id_modulo = null,
+        public ?int $codigo_estadopago = null,
+
+        public ?int $numero_modulo = null,
+        public ?string $numero_operacion = null,
         public ?string $fecha_pago = null,
         public ?string $fecha_vencimiento = null,
-        public ?float $cantidad = null,
+        public ?float $cantidad_efectivo = null,
+        public ?float $cantidad_operacion = null,
+
+        public ?string $fecha_crea = null,
+        public ?string $fecha_actualiza = null,
+        public ?string $fecha_elimina = null,
+
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null
@@ -31,33 +42,44 @@ class PagoUpdateDTO extends Data
                 'exists:matricula,id',
                 'nullable'
             ],
+            'codigo_formapago' => [
+                'sometimes',
+                'integer',
+                'exists:detalle_parametro,codigo',
+                'nullable'
+            ],
+            'id_sucursal' => [
+                'sometimes',
+                'integer',
+                'exists:detalle_parametro,codigo',
+                'nullable'
+            ],
             'id_modulo' => [
                 'sometimes',
                 'integer',
                 'exists:modulo,id',
-                'nullable'
+                'nullable',
             ],
-            'id_estadopago' => [
+            'codigo_estadopago' => [
                 'sometimes',
                 'integer',
                 'exists:detalle_parametro,codigo',
-                'nullable'
-            ],
-            'id_formapago' => [
-                'sometimes',
-                'integer',
-                'exists:detalle_parametro,codigo',
-                'nullable'
+                'nullable',
             ],
             'concepto' => [
                 'sometimes',
                 'string',
+                'max:200',
                 'nullable'
             ],
-            'id_institucion' => [
+            'numero_modulo' => [
                 'sometimes',
                 'integer',
-                'exists:institucion,id',
+                'nullable'
+            ],
+            'numero_operacion' => [
+                'sometimes',
+                'string',
                 'nullable'
             ],
             'fecha_pago' => [
@@ -70,9 +92,34 @@ class PagoUpdateDTO extends Data
                 'string',
                 'nullable'
             ],
-            'cantidad' => [
+            'cantidad_efectivo' => [
                 'sometimes',
-                'float',
+                'numeric',
+                'min:0',
+                'nullable'
+            ],
+            'cantidad_operacion' => [
+                'sometimes',
+                'numeric',
+                'min:0',
+                'nullable'
+            ],
+            'fecha_crea' => [
+                'sometimes',
+                'string',
+                'max:10',
+                'nullable'
+            ],
+            'fecha_actualiza' => [
+                'sometimes',
+                'string',
+                'max:10',
+                'nullable'
+            ],
+            'fecha_elimina' => [
+                'sometimes',
+                'string',
+                'max:10',
                 'nullable'
             ],
             'user_crea' => [

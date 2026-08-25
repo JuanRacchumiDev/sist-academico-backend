@@ -352,12 +352,12 @@ class MatriculaService implements IMatriculaService
             $valorMatricula = $matriculaCreateDTO->monto_matricula;
             $valorModulo = $matriculaCreateDTO->monto_modulo;
             $fechaMatricula = $matriculaCreateDTO->fecha_matricula;
-            $idInstitucion = $matriculaCreateDTO->id_institucion;
+            $idInstitucion = $matriculaCreateDTO->id_sucursal;
 
             $dataCabecera = [
                 'id_persona' => $idPersona,
-                'id_estadomatricula' => $matriculaCreateDTO->id_estadomatricula,
-                'id_institucion' => $idInstitucion,
+                'codigo_estadomatricula' => $matriculaCreateDTO->codigo_estadomatricula,
+                'id_sucursal' => $idInstitucion,
                 'numero_modulos' => $matriculaCreateDTO->numero_modulos,
                 'fecha_matricula' => $fechaMatricula,
                 'estado' => $estado,
@@ -385,8 +385,8 @@ class MatriculaService implements IMatriculaService
 
             $pagoMatriculaDTO = PagoCreateDTO::from([
                 'id_matricula'      => $matricula->id,
-                'id_formapago'      => $matriculaCreateDTO->id_formapago_matricula,
-                'id_institucion'    => $idInstitucion,
+                'codigo_formapago'      => $matriculaCreateDTO->codigo_formapago_matricula,
+                'id_sucursal'    => $idInstitucion,
                 'concepto'          => $matriculaCreateDTO->concepto_matricula ?? 'PAGO DE MATRÍCULA',
                 'numero_operacion'  => $matriculaCreateDTO->numero_operacion_matricula,
                 'fecha_pago'        => $fechaMatricula,
@@ -404,8 +404,8 @@ class MatriculaService implements IMatriculaService
             if ($matriculaCreateDTO->pagarPrimerModulo) {
                 $pagoModuloDTO = PagoCreateDTO::from([
                     'id_matricula'       => $matricula->id,
-                    'id_formapago'       => $matriculaCreateDTO->id_formapago_modulo,
-                    'id_institucion'     => $idInstitucion,
+                    'codigo_formapago'       => $matriculaCreateDTO->codigo_formapago_modulo,
+                    'id_sucursal'     => $idInstitucion,
                     'concepto'           => $matriculaCreateDTO->concepto_modulo ?? 'PAGO DE MÓDULO #1',
                     'numero_modulo'      => 1,
                     'numero_operacion'   => $matriculaCreateDTO->numero_operacion_modulo,
@@ -420,32 +420,40 @@ class MatriculaService implements IMatriculaService
                 $this->pagoRepository->create($pagoModuloDTO->toArray());
             }
 
-            // Obteniendo la clase del grupo perfil
-            $clase = config('params.clases.perfil');
+            // Validando si existe usuario registrado para la persona
+            $filtersUsuario = ['id_persona' => $idPersona];
 
-            // Obteniendo perfil de la persona
-            $perfil = $this->detalleRepository->findByClaseAndNombreUrl($clase, 'alumno');
+            $usuarioExists = $this->userRepository->findOne($filtersUsuario);
 
-            $userCreateData = [
-                'name'          => substr($persona->nombre_completo, 0, 10),
-                'email'         => $persona->email,
-                'password'      => $persona->numero_documento,
-                'id_perfil'     => $perfil->codigo,
-                'id_persona'    => $persona->id,
-                'estado'        => true
-            ];
+            // Si no existe usuario para una persona, creamos un nuevo registro
+            if (!$usuarioExists) {
+                // Obteniendo la clase del grupo perfil
+                $clase = config('params.clases.perfil');
 
-            Log::info('Evaluando variable userCreateData', ['userCreateData' => $userCreateData]);
+                // Obteniendo perfil de la persona
+                $perfil = $this->detalleRepository->findByNombreUrl($clase, 'alumno');
 
-            // Creamos el usuario
-            $this->userRepository->create($userCreateData);
+                $userCreateData = [
+                    'name'          => substr($persona->nombre_completo, 0, 10),
+                    'email'         => $persona->email,
+                    'password'      => $persona->numero_documento,
+                    'codigo_perfil' => $perfil->codigo,
+                    'id_persona'    => $persona->id,
+                    'estado'        => true
+                ];
 
-            // Obtener la matrícula registrada
-            $dataMatricula = $this->matriculaRepository->findById($matricula->id);
+                Log::info('Evaluando variable userCreateData', ['userCreateData' => $userCreateData]);
 
-            Mail::to($persona->email)->send(
-                new MatriculaConfirmadaMail($dataMatricula, $persona->numero_documento)
-            );
+                // Creamos el usuario
+                $this->userRepository->create($userCreateData);
+
+                // Obtener la matrícula registrada
+                // $dataMatricula = $this->matriculaRepository->findById($matricula->id);
+
+                // Mail::to($persona->email)->send(
+                //     new MatriculaConfirmadaMail($dataMatricula, $persona->numero_documento)
+                // );
+            }
 
             return $matricula->load(['detalles.programa']);
         });

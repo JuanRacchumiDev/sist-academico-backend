@@ -16,17 +16,21 @@ return new class extends Migration
 
             $table->unsignedBigInteger('id_matricula');
             $table->unsignedBigInteger('id_modulo')->nullable();
-            $table->unsignedBigInteger('id_estadopago')->nullable();
-            $table->unsignedBigInteger('id_formapago');
-            $table->unsignedBigInteger('id_institucion');
+            $table->unsignedBigInteger('codigo_estadopago')->nullable();
+            $table->unsignedBigInteger('codigo_formapago');
+            $table->unsignedBigInteger('id_sucursal');
 
             $table->string('concepto', 200);
             $table->integer('numero_modulo')->nullable();
             $table->string('numero_operacion', 20)->nullable();
-            $table->string('fecha_pago')->nullable();
-            $table->string('fecha_vencimiento')->nullable();
+            $table->string('fecha_pago', 10)->nullable();
+            $table->string('fecha_vencimiento', 10)->nullable();
             $table->decimal('cantidad_efectivo', 10, 2)->nullable();
             $table->decimal('cantidad_operacion', 10, 2)->nullable();
+
+            $table->string('fecha_crea', 10)->nullable();
+            $table->string('fecha_actualiza', 10)->nullable();
+            $table->string('fecha_elimina', 10)->nullable();
 
             $table->string('user_crea', 12)->nullable();
             $table->string('user_actualiza', 12)->nullable();
@@ -43,17 +47,17 @@ return new class extends Migration
                 ->references('id')
                 ->on('modulo');
 
-            $table->foreign('id_estadopago')
+            $table->foreign('codigo_estadopago')
                 ->references('codigo')
                 ->on('detalle_parametro');
 
-            $table->foreign('id_formapago')
+            $table->foreign('codigo_formapago')
                 ->references('codigo')
                 ->on('detalle_parametro');
 
-            $table->foreign('id_institucion')
-                ->references('id')
-                ->on('institucion');
+            $table->foreign('id_sucursal')
+                ->references('codigo')
+                ->on('detalle_parametro');
         });
     }
 
@@ -69,14 +73,14 @@ return new class extends Migration
             $table->dropForeign('id_modulo');
             $table->dropColumn('id_modulo');
 
-            $table->dropForeign('id_estadopago');
-            $table->dropColumn('id_estadopago');
+            $table->dropForeign('codigo_estadopago');
+            $table->dropColumn('codigo_estadopago');
 
-            $table->dropForeign('id_formapago');
-            $table->dropColumn('id_formapago');
+            $table->dropForeign('codigo_formapago');
+            $table->dropColumn('codigo_formapago');
 
-            $table->dropForeign('id_institucion');
-            $table->dropColumn('id_institucion');
+            $table->dropForeign('id_sucursal');
+            $table->dropColumn('id_sucursal');
         });
 
         Schema::dropIfExists('pago');

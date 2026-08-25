@@ -61,6 +61,14 @@ class PagoController extends Controller
                 $filters['search'] = $request->input('search');
             }
 
+            if ($request->has('fechaInicio')) {
+                $filters['fecha_inicio'] = $request->input('fechaInicio');
+            }
+
+            if ($request->has('fechaFinal')) {
+                $filters['fecha_final'] = $request->input('fechaFinal');
+            }
+
             $perPage = $request->input('per_page', 10);
 
             $filters = array_map(function ($value) {
@@ -68,6 +76,8 @@ class PagoController extends Controller
                 if ($value === 'false') return false;
                 return $value;
             }, $filters);
+
+            Log::info('Definiendo filtros', ['filters' => $filters]);
 
             $pagos = $this->pagoService->getAllPagosWithFilters($filters, $perPage);
 

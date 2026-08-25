@@ -1,4 +1,5 @@
 <?php
+
 namespace App\DTOs\GrupoPersona;
 
 use Spatie\LaravelData\Data;
@@ -6,18 +7,29 @@ use Spatie\LaravelData\Data;
 class GrupoPersonaCreateDTO extends Data
 {
     public function __construct(
-        public string $codigo_detalle_parametro,
+        public string $codigo_grupo,
         public int $id_persona,
-        public ?int $id_institucion = null,
+        public bool $estado,
+        public ?int $id_sucursal = null,
+        public ?string $fecha_crea = null,
+        public ?string $fecha_actualiza = null,
+        public ?string $fecha_elimina = null,
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null,
-    ){}
+    ) {}
+
+    public static function withDefaults(): array
+    {
+        return [
+            'estado' => true
+        ];
+    }
 
     public static function rules(): array
     {
         return [
-            'codigo_detalle_parametro' => [
+            'codigo_grupo' => [
                 'required',
                 'string',
                 'exists:detalle_parametro,codigo'
@@ -27,10 +39,28 @@ class GrupoPersonaCreateDTO extends Data
                 'integer',
                 'exists:persona,id'
             ],
-            'id_institucion' => [
+            'id_sucursal' => [
                 'sometimes',
                 'integer',
-                'exists:institucion,id',
+                'exists:detalle_parametro,codigo',
+                'nullable'
+            ],
+            'fecha_crea' => [
+                'sometimes',
+                'string',
+                'max:10',
+                'nullable'
+            ],
+            'fecha_actualiza' => [
+                'sometimes',
+                'string',
+                'max:10',
+                'nullable'
+            ],
+            'fecha_elimina' => [
+                'sometimes',
+                'string',
+                'max:10',
                 'nullable'
             ],
             'user_crea' => [
@@ -51,6 +81,10 @@ class GrupoPersonaCreateDTO extends Data
                 'max:12',
                 'nullable'
             ],
+            'estado' => [
+                'required',
+                'boolean'
+            ]
         ];
-    } 
+    }
 }

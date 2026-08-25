@@ -16,7 +16,7 @@ return new class extends Migration
 
             $table->unsignedBigInteger('id_programa')->nullable();
             $table->unsignedBigInteger('id_modulo')->nullable();
-            $table->unsignedBigInteger('id_institucion')->nullable();
+            $table->unsignedBigInteger('id_sucursal')->nullable();
 
             $table->string('titulo', 100);
             $table->string('titulo_url', 120);
@@ -26,8 +26,12 @@ return new class extends Migration
             $table->string('filepath', 150);
             $table->string('mimetype', 200);
             $table->integer('size');
-            $table->boolean('es_descargable')->default(true);
-            $table->boolean('es_visible')->default(true);
+            $table->boolean('is_descargable')->default(true);
+            $table->boolean('is_visible')->default(true);
+
+            $table->string('fecha_crea', 10)->nullable();
+            $table->string('fecha_actualiza', 10)->nullable();
+            $table->string('fecha_elimina', 10)->nullable();
 
             $table->string('user_crea', 12)->nullable();
             $table->string('user_actualiza', 12)->nullable();
@@ -46,9 +50,9 @@ return new class extends Migration
                 ->references('id')
                 ->on('modulo');
 
-            $table->foreign('id_institucion')
-                ->references('id')
-                ->on('institucion');
+            $table->foreign('id_sucursal')
+                ->references('codigo')
+                ->on('detalle_parametro');
         });
     }
 
@@ -64,8 +68,8 @@ return new class extends Migration
             $table->dropForeign('id_modulo');
             $table->dropColumn('id_modulo');
 
-            $table->dropForeign('id_institucion');
-            $table->dropColumn('id_institucion');
+            $table->dropForeign('id_sucursal');
+            $table->dropColumn('id_sucursal');
         });
 
         Schema::dropIfExists('adjunto');

@@ -10,9 +10,12 @@ class GrupoPersona extends Model
     protected $table = "grupo_persona";
 
     protected $fillable = [
-        'codigo_detalle_parametro',
+        'codigo_grupo',
         'id_persona',
-        'id_institucion',
+        'id_sucursal',
+        'fecha_crea',
+        'fecha_actualiza',
+        'fecha_elimina',
         'user_crea',
         'user_actualiza',
         'user_elimina'
@@ -28,7 +31,7 @@ class GrupoPersona extends Model
 
     public function grupo(): BelongsTo
     {
-        return $this->belongsTo(DetalleParametro::class, 'codigo_detalle_parametro', 'codigo');
+        return $this->belongsTo(DetalleParametro::class, 'codigo_grupo', 'codigo');
     }
 
     public function persona(): BelongsTo
@@ -38,6 +41,6 @@ class GrupoPersona extends Model
 
     public function institucion(): BelongsTo
     {
-        return $this->belongsTo(Institucion::class, 'id_institucion', 'id');
+        return $this->belongsTo(Institucion::class, 'id_sucursal', 'id');
     }
 }

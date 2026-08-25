@@ -17,10 +17,15 @@ return new class extends Migration
             $table->unsignedBigInteger('id_cuestionario_persona');
             $table->unsignedBigInteger('id_pregunta');
             $table->unsignedBigInteger('id_pregunta_opcion')->nullable()->comment('Para tipo RADIO O CHECKBOX');
+
             $table->text('respuesta_texto')->nullable()->comment('Para respuestas en caja de texto');
 
             $table->decimal('puntaje_obtenido', 5, 2)->default('0.00');
             $table->boolean('es_correcta')->nullable()->comment('Null si requiere revisión manual');
+
+            $table->string('fecha_crea', 10)->nullable();
+            $table->string('fecha_actualiza', 10)->nullable();
+            $table->string('fecha_elimina', 10)->nullable();
 
             $table->string('user_crea', 12)->nullable();
             $table->string('user_actualiza', 12)->nullable();

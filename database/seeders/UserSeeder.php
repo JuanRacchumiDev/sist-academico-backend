@@ -28,17 +28,9 @@ class UserSeeder extends Seeder
             ->where('nombre_url', 'alumno')
             ->first();
 
-        $perfilDocente = DetalleParametro::where('parametro_clase', 1001)
-            ->where('nombre_url', 'docente')
-            ->first();
-
         $passwordAdminHashedPI = Hash::make('admin123');
 
-        $passwordAdminHashedIpede = Hash::make('ipede123');
-
         $passwordAlumnoHashedIpede = Hash::make("alumno123");
-
-        $passwordDocenteHashedIpede = Hash::make("docente123");
 
         DB::table('users')->truncate();
 
@@ -47,15 +39,7 @@ class UserSeeder extends Seeder
                 'name' => 'admin',
                 'email' => 'admin@innovaperu.com',
                 'password' => $passwordAdminHashedPI,
-                'id_perfil' => $perfilAdmnin->codigo,
-                'created_at' => $now,
-                'updated_at' => $now
-            ],
-            [
-                'name' => 'ipede',
-                'email' => 'admin@ipede.com',
-                'password' => $passwordAdminHashedIpede,
-                'id_perfil' => $perfilAdmnin->codigo,
+                'codigo_perfil' => $perfilAdmnin->codigo,
                 'created_at' => $now,
                 'updated_at' => $now
             ],
@@ -63,7 +47,7 @@ class UserSeeder extends Seeder
                 'name' => 'ualumno',
                 'email' => 'alumno.test@gmail.com',
                 'password' => $passwordAlumnoHashedIpede,
-                'id_perfil' => $perfilAlumno->codigo,
+                'codigo_perfil' => $perfilAlumno->codigo,
                 'created_at' => $now,
                 'updated_at' => $now
             ]

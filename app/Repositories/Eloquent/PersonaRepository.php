@@ -139,7 +139,7 @@ class PersonaRepository implements IPersonaRepository
     public function updateOrCreateFromAPI(PersonaAPIDTO $dto): Persona
     {
         $persona = Persona::firstOrNew([
-            'id_tipodocumento' => $dto->id_tipodocumento,
+            'codigo_tipodocumento' => $dto->codigo_tipodocumento,
             'numero_documento' => $dto->numero_documento
         ]);
 
@@ -173,8 +173,8 @@ class PersonaRepository implements IPersonaRepository
 
     private function applyFilters(Builder $query, array $filters): Builder
     {
-        if (isset($filters['id_tipodocumento'])) {
-            $query->where('id_tipodocumento', $filters['id_tipodocumento']);
+        if (isset($filters['codigo_tipodocumento'])) {
+            $query->where('codigo_tipodocumento', $filters['codigo_tipodocumento']);
         }
 
         if (isset($filters['numero_documento'])) {
@@ -212,7 +212,7 @@ class PersonaRepository implements IPersonaRepository
             'matriculas.institucion',
             'matriculas.detalles.programa' => function ($query) {
                 $query->with(['tipoPrograma', 'adjuntos' => function ($q) {
-                    $q->where('estado', true)->where('es_descargable', true);
+                    $q->where('estado', true)->where('is_descargable', true);
                 }]);
             },
             'certificados'

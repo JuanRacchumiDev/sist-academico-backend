@@ -18,7 +18,7 @@ class User extends Authenticatable implements JWTSubject
         'name',
         'email',
         'password',
-        'id_perfil',
+        'codigo_perfil',
         'id_persona',
         "user_crea",
         "user_actualiza",
@@ -84,7 +84,7 @@ class User extends Authenticatable implements JWTSubject
      */
     public function perfil(): BelongsTo
     {
-        return $this->belongsTo(DetalleParametro::class, 'id_perfil', 'codigo');
+        return $this->belongsTo(DetalleParametro::class, 'codigo_perfil', 'codigo');
     }
 
     /**

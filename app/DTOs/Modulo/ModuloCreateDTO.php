@@ -13,10 +13,12 @@ class ModuloCreateDTO extends Data
         public int $orden,
         public bool $estado = true,
         public ?int $id_programa = null,
-        public ?int $id_institucion = null,
         public ?string $descripcion = null,
         public ?string $temario = null,
         public ?float $nota = null,
+        public ?string $fecha_crea = null,
+        public ?string $fecha_actualiza = null,
+        public ?string $fecha_elimina = null,
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null
@@ -29,12 +31,6 @@ class ModuloCreateDTO extends Data
                 'required',
                 'integer',
                 'exists:programa,id'
-            ],
-            'id_institucion' => [
-                'sometimes',
-                'integer',
-                'exists:institucion,id',
-                'nullable'
             ],
             'titulo' => [
                 'required',
@@ -68,6 +64,24 @@ class ModuloCreateDTO extends Data
             'orden' => [
                 'required',
                 'integer',
+            ],
+            'fecha_crea' => [
+                'sometimes',
+                'string',
+                'max:10',
+                'nullable'
+            ],
+            'fecha_actualiza' => [
+                'sometimes',
+                'string',
+                'max:10',
+                'nullable'
+            ],
+            'fecha_elimina' => [
+                'sometimes',
+                'string',
+                'max:10',
+                'nullable'
             ],
             'user_crea' => [
                 'sometimes',

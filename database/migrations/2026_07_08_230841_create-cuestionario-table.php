@@ -23,6 +23,10 @@ return new class extends Migration
             $table->decimal('nota_minima_aprobatoria', 5, 2)->default(11.0);
             $table->integer('intentos_permitidos')->default(1);
 
+            $table->string('fecha_crea', 10)->nullable();
+            $table->string('fecha_actualiza', 10)->nullable();
+            $table->string('fecha_elimina', 10)->nullable();
+
             $table->string('user_crea', 12)->nullable();
             $table->string('user_actualiza', 12)->nullable();
             $table->string('user_elimina', 12)->nullable();

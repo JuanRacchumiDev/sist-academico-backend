@@ -9,7 +9,7 @@ class PersonaAPIDTO
     public readonly string $nombre_completo;
 
     public function __construct(
-        public readonly int $id_tipodocumento,
+        public readonly int $codigo_tipodocumento,
         public readonly string $numero_documento,
         public readonly string $nombres,
         public readonly string $apellido_paterno,
@@ -25,6 +25,9 @@ class PersonaAPIDTO
         public readonly ?string $ubigeo = null,
         public readonly ?string $fecha_nacimiento = null,
         public readonly ?string $estado_civil = null,
+        public readonly ?string $fecha_crea = null,
+        public readonly ?string $fecha_actualiza = null,
+        public readonly ?string $fecha_elimina = null,
         public readonly ?string $user_crea = null,
         public readonly ?string $user_actualiza = null,
         public readonly ?string $user_elimina = null,
@@ -58,7 +61,7 @@ class PersonaAPIDTO
         $ubigeoString = is_array($response['ubigeo']) ? end($response['ubigeo']) : null;
 
         return new self(
-            id_tipodocumento: 1,
+            codigo_tipodocumento: 1,
             numero_documento: $response['numero'],
             nombres: $response['nombres'],
             apellido_paterno: $response['apellido_paterno'],
@@ -72,6 +75,9 @@ class PersonaAPIDTO
             ubigeo: $ubigeoString,
             fecha_nacimiento: $fechaNacimientoBD,
             estado_civil: $response['estado_civil'] ?? null,
+            fecha_crea: $response['fecha_crea'] ?? null,
+            fecha_actualiza: $response['fecha_actualiza'] ?? null,
+            fecha_elimina: $response['fecha_elimina'] ?? null,
             user_crea: $response['user_crea'] ?? null,
             user_actualiza: $response['user_actualiza'] ?? null,
             user_elimina: $response['user_elimina'] ?? null,
@@ -84,7 +90,7 @@ class PersonaAPIDTO
     {
         // Clonar la instancia actual, sobrescribiendo solo la propiedad nombre_grupo
         return new self(
-            id_tipodocumento: $this->id_tipodocumento,
+            codigo_tipodocumento: $this->codigo_tipodocumento,
             numero_documento: $this->numero_documento,
             nombres: $this->nombres,
             apellido_paterno: $this->apellido_paterno,
@@ -99,6 +105,9 @@ class PersonaAPIDTO
             ubigeo: $this->ubigeo,
             fecha_nacimiento: $this->fecha_nacimiento,
             estado_civil: $this->estado_civil,
+            fecha_crea: $this->fecha_crea,
+            fecha_actualiza: $this->fecha_actualiza,
+            fecha_elimina: $this->fecha_elimina,
             user_crea: $this->user_crea,
             user_actualiza: $this->user_actualiza,
             user_elimina: $this->user_elimina,
@@ -111,7 +120,7 @@ class PersonaAPIDTO
     public function withNombreCompleto(string $nuevoNombre): self
     {
         return new self(
-            id_tipodocumento: $this->id_tipodocumento,
+            codigo_tipodocumento: $this->codigo_tipodocumento,
             numero_documento: $this->numero_documento,
             nombres: $this->nombres,
             apellido_paterno: $this->apellido_paterno,
@@ -125,6 +134,9 @@ class PersonaAPIDTO
             ubigeo: $this->ubigeo,
             fecha_nacimiento: $this->fecha_nacimiento,
             estado_civil: $this->estado_civil,
+            fecha_crea: $this->fecha_crea,
+            fecha_actualiza: $this->fecha_actualiza,
+            fecha_elimina: $this->fecha_elimina,
             user_crea: $this->user_crea,
             user_actualiza: $this->user_actualiza,
             user_elimina: $this->user_elimina,

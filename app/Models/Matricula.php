@@ -14,8 +14,8 @@ class Matricula extends Model
 
     protected $fillable = [
         "id_persona",
-        "id_estadomatricula",
-        "id_institucion",
+        "codigo_estadomatricula",
+        "id_sucursal",
         'numero_modulos',
         "fecha_matricula",
         "fecha_retiro",
@@ -46,12 +46,12 @@ class Matricula extends Model
 
     public function estadoMatricula(): BelongsTo
     {
-        return $this->belongsTo(DetalleParametro::class, 'id_estadomatricula', 'codigo');
+        return $this->belongsTo(DetalleParametro::class, 'codigo_estadomatricula', 'codigo');
     }
 
     public function institucion(): BelongsTo
     {
-        return $this->belongsTo(Institucion::class, 'id_institucion', 'id');
+        return $this->belongsTo(Institucion::class, 'id_sucursal', 'id');
     }
 
     public function detalles(): HasMany

@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('modulo', function (Blueprint $table) {
             $table->id();
-
             $table->unsignedBigInteger('id_programa')->nullable();
 
             $table->string('titulo', 100);
@@ -22,6 +21,10 @@ return new class extends Migration
             $table->text('temario')->nullable();
             $table->decimal('nota', 10, 2)->nullable();
             $table->integer('orden');
+
+            $table->string('fecha_crea', 10)->nullable();
+            $table->string('fecha_actualiza', 10)->nullable();
+            $table->string('fecha_elimina', 10)->nullable();
 
             $table->string('user_crea', 12)->nullable();
             $table->string('user_actualiza', 12)->nullable();

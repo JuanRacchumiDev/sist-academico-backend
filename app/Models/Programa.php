@@ -12,10 +12,10 @@ class Programa extends Model
     protected $guarded = ['id'];
 
     protected $fillable = [
-        'id_segmento',
-        'id_tipoprograma',
-        'id_categoriaprograma',
-        'id_institucion',
+        'codigo_segmento',
+        'codigo_tipoprograma',
+        'codigo_categoriaprograma',
+        'id_sucursal',
 
         'codigo_old',
         'sigla',
@@ -36,6 +36,9 @@ class Programa extends Model
         'cantidad_inscritos',
         'precio_modulo',
         'is_vigente',
+        'fecha_crea',
+        'fecha_actualiza',
+        'fecha_elimina',
         'user_crea',
         'user_actualiza',
         'user_elimina',
@@ -61,7 +64,7 @@ class Programa extends Model
      */
     public function segmento(): BelongsTo
     {
-        return $this->belongsTo(DetalleParametro::class, 'id_segmento', 'codigo');
+        return $this->belongsTo(DetalleParametro::class, 'codigo_segmento', 'codigo');
     }
 
     /**
@@ -70,7 +73,7 @@ class Programa extends Model
      */
     public function tipoPrograma(): BelongsTo
     {
-        return $this->belongsTo(DetalleParametro::class, 'id_tipoprograma', 'codigo');
+        return $this->belongsTo(DetalleParametro::class, 'codigo_tipoprograma', 'codigo');
     }
 
     /**
@@ -79,16 +82,16 @@ class Programa extends Model
      */
     public function categoriaPrograma(): BelongsTo
     {
-        return $this->belongsTo(DetalleParametro::class, 'id_categoriaprograma', 'codigo');
+        return $this->belongsTo(DetalleParametro::class, 'codigo_categoriaprograma', 'codigo');
     }
 
     /**
-     * Obtener la institución asociado a un programa
-     * @return BelongsTo<Institucion, $this>
+     * Obtener la sucursal asociada a un programa
+     * @return BelongsTo<DetalleParametro, $this>
      */
-    public function institucion(): BelongsTo
+    public function sucursal(): BelongsTo
     {
-        return $this->belongsTo(Institucion::class, 'id_institucion', 'id');
+        return $this->belongsTo(DetalleParametro::class, 'id_sucursal', 'codigo');
     }
 
     public function detalleMatricula()

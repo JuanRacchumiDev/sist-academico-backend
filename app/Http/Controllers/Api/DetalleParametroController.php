@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\DTOs\DetalleParametro\DetalleParametroCreateDTO;
 use App\DTOs\DetalleParametro\DetalleParametroUpdateDTO;
+use App\Helpers\FechaHelper;
 use App\Http\Controllers\Controller;
 use App\Services\Contracts\IDetalleParametroService;
 use Illuminate\Http\JsonResponse;
@@ -30,7 +31,13 @@ class DetalleParametroController extends Controller
     public function getFiltered(Request $request): JsonResponse
     {
         try {
-            $filters = $request->only(['parametro_clase', 'en_persona', 'en_empresa', 'visible', 'estado']);
+            $filters = $request->only([
+                'parametro_clase',
+                'en_persona',
+                'en_empresa',
+                'visible',
+                'estado'
+            ]);
 
             $filters = array_map(function ($value) {
                 if ($value === 'true') return true;
@@ -65,7 +72,7 @@ class DetalleParametroController extends Controller
     }
 
     /**
-     * Obtiene una lista de DetalleParametro filtrados
+     * Obtiene una lista paginada de DetalleParametro aplicando filtros dinámicos
      * @param Request $request
      * @return JsonResponse
      */
@@ -86,7 +93,7 @@ class DetalleParametroController extends Controller
                 $filters['search'] = $request->input('search');
             }
 
-            $perPage = $request->input('per_page', 10);
+            $perPage = (int)$request->input('per_page', 10);
 
             $filters = array_map(function ($value) {
                 if ($value === 'true') return true;
@@ -118,7 +125,7 @@ class DetalleParametroController extends Controller
                 ]
             ], 200);
         } catch (\Exception $e) {
-            Log::error("Error filtering catálogos: " . $e->getMessage());
+            Log::error("Error filtering catálogos paginados: " . $e->getMessage());
 
             return response()->json([
                 'result' => false,
@@ -129,7 +136,9 @@ class DetalleParametroController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * Muestra el listado de detalles asociados a una clase de parámetro.
+     * @param string $clase
+     * @return JsonResponse
      */
     public function index(string $clase): JsonResponse
     {
@@ -139,7 +148,7 @@ class DetalleParametroController extends Controller
             if (is_null($paramClase)) {
                 return response()->json([
                     'result' => false,
-                    'message' => 'Clase de parámetro no válido'
+                    'message' => 'Clase de parámetro no válida'
                 ], 404);
             }
 
@@ -169,7 +178,10 @@ class DetalleParametroController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Registra un nuevo DetalleParametro.
+     * @param string $clase
+     * @param Request $request
+     * @return JsonResponse
      */
     public function store(string $clase, Request $request): JsonResponse
     {
@@ -185,24 +197,21 @@ class DetalleParametroController extends Controller
             }
 
             $data = $request->all();
-
             $data['parametro_clase'] = $paramClase;
+            $data['fecha_crea'] = FechaHelper::obtenerFechaActual();
 
             if (isset($data['nombre'])) {
                 $data['nombre_url'] = Str::slug($data['nombre']);
             }
 
-            // Validar si existe un registro previo
-            $detalleExiste = $this->detalleParametroService->getByClaseAndNombreUrl(
-                (int)$data['parametro_clase'],
-                $data['nombre_url']
-            );
+            // Validar si existe un registro previo por clase y nombre_url
+            $detalleExiste = $this->detalleParametroService->getUniqueByParams($data);
 
             if ($detalleExiste) {
                 return response()->json([
                     'result' => true,
                     'data' => $detalleExiste,
-                    'message' => 'El nombre ingresado se encuentra registrado',
+                    'message' => 'El nombre ingresado ya se encuentra registrado',
                     'code' => 'PREVIOUSLY_REGISTERED'
                 ], 200);
             }
@@ -224,7 +233,7 @@ class DetalleParametroController extends Controller
         } catch (ValidationException $e) {
             return response()->json([
                 'result' => false,
-                'message' => 'Validation error',
+                'message' => 'Error de validación',
                 'errors' => $e->errors(),
                 'code' => 'INVALID_RECORD'
             ], 422);
@@ -239,21 +248,24 @@ class DetalleParametroController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $clase, string $codigo): JsonResponse
+    public function showByParams(Request $request): JsonResponse
     {
         try {
-            $paramClase = config('params.clases.' . $clase);
+            $filters = $request->only(
+                [
+                    'parametro_clase',
+                    'codigo',
+                    'nombre_url'
+                ]
+            );
 
-            $detalle = $this->detalleParametroService->getByClaseAndCodigo((int)$paramClase, (int)$codigo);
+            $detalle = $this->detalleParametroService->getUniqueByParams($filters);
 
             if (!$detalle) {
                 return response()->json([
                     'result' => false,
                     'message' => 'Detalle no encontrado',
-                    'data' => []
+                    'data' => null
                 ], 404);
             }
 
@@ -263,7 +275,7 @@ class DetalleParametroController extends Controller
                 'message' => 'Detalle encontrado correctamente'
             ], 200);
         } catch (\Exception $e) {
-            Log::error("Error fetching detalle (codigo: {$codigo}): " . $e->getMessage());
+            Log::error("Error fetching detalle: " . $e->getMessage());
 
             return response()->json([
                 'result' => false,
@@ -291,16 +303,14 @@ class DetalleParametroController extends Controller
             $data = $request->all();
 
             $data['parametro_clase'] = $paramClase;
+            $data['fecha_actualiza'] = FechaHelper::obtenerFechaActual();
 
             if (isset($data['nombre'])) {
                 $data['nombre_url'] = Str::slug($data['nombre']);
             }
 
             // Validando si existe un registro previo
-            $detalleExiste = $this->detalleParametroService->getByClaseAndNombreUrl(
-                $data['parametro_clase'],
-                $data['nombre_url']
-            );
+            $detalleExiste = $this->detalleParametroService->getUniqueByParams($data);
 
             if ($detalleExiste) {
                 return response()->json([

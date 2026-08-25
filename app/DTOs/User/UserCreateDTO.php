@@ -10,7 +10,7 @@ class UserCreateDTO extends Data
         public string $name,
         public string $email,
         public string $password,
-        public int $id_perfil,
+        public int $codigo_perfil,
         public bool $estado = true,
         public ?int $id_persona = null,
         public ?string $user_crea = null,
@@ -36,7 +36,7 @@ class UserCreateDTO extends Data
                 'required',
                 'string'
             ],
-            'id_perfil' => [
+            'codigo_perfil' => [
                 'required',
                 'int',
                 'exists:detalle_parametro,codigo'

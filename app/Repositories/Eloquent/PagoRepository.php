@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\Builder;
 use Override;
 
 class PagoRepository implements IPagoRepository
@@ -18,55 +19,16 @@ class PagoRepository implements IPagoRepository
     protected string $pathModulo = "pdfs/pago-modulo/";
     protected string $pathOtros = "pdfs/otros/";
 
-    public function getAll(?array $searchParams = null): Collection
+    public function getAll(?array $filters = null): Collection
     {
-        $query = Pago::with([
-            'matricula.persona',
-            // 'modulo',
-            'estadoPago',
-            'formaPago',
-            'institucion'
-        ]);
-
-        if ($searchParams) {
-            $query->where(function ($q) use ($searchParams) {
-                if (isset($searchParams['search'])) {
-                    $search = '%' . strtolower($searchParams['search']) . '%';
-
-                    $q->whereRaw('LOWER(concepto) LIKE ?', [$search]);
-                }
-            });
-        }
-
-        return $query->get();
+        return $this->filter($filters)->get();
     }
 
     public function getAllFiltered(array $filters, int $perPage = 10): LengthAwarePaginator
     {
-        $query = Pago::with([
-            'matricula.persona',
-            // 'modulo',
-            'estadoPago',
-            'formaPago',
-            'institucion'
-        ]);
-
-        if (isset($filters['estado'])) {
-            $query->where('estado', (bool)$filters['estado']);
-        }
-
-        // Aplicar búsqueda por texto
-        if (isset($filters['search'])) {
-            $search = '%' . strtolower($filters['search']) . '%';
-
-            $query->where(function ($q) use ($search) {
-                $q->whereRaw('LOWER(concepto) LIKE ?', [$search]);
-            });
-        }
-
-        $query->orderBy('id', 'desc');
-
-        return $query->paginate($perPage);
+        return $this->filter($filters)
+            ->orderBy('id', 'desc')
+            ->paginate($perPage);
     }
 
     public function getMatriculaData(array $filters)
@@ -79,8 +41,8 @@ class PagoRepository implements IPagoRepository
 
         $pagoData = DB::table('pago as p')
             ->join('matricula as m', 'm.id', '=', 'p.id_matricula')
-            ->join('detalle_parametro as dp', 'dp.codigo', '=', 'p.id_formapago')
-            ->join('detalle_parametro as dp3', 'dp3.codigo', '=', 'p.id_estadopago')
+            ->join('detalle_parametro as dp', 'dp.codigo', '=', 'p.codigo_formapago')
+            ->join('detalle_parametro as dp3', 'dp3.codigo', '=', 'p.codigo_estadopago')
             ->select(
                 'm.fecha_matricula',
                 'dp.nombre as nombre_formapago',
@@ -131,8 +93,8 @@ class PagoRepository implements IPagoRepository
 
         $pagoData = DB::table('pago as p')
             ->join('programa as p2', 'p.id_programa', '=', 'p2.id')
-            ->join('detalle_parametro as dp', 'dp.codigo', '=', 'p.id_formapago')
-            ->join('detalle_parametro as dp3', 'dp3.codigo', '=', 'p.id_estadopago')
+            ->join('detalle_parametro as dp', 'dp.codigo', '=', 'p.codigo_formapago')
+            ->join('detalle_parametro as dp3', 'dp3.codigo', '=', 'p.codigo_estadopago')
             ->select(
                 'p2.nombre as nombre_programa',
                 'dp.nombre as nombre_formapago',
@@ -177,13 +139,13 @@ class PagoRepository implements IPagoRepository
         $modulosData = DB::select(
             "
             SELECT
-                pg.id, pg.id_formapago, pg.numero_modulo,
+                pg.id, pg.codigo_formapago, pg.numero_modulo,
                 pg.concepto, pg.numero_operacion, pg.fecha_pago,
                 pg.cantidad_efectivo, pg.cantidad_operacion,
                 dp.nombre as nombre_formapago
             FROM
                 pago pg INNER JOIN detalle_parametro dp
-                ON dp.codigo = pg.id_formapago
+                ON dp.codigo = pg.codigo_formapago
             WHERE pg.id_matricula = ? AND pg.numero_modulo IS NOT NULL
             ORDER BY pg.numero_modulo ASC
             ",
@@ -216,7 +178,6 @@ class PagoRepository implements IPagoRepository
     {
         return Pago::with([
             'matricula.persona',
-            // 'modulo',
             'estadoPago',
             'formaPago',
             'institucion'
@@ -249,5 +210,60 @@ class PagoRepository implements IPagoRepository
         }
 
         return false;
+    }
+
+    /**
+     * Aplica los filtros dinámicos a la consulta del modelo Pago.
+     *
+     * @param array|null $filters
+     * @return Builder
+     */
+    private function filter(?array $filters = null): Builder
+    {
+        $query = Pago::with([
+            'matricula.persona',
+            'estadoPago',
+            'formaPago',
+            'institucion'
+        ]);
+
+        if (empty($filters)) {
+            return $query;
+        }
+
+        // 1. Filtro por estado del pago
+        if (isset($filters['estado'])) {
+            $query->where('estado', (bool)$filters['estado']);
+        }
+
+        // 2. Filtro por rango de fechas de pago
+        if (!empty($filters['fecha_inicio'])) {
+            $query->whereDate('fecha_pago', '>=', $filters['fecha_inicio']);
+        }
+
+        if (!empty($filters['fecha_final'])) {
+            $query->whereDate('fecha_pago', '<=', $filters['fecha_final']);
+        }
+
+        // 3. Filtro por Nombre Completo de la Persona (Relación Pago -> Matricula -> Persona)
+        if (!empty($filters['search'])) {
+            $search = '%' . strtolower($filters['search']) . '%';
+
+            $query->whereHas('matricula.persona', function (Builder $qPersona) use ($search) {
+                $qPersona->whereRaw('LOWER(nombre_completo) LIKE ?', [$search]);
+            });
+        }
+
+        // 4. Búsqueda por texto (concepto del pago o número de operación)
+        // if (!empty($filters['search'])) {
+        //     $search = '%' . strtolower($filters['search']) . '%';
+
+        //     $query->where(function (Builder $q) use ($search) {
+        //         $q->whereRaw('LOWER(concepto) LIKE ?', [$search])
+        //             ->orWhereRaw('LOWER(numero_operacion) LIKE ?', [$search]);
+        //     });
+        // }
+
+        return $query;
     }
 }
