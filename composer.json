@@ -17,8 +17,8 @@
         "setasign/fpdf": "^1.9",
         "setasign/fpdi": "^2.6",
         "simplesoftwareio/simple-qrcode": "^4.2",
-        "spatie/laravel-data": "^4.18",
-        "tymon/jwt-auth": "^2.2"
+        "spatie/laravel-data": "^4.23",
+        "tymon/jwt-auth": "^2.3"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
