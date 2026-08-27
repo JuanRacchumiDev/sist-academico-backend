@@ -33,13 +33,14 @@ class CertificadoController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
-            $filters = $request->only([
-                'fecha_inicio',
-                'fecha_final',
-                'search'
-            ]);
+            // $filters = $request->only([
+            //     'fecha_inicio',
+            //     'fecha_final',
+            //     'search'
+            // ]);
 
-            $certificados = $this->certificadoService->getAllCertificados($filters);
+            // $certificados = $this->certificadoService->getAllCertificados($filters);
+            $certificados = $this->certificadoService->getAllCertificados();
 
             if ($certificados->isEmpty()) {
                 return response()->json([
@@ -74,29 +75,33 @@ class CertificadoController extends Controller
                 'id_modulo',
                 'fecha_inicio',
                 'fecha_final',
-                'fechaInicio',
-                'fechaFinal',
                 'search'
             ]);
-
-            // Normalización de claves provenientes del frontend en camelCase
-            if (isset($filters['fechaInicio']) && empty($filters['fecha_inicio'])) {
-                $filters['fecha_inicio'] = $filters['fechaInicio'];
-            }
-            if (isset($filters['fechaFinal']) && empty($filters['fecha_final'])) {
-                $filters['fecha_final'] = $filters['fechaFinal'];
-            }
 
             $perPage = (int) $request->input('per_page', $request->input('limit', 10));
 
             $certificados = $this->certificadoService->getAllCertificadosWithFilters($filters, $perPage);
 
+            if ($certificados->isEmpty()) {
+                return response()->json([
+                    'result' => false,
+                    'data' => [],
+                    'message' => 'No se encontraron resultados'
+                ], 200);
+            }
+
             return response()->json([
                 'result' => true,
                 'data' => $certificados,
-                'message' => $certificados->isEmpty()
-                    ? 'No se encontraron certificados'
-                    : 'Resultados encontrados correctamente'
+                'message' => 'Resultados encontrados correctamente',
+                'pagination' => [
+                    'total' => $certificados->total(),
+                    'per_page' => $certificados->perPage(),
+                    'current_page' => $certificados->currentPage(),
+                    'last_page' => $certificados->lastPage(),
+                    'from' => $certificados->firstItem(),
+                    'to' => $certificados->lastItem()
+                ]
             ], 200);
         } catch (\Exception $e) {
             Log::error("Error filtering certificados: " . $e->getMessage());
@@ -111,43 +116,47 @@ class CertificadoController extends Controller
 
     public function download(int $id): BinaryFileResponse|JsonResponse
     {
-        try {
-            $fileData = $this->certificadoService->downloadCertificado($id);
+        return $this->servePdfResponse($id, 'attachment');
 
-            return response()->download($fileData['full_path'], $fileData['filename'], [
-                'Content-Type' => 'application/pdf',
-            ]);
-        } catch (Exception $e) {
-            $statusCode = $e->getCode() === 404 ? 404 : 500;
+        // try {
+        //     $fileData = $this->certificadoService->downloadCertificado($id);
 
-            Log::error("Error al descargar el certificado {$id}: " . $e->getMessage());
+        //     return response()->download($fileData['full_path'], $fileData['filename'], [
+        //         'Content-Type' => 'application/pdf',
+        //     ]);
+        // } catch (Exception $e) {
+        //     $statusCode = $e->getCode() === 404 ? 404 : 500;
 
-            return response()->json([
-                'status'  => 'error',
-                'message' => $e->getMessage()
-            ], $statusCode);
-        }
+        //     Log::error("Error al descargar el certificado {$id}: " . $e->getMessage());
+
+        //     return response()->json([
+        //         'status'  => 'error',
+        //         'message' => $e->getMessage()
+        //     ], $statusCode);
+        // }
     }
 
     public function downloadPDF(int $id): BinaryFileResponse|JsonResponse
     {
-        try {
-            $fileData = $this->certificadoService->downloadCertificado($id);
+        return $this->servePdfResponse($id, 'inline');
 
-            return response()->file($fileData['full_path'], [
-                'Content-Type'        => 'application/pdf',
-                'Content-Disposition' => 'inline; filename="' . $fileData['filename'] . '"'
-            ]);
-        } catch (Exception $e) {
-            $statusCode = $e->getCode() === 404 ? 404 : 500;
+        // try {
+        //     $fileData = $this->certificadoService->downloadCertificado($id);
 
-            Log::error("Error al previsualizar el certificado {$id}: " . $e->getMessage());
+        //     return response()->file($fileData['full_path'], [
+        //         'Content-Type'        => 'application/pdf',
+        //         'Content-Disposition' => 'inline; filename="' . $fileData['filename'] . '"'
+        //     ]);
+        // } catch (Exception $e) {
+        //     $statusCode = $e->getCode() === 404 ? 404 : 500;
 
-            return response()->json([
-                'status'  => 'error',
-                'message' => $e->getMessage()
-            ], $statusCode);
-        }
+        //     Log::error("Error al previsualizar el certificado {$id}: " . $e->getMessage());
+
+        //     return response()->json([
+        //         'status'  => 'error',
+        //         'message' => $e->getMessage()
+        //     ], $statusCode);
+        // }
     }
 
     public function store(Request $request): JsonResponse
@@ -309,80 +318,52 @@ class CertificadoController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
-     */
-    // public function update(int $id, Request $request): JsonResponse
-    // {
-    //     try {
-    //         $data = $request->all();
-
-    //         $usuarioAutenticado = Auth::user();
-    //         $username = $usuarioAutenticado ? ($usuarioAutenticado->name) : 'systemapi';
-    //         $data['user_actualiza'] = $username;
-
-    //         $dto = CertificadoUpdateDTO::from($data);
-
-    //         $certificado = $this->certificadoService->updateCertificado($id, $dto);
-
-    //         if (!$certificado) {
-    //             return response()->json([
-    //                 'result' => false,
-    //                 'data' => [],
-    //                 'message' => 'Certificado no encontrado o no se pudo actualizar'
-    //             ], 404);
-    //         }
-
-    //         $this->certificadoService->generatePDF($id);
-
-    //         return response()->json([
-    //             'result' => true,
-    //             'data' => $certificado,
-    //             'message' => 'Certificado actualizo correctamente'
-    //         ], 200);
-    //     } catch (ValidationException $e) {
-    //         return response()->json([
-    //             'result' => false,
-    //             'message' => 'Validation error',
-    //             'errors' => $e->errors()
-    //         ], 422);
-    //     } catch (\Exception $e) {
-    //         $message = 'Error al actualizar el certificado:' . $e->getMessage();
-
-    //         Log::error("Error updating certificado: " . $e->getMessage());
-
-    //         return response()->json([
-    //             'result' => false,
-    //             'message' => $message
-    //         ], 500);
-    //     }
-    // }
-
-    /**
      * Remove the specified resource from storage.
      */
     public function destroy(string $id): JsonResponse
     {
         try {
-            $deleted = $this->certificadoService->deleteCertificado($id);
-
-            if (!$deleted) {
-                return response()->json([
-                    'status'  => 'error',
-                    'message' => 'No se encontró el certificado o no se pudo eliminar.'
-                ], 404);
-            }
+            $this->certificadoService->deleteCertificado($id);
 
             return response()->json([
-                'status'  => 'success',
-                'message' => 'Certificado eliminado correctamente.'
+                'result'  => true,
+                'message' => 'Certificado y archivos asociados eliminados correctamente.'
             ], 200);
         } catch (Exception $e) {
+            $statusCode = ($e->getCode() >= 400 && $e->getCode() < 600) ? $e->getCode() : 500;
+
             Log::error("Error al eliminar el certificado {$id}: " . $e->getMessage());
 
             return response()->json([
-                'status'  => 'error',
-                'message' => 'Error al intentar eliminar el certificado.'
-            ], 500);
+                'result'  => false,
+                'message' => $e->getMessage()
+            ], $statusCode);
+        }
+    }
+
+    /**
+     * Método privado helper para servir el PDF según la disposición solicitada.
+     */
+    private function servePdfResponse(int $id, string $disposition = 'attachment'): BinaryFileResponse|JsonResponse
+    {
+        try {
+            $fileData = $this->certificadoService->downloadCertificado($id);
+
+            return response()->download(
+                $fileData['full_path'],
+                $fileData['filename'],
+                ['Content-Type' => 'application/pdf'],
+                $disposition
+            );
+        } catch (Exception $e) {
+            $statusCode = $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500;
+
+            Log::error("Error procesando certificado ID {$id}: " . $e->getMessage());
+
+            return response()->json([
+                'result'  => false,
+                'message' => $e->getMessage(),
+            ], $statusCode);
         }
     }
 }

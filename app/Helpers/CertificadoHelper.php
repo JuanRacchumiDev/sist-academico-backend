@@ -72,56 +72,90 @@ class CertificadoHelper
     }
 
     /**
-     * Calcula dinámicamente el font-size y line-height según la longitud estimada del texto.
+     * Calcula dinámicamente el font-size y line-height evaluando el ancho real proyectado en pt/px.
      * 
      * @param string $texto Texto a evaluar
-     * @param float $fontSizeBase Tamaño de fuente deseado si entra en 1 sola línea (px/pt)
-     * @param float $longitudMaxima Longitud máxima del texto ingresado
+     * @param float $fontSizeBase Tamaño de fuente base deseado
+     * @param float $anchoMaximoDisponible Ancho disponible de la capa/caja en el PDF (por defecto 673.51 pt = 80% de A4 landscape)
+     * @param float $factorFuente Factor de aspecto promedio de la fuente (GreatVibes/Calibri es aprox 0.38)
      * @return array ['font_size' => int|float, 'line_height' => float]
      */
     public static function calcularEstilosTexto(
         string $texto,
         float $fontSizeBase,
-        float $longitudMaxima = 46.0
-        // float $anchoContenedorPrincipal = 850.0,
-        // float $factorAnchoFuente = 0.58
+        float $anchoMaximoDisponible = 673.51,
+        float $factorFuente = 0.38
     ): array {
         $textoLimpio = trim($texto);
-        $longitudTexto = mb_strlen($textoLimpio);
 
-        Log::info("Evaluando texto: '{$textoLimpio}'", [
-            'longitud' => $longitudTexto,
-            'fontSizeBase' => $fontSizeBase,
-            'longitudMax'  => $longitudMaxima,
-        ]);
-
-        // Caso 1: Es menor o igual a la longitud máxima
-        if ($longitudTexto <= $longitudMaxima) {
-            $newFontSize = (int) round($fontSizeBase * 0.80);
-            Log::info("Resultado: Caso 1 para '{$textoLimpio}'", ['fontSize' => $newFontSize]);
+        if ($textoLimpio === '') {
             return [
-                'font_size' => $newFontSize,
+                'font_size' => (int) round($fontSizeBase * 0.80),
                 'line_height' => 1.0
             ];
         }
 
-        // Caso 2: Mayor a la longitud máxima, pero menor o igual al doble
-        if ($longitudTexto <= ($longitudMaxima * 2)) {
-            $newFontSize = (int) round($fontSizeBase * 0.70);
-            Log::info("Resultado: Caso 2 para '{$textoLimpio}'", ['fontSize' => $newFontSize]);
+        // Ponderación de caracteres según su ancho visual
+        $anchoCaracteres = 0;
+        $longitud = mb_strlen($textoLimpio);
+
+        for ($i = 0; $i < $longitud; $i++) {
+            $char = mb_substr($textoLimpio, $i, 1);
+
+            if (preg_match('/[A-ZÑÁÉÍÓÚ]/u', $char)) {
+                $anchoCaracteres += 1.25; // Mayúsculas
+            } elseif (preg_match('/[mwW]/u', $char)) {
+                $anchoCaracteres += 1.35; // Letras muy anchas
+            } elseif (preg_match('/[iI1.,;\s]/u', $char)) {
+                $anchoCaracteres += 0.45; // Caracteres muy angostos o espacios
+            } elseif (preg_match('/[lftr]/u', $char)) {
+                $anchoCaracteres += 0.65; // Letras angostas
+            } else {
+                $anchoCaracteres += 1.0;  // Minúsculas estándar (a, e, o, c, u, etc.)
+            }
+        }
+
+        // Ancho total proyectado en la misma unidad que el PDF (pt/px)
+        $anchoProyectado = $anchoCaracteres * $fontSizeBase * $factorFuente;
+
+        Log::info("Evaluando tamaño para texto: '{$textoLimpio}'", [
+            'longitudTexto'         => $longitud,
+            'anchoCaracteres'       => $anchoCaracteres,
+            'fontSizeBase'          => $fontSizeBase,
+            'anchoProyectado'       => $anchoProyectado,
+            'anchoMaximoDisponible' => $anchoMaximoDisponible
+        ]);
+
+        // CASO 1: El texto entra en 1 sola línea cómodamente sin reducir la fuente base
+        if ($anchoProyectado <= $anchoMaximoDisponible) {
+            $newFontSize = (int) round($fontSizeBase);
+            Log::info("Resultado: Entra en 1 sola línea (Caso 1)", ['fontSize' => $newFontSize]);
+
             return [
                 'font_size'   => $newFontSize,
-                'line_height' => 0.8
+                'line_height' => 1.0
             ];
         }
 
-        // Caso 3: Mayor al doble de la longitud máxima
-        $newFontSize = (int) round($fontSizeBase * 0.50);
-        Log::info("Resultado: Caso 3 para '{$textoLimpio}'", ['fontSize' => $newFontSize]);
+        // CASO 2: Requiere escalar la fuente o dividirse en 2 líneas (hasta 2x el ancho)
+        if ($anchoProyectado <= ($anchoMaximoDisponible * 2)) {
+            // Se calcula una reducción proporcional o se aplica un 75% del tamaño base
+            $newFontSize = (int) round($fontSizeBase * 0.75);
+            Log::info("Resultado: Requiere 2 líneas o escala moderada (Caso 2)", ['fontSize' => $newFontSize]);
+
+            return [
+                'font_size'   => $newFontSize,
+                'line_height' => 0.95
+            ];
+        }
+
+        // CASO 3: Texto muy largo (requiere 3 líneas o escala mayor)
+        $newFontSize = (int) round($fontSizeBase * 0.55);
+        Log::info("Resultado: Requiere 3 líneas o escala fuerte (Caso 3)", ['fontSize' => $newFontSize]);
 
         return [
             'font_size'   => $newFontSize,
-            'line_height' => 0.8
+            'line_height' => 0.85
         ];
     }
 }

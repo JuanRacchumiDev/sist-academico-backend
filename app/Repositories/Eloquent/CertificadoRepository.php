@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class CertificadoRepository implements ICertificadoRepository
 {
@@ -43,7 +45,7 @@ class CertificadoRepository implements ICertificadoRepository
             'plantilla',
             'programa',
             'modulo'
-        ])->findOrFail($id);
+        ])->find($id);
     }
 
     public function create(array $data): Certificado
@@ -70,19 +72,24 @@ class CertificadoRepository implements ICertificadoRepository
 
         if (!$certificado) return false;
 
-        // Storage::disk('local')->delete(
-        //     [
-        //         $certificado->path_file . '/' . $certificado->filename,
-        //         $certificado->codigo_qr_path
-        //     ]
-        // );
+        return DB::transaction(function () use ($certificado) {
+            // Obteniendo la ruta de los archivos a eliminar
+            $pdfPath = trim("{$certificado->path_file}/{$certificado->filename}");
+            $qrPath = $certificado->codigo_qr_path;
 
-        $this->storageService->delete([
-            $certificado->path_file . '/' . $certificado->filename,
-            $certificado->codigo_qr_path
-        ]);
+            $filesToDelete = array_filter([$pdfPath, $qrPath]);
 
-        return $certificado->delete();
+            // Eliminar archivos físicos
+            if (!empty($filesToDelete)) {
+                try {
+                    $this->storageService->delete($filesToDelete);
+                } catch (\Exception $e) {
+                    Log::warning("No se pudieron eliminar algunos archivos del storage para el certificado ID {$certificado->id}: " . $e->getMessage());
+                }
+            }
+
+            return (bool) $certificado->delete();
+        });
     }
 
     private function applyFilters(array $filters): Builder
@@ -102,16 +109,12 @@ class CertificadoRepository implements ICertificadoRepository
             $search = $filters['search'];
 
             $query->where(function (Builder $q) use ($search) {
-                $searchTerm = '%' . $search . '%';
-                $q->where('codigo_verificacion', 'LIKE', $searchTerm)
-                    ->orWhere('nombre_impresion', 'LIKE', $searchTerm)
-                    ->orWhereHas('persona', function (Builder $qPersona) use ($searchTerm) {
-                        $qPersona->where('nombres', 'LIKE', $searchTerm)
-                            ->orWhere('apellido_paterno', 'LIKE', $searchTerm)
-                            ->orWhere('apellido_materno', 'LIKE', $searchTerm)
-                            ->orWhere('nombre_completo', 'LIKE', $searchTerm)
-                            ->orWhere('numero_documento', 'LIKE', $searchTerm);
-                    });
+                // Convertimos el término de búsqueda a minúsculas
+                $searchTerm = '%' . mb_strtolower($search, 'UTF-8') . '%';
+
+                // Búsqueda insensible a mayúsculas/minúsculas usando LOWER()
+                $q->whereRaw('LOWER(codigo_verificacion) LIKE ?', [$searchTerm])
+                    ->orWhereRaw('LOWER(nombre_impresion) LIKE ?', [$searchTerm]);
             });
         }
 

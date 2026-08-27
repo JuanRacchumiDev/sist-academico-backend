@@ -93,7 +93,7 @@
         .layer-programa {
             /* border: 1px solid blue; */
             position: absolute;
-            top: 460px;
+            top: 440px;
             left: 10%;
             width: 80%;
             text-align: center;

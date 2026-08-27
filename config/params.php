@@ -19,13 +19,13 @@ return [
         'sede' => 1013
     ],
     'styles_pdfs' => [
-        'longitudMaxima' => 46.0,
-        'anchoContenedorPrincipal' => 850.0,
-        'anchoContenedorSecundario' => 673.0,
+        'anchoMaximoAlumno' => 724.02,
+        'anchoMaximoPrograma' => 673.51,
+        'anchoMaximoFechas' => 673.51,
         'baseFontSize' => [
             'alumno' => 77,
-            'programa' => 40,
-            'fechas' => 17
+            'programa' => 32,
+            'fechas' => 19
         ],
         'certificacion' => [
             'cert_col_abogados' => [

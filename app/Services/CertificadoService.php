@@ -183,18 +183,22 @@ class CertificadoService implements ICertificadoService
             ? config('params.styles_pdfs.' . $tipoPrograma->nombre_url . '.fontSize.fechas')
             : config('params.styles_pdfs.baseFontSize.fechas');
 
-        $longitudMaxima = config('params.styles_pdfs.longitudMaxima');
+        $anchoMaximoAlumno = config('params.styles_pdfs.anchoMaximoAlumno');
+        $anchoMaximoPrograma = config('params.styles_pdfs.anchoMaximoPrograma');
+        $anchoMaximoFechas = config('params.styles_pdfs.anchoMaximoFechas');
 
-        Log::info('Evaluando parámetros de estilos', [
-            'baseFontSizeAlumno'   => $baseFontSizeAlumno,
-            'baseFontSizePrograma' => $baseFontSizePrograma,
-            'baseFontSizeFechas'   => $baseFontSizeFechas,
-            'longitudMaxima'       => $longitudMaxima,
+        Log::info('Evaluando parámetros de estilos por ancho', [
+            'baseFontSizeAlumno'     => $baseFontSizeAlumno,
+            'baseFontSizePrograma'   => $baseFontSizePrograma,
+            'baseFontSizeFechas'     => $baseFontSizeFechas,
+            'anchoMaximoAlumno'  => $anchoMaximoAlumno,
+            'anchoMaximoPrograma' => $anchoMaximoPrograma,
+            'anchoMaximoFechas' => $anchoMaximoFechas
         ]);
 
-        $estilosAlumno = CertificadoHelper::calcularEstilosTexto($certificado->nombre_impresion, $baseFontSizeAlumno, $longitudMaxima);
-        $estilosPrograma = CertificadoHelper::calcularEstilosTexto($programa->titulo ?? '', $baseFontSizePrograma, $longitudMaxima);
-        $estilosFechas = CertificadoHelper::calcularEstilosTexto($descFechasPrograma, $baseFontSizeFechas, $longitudMaxima);
+        $estilosAlumno = CertificadoHelper::calcularEstilosTexto($certificado->nombre_impresion, $baseFontSizeAlumno, $anchoMaximoAlumno);
+        $estilosPrograma = CertificadoHelper::calcularEstilosTexto($programa->titulo ?? '', $baseFontSizePrograma, $anchoMaximoPrograma);
+        $estilosFechas = CertificadoHelper::calcularEstilosTexto($descFechasPrograma, $baseFontSizeFechas, $anchoMaximoFechas);
 
         Log::info('Evaluando resultados de estilos', [
             'estilosAlumno'   => $estilosAlumno,
@@ -285,7 +289,7 @@ class CertificadoService implements ICertificadoService
         $certificado = $this->certificadoRepository->findById($id);
 
         if (!$certificado) {
-            throw new Exception("El certificado con ID {$id} no existe.", 404);
+            throw new Exception("El certificado con ID {$id} no fue encontrado.", 404);
         }
 
         $relativePath = "{$certificado->path_file}/{$certificado->filename}";
@@ -296,11 +300,10 @@ class CertificadoService implements ICertificadoService
             $fullPath = $this->storageService->getLocalPath($relativePath);
         }
 
-        // if (!Storage::disk('local')->exists($relativePath)) {
-        //     $fullPath = $this->generatePDF($id);
-        // } else {
-        //     $fullPath = Storage::disk('local')->path($relativePath);
-        // }
+        // Validación adicional: comprobar que el archivo exista físicamente en el disco
+        if (!file_exists($fullPath)) {
+            throw new Exception("El archivo del certificado no se encuentra disponible físicamente.", 404);
+        }
 
         $filename = $certificado->filename ?? "Certificado_{$certificado->codigo_verificacion}.pdf";
 
@@ -494,7 +497,9 @@ class CertificadoService implements ICertificadoService
     {
         $certificado = $this->certificadoRepository->findById($id);
 
-        if (!$certificado) return false;
+        if (!$certificado) {
+            throw new \Exception("El certificado con ID {$id} no fue encontrado.", 404);
+        }
 
         return $this->certificadoRepository->delete($id);
     }

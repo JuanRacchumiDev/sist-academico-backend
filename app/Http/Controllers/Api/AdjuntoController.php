@@ -57,7 +57,7 @@ class AdjuntoController extends Controller
     public function getFilteredPaginate(Request $request): JsonResponse
     {
         try {
-            $filters = $request->only(['codigo_tipoprograma', 'search', 'fecha_inicio', 'fecha_final']);
+            $filters = $request->only(['id_programa', 'id_modulo', 'search', 'fecha_inicio', 'fecha_final']);
 
             $perPage = (int)$request->input('per_page', 10);
 
@@ -93,22 +93,23 @@ class AdjuntoController extends Controller
         }
     }
 
-    public function download(string $id): BinaryFileResponse | JsonResponse
+    public function download(int $id): BinaryFileResponse|JsonResponse
     {
         try {
-            $downloadData = $this->adjuntoService->getDownloadData((int)$id);
+            $downloadData = $this->adjuntoService->getDownloadData($id);
 
             return response()->download(
                 $downloadData['fullpath'],
-                $downloadData['filename']
+                $downloadData['filename'],
+                ['Content-Type' => $downloadData['mimetype']]
             );
         } catch (Exception $ex) {
-            Log::error("Error al descargar adjunto (id: {$id}): " . $ex->getMessage());
+            Log::error("Error al descargar adjunto (ID: {$id}): " . $ex->getMessage());
 
-            $statusCode = $ex->getCode() >= 400 && $ex->getCode() < 600 ? $ex->getCode() : 500;
+            $statusCode = ($ex->getCode() >= 400 && $ex->getCode() < 600) ? $ex->getCode() : 500;
 
             return response()->json([
-                'result' => false,
+                'result'  => false,
                 'message' => $ex->getMessage() ?: 'Error al procesar la descarga'
             ], $statusCode);
         }
@@ -119,38 +120,38 @@ class AdjuntoController extends Controller
         try {
             $filters = $request->validate([
                 'id_programa' => 'required|integer|exists:programa,id',
-                'id_modulo' => 'sometimes|nullable|integer|exists:modulo,id',
-                'titulo' => 'required|string|max:100'
+                'id_modulo'   => 'sometimes|nullable|integer|exists:modulo,id',
+                'titulo'      => 'required|string|max:100'
             ]);
 
             $adjuntoExistente = $this->adjuntoService->obtenerAdjuntoByParams(
-                $filters['id_programa'],
-                $filters['id_modulo'] ?? null,
+                (int)$filters['id_programa'],
+                !empty($filters['id_modulo']) ? (int)$filters['id_modulo'] : null,
                 $filters['titulo']
             );
 
             if ($adjuntoExistente) {
                 return response()->json([
-                    'result' => true,
-                    'exists' => true,
-                    'data' => $adjuntoExistente,
+                    'result'  => true,
+                    'exists'  => true,
+                    'data'    => $adjuntoExistente,
                     'message' => 'El adjunto ya ha sido ingresado previamente',
-                    'code' => 'PREVIOUSLY_REGISTERED'
+                    'code'    => 'PREVIOUSLY_REGISTERED'
                 ], 200);
             }
 
             return response()->json([
-                'result' => true,
-                'exists' => false,
+                'result'  => true,
+                'exists'  => false,
                 'message' => 'El adjunto no existe',
-                'code' => 'NOT_REGISTERED'
+                'code'    => 'NOT_REGISTERED'
             ], 200);
         } catch (ValidationException $e) {
             return response()->json([
-                'result' => false,
+                'result'  => false,
                 'message' => 'Error de validación',
-                'errors' => $e->errors(),
-                'code' => 'INVALID_FILTERS'
+                'errors'  => $e->errors(),
+                'code'    => 'INVALID_FILTERS'
             ], 422);
         }
     }
@@ -165,14 +166,13 @@ class AdjuntoController extends Controller
             $idModulo = $dto->id_modulo ?? null;
             $titulo = $dto->titulo;
 
-            // $adjuntoExistente = $this->adjuntoService->getAllAdjuntos($filters)->first();
             $adjuntoExistente = $this->adjuntoService->obtenerAdjuntoByParams($idPrograma, $idModulo, $titulo);
 
             if ($adjuntoExistente) {
                 return response()->json([
                     'result' => true,
                     'data' => $adjuntoExistente,
-                    'message' => 'El adjunto ya ha sido ingresado',
+                    'message' => 'El adjunto ya ha sido ingresado previamente',
                     'code' => 'PREVIOUSLY_REGISTERED'
                 ], 200);
             }
@@ -202,11 +202,13 @@ class AdjuntoController extends Controller
         } catch (\Exception $e) {
             Log::error("Error al crear el registro de adjunto: " . $e->getMessage());
 
+            $statusCode = ($e->getCode() >= 400 && $e->getCode() < 600) ? $e->getCode() : 500;
+
             return response()->json([
                 'result' => false,
                 'message' => 'Error al crear el registro: ' . $e->getMessage(),
                 'code' => 'INVALID_RECORD'
-            ], 500);
+            ], $statusCode);
         }
     }
 
@@ -249,7 +251,7 @@ class AdjuntoController extends Controller
         try {
             // Obtenemos los datos excepto el archivo para su tratamiento posterior
             $data = $request->except('file');
-            $file = $request->file('file'); // Puede ser null si el usuario no reemplazó el archivo
+            $file = $request->file('file');
 
             $adjunto = $this->adjuntoService->updateAdjunto((int)$id, $data, $file);
 
@@ -268,10 +270,13 @@ class AdjuntoController extends Controller
             ], 200);
         } catch (\Exception $e) {
             Log::error("Error actualizando adjunto (id: {$id}): " . $e->getMessage());
+
+            $statusCode = ($e->getCode() >= 400 && $e->getCode() < 600) ? $e->getCode() : 500;
+
             return response()->json([
                 'result' => false,
                 'message' => 'Error al actualizar el adjunto: ' . $e->getMessage()
-            ], 500);
+            ], $statusCode);
         }
     }
 
@@ -280,6 +285,22 @@ class AdjuntoController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        try {
+            $this->adjuntoService->deleteAdjunto($id);
+
+            return response()->json([
+                'result'  => true,
+                'message' => 'Adjunto y archivo físico eliminados correctamente'
+            ], 200);
+        } catch (Exception $e) {
+            Log::error("Error eliminando adjunto (ID: {$id}): " . $e->getMessage());
+
+            $statusCode = ($e->getCode() >= 400 && $e->getCode() < 600) ? $e->getCode() : 500;
+
+            return response()->json([
+                'result'  => false,
+                'message' => 'Error al eliminar el adjunto: ' . $e->getMessage()
+            ], $statusCode);
+        }
     }
 }

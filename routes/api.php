@@ -139,6 +139,7 @@ Route::prefix('v1')->group(function () {
             Route::get('/{id}', [AdjuntoController::class, 'show'])->name('adjuntos.show');
             Route::post('/', [AdjuntoController::class, 'store'])->name('adjuntos.store');
             Route::patch('/{id}', [AdjuntoController::class, 'update'])->name('adjuntos.update');
+            Route::delete('/{id}', [AdjuntoController::class, 'destroy'])->name('adjuntos.destroy');
         });
 
         Route::prefix('cuestionarios')->group(function () {

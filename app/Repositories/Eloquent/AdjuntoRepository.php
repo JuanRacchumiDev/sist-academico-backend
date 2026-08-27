@@ -10,16 +10,18 @@ use Illuminate\Database\Eloquent\Builder;
 
 class AdjuntoRepository implements IAdjuntoRepository
 {
-    public function getAll(?array $filters = null): Collection
+    public function getAll(?array $searchParams = null): Collection
     {
-        return $this->filter($filters)->get();
+        $query = $this->applyFilters($searchParams ?? []);
+
+        $adjuntos = $query->get();
+
+        return $adjuntos;
     }
 
     public function getAllFiltered(array $filters, int $perPage = 10): LengthAwarePaginator
     {
-        return $this->filter($filters)
-            ->orderBy('id', 'desc')
-            ->paginate($perPage);
+        return $this->applyFilters($filters)->paginate($perPage);
     }
 
     public function findById(int $id): ?Adjunto
@@ -28,7 +30,7 @@ class AdjuntoRepository implements IAdjuntoRepository
             'programa.tipoPrograma',
             'modulo',
             'institucion'
-        ])->findOrFail($id);
+        ])->find($id);
     }
 
     public function findDuplicate(int $idPrograma, ?int $idModulo, string $titulo): ?Adjunto
@@ -75,30 +77,36 @@ class AdjuntoRepository implements IAdjuntoRepository
         return false;
     }
 
-    private function filter(?array $filters = null): Builder
+    private function applyFilters(array $filters): Builder
     {
-        $query = Adjunto::with([
-            'programa.tipoPrograma',
-            'modulo',
-            'institucion'
-        ]);
+        $query = Adjunto::query()
+            ->with([
+                'programa.tipoPrograma',
+                'modulo',
+                'institucion'
+            ]);
 
-        if (empty($filters)) {
-            return $query;
-        }
+        // Filtro por búsqueda
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
 
-        // 1. Filtro por tipo de programa
-        if (isset($filters['codigo_tipoprograma'])) {
-            $idTipoPrograma = $filters['codigo_tipoprograma'];
+            $query->where(function (Builder $q) use ($search) {
+                // Convertimos el término de búsqueda a minúsculas
+                $searchTerm = '%' . mb_strtolower($search, 'UTF-8') . '%';
 
-            $query->whereHas('programa', function (Builder $qPrograma) use ($idTipoPrograma) {
-                $qPrograma->where('codigo_tipoprograma', [$idTipoPrograma]);
+                // Búsqueda insensible a mayúsculas/minúsculas usando LOWER()
+                $q->whereRaw('LOWER(titulo) LIKE ?', [$searchTerm]);
             });
         }
 
-        // 2. Filtro por estado del pago
-        if (isset($filters['estado'])) {
-            $query->where('estado', (bool)$filters['estado']);
+        // Filtro por programa
+        if (!empty($filters['id_programa'])) {
+            $query->where('codigo_tipocertificado', $filters['codigo_tipocertificado']);
+        }
+
+        // 2. Filtro por modulo
+        if (isset($filters['id_modulo'])) {
+            $query->where('id_modulo', $filters['id_modulo']);
         }
 
         // 3. Filtro por rango de fechas de pago
@@ -110,15 +118,6 @@ class AdjuntoRepository implements IAdjuntoRepository
             $query->whereDate('fecha_crea', '<=', $filters['fecha_final']);
         }
 
-        // 4. Filtro por Nombre Completo de la Persona (Relación Pago -> Matricula -> Persona)
-        if (!empty($filters['search'])) {
-            $search = '%' . strtolower($filters['search']) . '%';
-
-            $query->whereHas('programa', function (Builder $qPrograma) use ($search) {
-                $qPrograma->whereRaw('LOWER(titulo) LIKE ?', [$search]);
-            });
-        }
-
-        return $query;
+        return $query->orderBy('id', 'DESC');
     }
 }
