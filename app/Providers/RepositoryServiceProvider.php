@@ -49,6 +49,7 @@ use App\Services\Contracts\ICertificadoService;
 use App\Services\Contracts\IAdjuntoService;
 use App\Services\Contracts\ICuestionarioService;
 use App\Services\Contracts\IInstitucionService;
+use App\Services\Contracts\IStorageService;
 
 use App\Services\DetalleParametroService;
 use App\Services\EventoService;
@@ -65,6 +66,7 @@ use App\Services\CertificadoService;
 use App\Services\AdjuntoService;
 use App\Services\CuestionarioService;
 use App\Services\InstitucionService;
+use App\Services\StorageService;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -254,6 +256,12 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(
             IInstitucionService::class,
             InstitucionService::class
+        );
+
+        // Enlazando el servicio de storage
+        $this->app->bind(
+            IStorageService::class,
+            StorageService::class
         );
     }
 

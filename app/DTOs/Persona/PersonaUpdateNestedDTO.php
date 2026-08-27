@@ -39,6 +39,13 @@ class PersonaUpdateNestedDTO extends Data
         public ?bool $estado = null
     ) {}
 
+    public static function withDefaults(): array
+    {
+        return [
+            'estado' => true
+        ];
+    }
+
     public static function rules(): array
     {
         $personaId = request()->route('persona');

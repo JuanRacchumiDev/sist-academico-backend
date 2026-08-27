@@ -22,6 +22,13 @@ class UserUpdateDTO extends Data
         public ?PersonaUpdateNestedDTO $persona = null
     ) {}
 
+    public static function withDefaults(): array
+    {
+        return [
+            'estado' => true
+        ];
+    }
+
     public static function rules(): array
     {
         $usuarioId = request()->route('usuario');

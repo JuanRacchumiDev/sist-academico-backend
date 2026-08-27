@@ -25,6 +25,13 @@ class PlantillaUpdateDTO extends Data
         public ?bool $estado = null,
     ) {}
 
+    public static function withDefaults(): array
+    {
+        return [
+            'estado' => true
+        ];
+    }
+
     /**
      * Reglas de validación para la creación de una Plantilla.
      *

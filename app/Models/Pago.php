@@ -51,11 +51,6 @@ class Pago extends Model
         return $this->belongsTo(Matricula::class, 'id_matricula', 'id');
     }
 
-    // public function modulo(): BelongsTo
-    // {
-    //     return $this->belongsTo(Modulo::class, 'id_modulo', 'id');
-    // }
-
     public function estadoPago(): BelongsTo
     {
         return $this->belongsTo(DetalleParametro::class, 'codigo_estadopago', 'codigo');

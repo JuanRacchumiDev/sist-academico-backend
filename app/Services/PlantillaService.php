@@ -39,36 +39,47 @@ class PlantillaService implements IPlantillaService
 
     public function createPlantilla(PlantillaCreateDTO $plantillaCreateDTO): Plantilla
     {
+        // Extrae variables con el archivo antes de convertir a array
+        $fileImagenFondo = $plantillaCreateDTO->path_imagen_fondo;
+        $fileImagenPublica = $plantillaCreateDTO->path_imagen_publica;
+        $filePdfFondo = $plantillaCreateDTO->path_pdf_fondo;
+
         $data = $plantillaCreateDTO->toArray();
 
         // Guardar imagen de fondo
-        if ($plantillaCreateDTO->path_imagen_fondo instanceof UploadedFile) {
+        if ($fileImagenFondo instanceof UploadedFile) {
             $data['path_imagen_fondo'] = $this->storePlantillaFile(
-                file: $plantillaCreateDTO->path_imagen_fondo,
+                file: $fileImagenFondo,
                 idInstitucion: $plantillaCreateDTO->id_institucion,
                 nombrePlantilla: $plantillaCreateDTO->nombre,
                 subfolder: 'fondos'
             );
+        } else {
+            $data['path_imagen_fondo'] = is_string($fileImagenFondo) ? $fileImagenFondo : null;
         }
 
         // Guardar imagen pública
-        if ($plantillaCreateDTO->path_imagen_publica instanceof UploadedFile) {
+        if ($fileImagenPublica instanceof UploadedFile) {
             $data['path_imagen_publica'] = $this->storePlantillaFile(
-                file: $plantillaCreateDTO->path_imagen_publica,
+                file: $fileImagenPublica,
                 idInstitucion: $plantillaCreateDTO->id_institucion,
                 nombrePlantilla: $plantillaCreateDTO->nombre,
                 subfolder: 'publicas'
             );
+        } else {
+            $data['path_imagen_publica'] = is_string($fileImagenPublica) ? $fileImagenPublica : null;
         }
 
         // Guardar PDF de fondo
-        if ($plantillaCreateDTO->path_pdf_fondo instanceof UploadedFile) {
+        if ($filePdfFondo instanceof UploadedFile) {
             $data['path_pdf_fondo'] = $this->storePlantillaFile(
-                file: $plantillaCreateDTO->path_pdf_fondo,
+                file: $filePdfFondo,
                 idInstitucion: $plantillaCreateDTO->id_institucion,
                 nombrePlantilla: $plantillaCreateDTO->nombre,
                 subfolder: 'docs'
             );
+        } else {
+            $data['path_pdf_fondo'] = is_string($filePdfFondo) ? $filePdfFondo : null;
         }
 
         return $this->plantillaRepository->create($data);

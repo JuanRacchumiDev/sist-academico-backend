@@ -17,6 +17,15 @@ class PreguntaOpcionUpdateDTO extends Data
         public ?string $user_elimina = null,
     ) {}
 
+    public static function withDefaults(): array
+    {
+        return [
+            'es_correcta' => false,
+            'orden' => 1,
+            'estado' => true
+        ];
+    }
+
     public static function rules(): array
     {
         return [

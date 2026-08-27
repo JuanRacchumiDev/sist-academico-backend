@@ -39,6 +39,13 @@ class PersonaCreateDTO extends Data
         public ?string $user_elimina = null
     ) {}
 
+    public static function withDefaults(): array
+    {
+        return [
+            'estado' => true
+        ];
+    }
+
     public static function rules(): array
     {
         return [

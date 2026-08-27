@@ -41,6 +41,10 @@ class Adjunto extends Model
         'updated_at'
     ];
 
+    protected $casts = [
+        'estado' => 'boolean'
+    ];
+
     protected $appends = ['nombre_archivo', 'ruta_enlace'];
 
     public function programa(): BelongsTo

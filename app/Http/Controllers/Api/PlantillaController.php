@@ -58,12 +58,16 @@ class PlantillaController extends Controller
     public function store(Request $request): JsonResponse
     {
         try {
-            $data = $request->all();
+            $data = array_merge($request->all(), $request->allFiles());
 
             $usuarioAutenticado = Auth::user();
             $username = $usuarioAutenticado ? ($usuarioAutenticado->name) : 'systemapi';
             $data['user_crea'] = $username;
             $data['fecha_crea'] = FechaHelper::obtenerFechaActual();
+
+            if (!isset($data['estado'])) {
+                $data['estado'] = true;
+            }
 
             $dto = PlantillaCreateDTO::validateAndCreate($data);
 

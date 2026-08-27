@@ -11,15 +11,24 @@ class CuestionarioPersonaCreateDTO extends Data
         public int $id_cuestionario,
         public int $id_persona,
         public string $fecha_inicio,
-        public bool $estado = true,
-        public int $numero_intento = 1,
-        public string $estado_intento = 'EN_PROCESO',
+        public bool $estado,
+        public int $numero_intento,
+        public string $estado_intento,
         public ?string $fecha_fin = null,
         public ?float $puntaje_total = null,
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null,
     ) {}
+
+    public static function withDefaults(): array
+    {
+        return [
+            'numero_intento' => 1,
+            'estado_intento' => 'EN_PROCESO',
+            'estado' => true
+        ];
+    }
 
     public static function rules(): array
     {

@@ -22,8 +22,15 @@ class PlantillaCreateDTO extends Data
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null,
-        public bool $estado = true,
+        public bool $estado,
     ) {}
+
+    public static function withDefaults(): array
+    {
+        return [
+            'estado' => true
+        ];
+    }
 
     /**
      * Reglas de validación para la creación de una Plantilla.
@@ -54,7 +61,7 @@ class PlantillaCreateDTO extends Data
                 'sometimes',
                 'file',
                 'image',
-                'mimes:jpg,jpeg',
+                'mimes:jpg,jpeg,png',
                 'max:2048',
                 'nullable'
             ],
@@ -62,7 +69,7 @@ class PlantillaCreateDTO extends Data
                 'sometimes',
                 'file',
                 'image',
-                'mimes:jpg,jpeg',
+                'mimes:jpg,jpeg,png',
                 'max:2048',
                 'nullable'
             ],
@@ -122,7 +129,7 @@ class PlantillaCreateDTO extends Data
                 'nullable'
             ],
             'estado' => [
-                'required',
+                'sometimes',
                 'boolean'
             ],
         ];

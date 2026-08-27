@@ -170,12 +170,16 @@ return [
             ]
         ],
         'capacitacion' => [
+            'fontSize' => [
+                'alumno' => 77,
+                'programa' => 33,
+                'fechas' => 22
+            ],
             'default_uno' => [
                 'color_nombre_alumno' => '#000000', // 79px
-                'color_nombre_programa' => '#0092FF', // 31px
-                'color_fechas' => '#D5A701', // 17px
-                'color_director' => '#000000' // 12px
-            ],
+                'color_nombre_programa' => '#000000', // 31px
+                'color_fechas' => '#589AFC', // 17px
+            ]
         ]
     ]
 ];

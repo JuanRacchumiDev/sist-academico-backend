@@ -56,7 +56,7 @@ class CertificadoUpdateDTO extends Data
             'id_sucursal' => [
                 'sometimes',
                 'integer',
-                'exists:detalle_parametro,codigo',
+                'exists:institucion,id',
                 'nullable'
             ],
             'id_plantilla' => [

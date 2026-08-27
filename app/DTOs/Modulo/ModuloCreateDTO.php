@@ -11,7 +11,7 @@ class ModuloCreateDTO extends Data
         public string $titulo,
         public string $titulo_url,
         public int $orden,
-        public bool $estado = true,
+        public bool $estado,
         public ?int $id_programa = null,
         public ?string $descripcion = null,
         public ?string $temario = null,
@@ -23,6 +23,13 @@ class ModuloCreateDTO extends Data
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null
     ) {}
+
+    public static function withDefaults(): array
+    {
+        return [
+            'estado' => true
+        ];
+    }
 
     public static function rules(): array
     {

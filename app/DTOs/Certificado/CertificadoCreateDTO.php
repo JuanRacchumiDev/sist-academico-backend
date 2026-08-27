@@ -12,6 +12,7 @@ class CertificadoCreateDTO extends Data
         public int $codigo_tipocertificado,
         public int $id_sucursal,
         public bool $estado,
+
         public ?int $id_plantilla = null,
         public ?int $id_programa = null,
         public ?int $id_modulo = null,
@@ -54,7 +55,7 @@ class CertificadoCreateDTO extends Data
             'id_sucursal' => [
                 'sometimes',
                 'integer',
-                'exists:detalle_parametro,codigo',
+                'exists:institucion,id',
                 'nullable'
             ],
             'id_plantilla' => [

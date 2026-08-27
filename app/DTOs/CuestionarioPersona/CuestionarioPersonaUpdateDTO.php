@@ -21,6 +21,15 @@ class CuestionarioPersonaUpdateDTO extends Data
         public ?string $user_elimina = null,
     ) {}
 
+    public static function withDefaults(): array
+    {
+        return [
+            'numero_intento' => 1,
+            'estado_intento' => 'EN_PROCESO',
+            'estado' => true
+        ];
+    }
+
     public static function rules(): array
     {
         return [

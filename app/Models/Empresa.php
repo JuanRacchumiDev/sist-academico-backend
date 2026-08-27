@@ -32,4 +32,16 @@ class Empresa extends Model
         'user_elimina',
         'estado'
     ];
+
+    protected $hidden = [
+        'user_crea',
+        'user_actualiza',
+        'user_elimina',
+        'created_at',
+        'updated_at'
+    ];
+
+    protected $casts = [
+        'estado' => 'boolean'
+    ];
 }

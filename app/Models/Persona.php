@@ -54,6 +54,9 @@ class Persona extends Model
         'updated_at'
     ];
 
+    protected $casts = [
+        'estado' => 'boolean'
+    ];
     /**
      * Obtener el tipo de documento asociado a una persona
      * @return BelongsTo<DetalleParametro, $this>

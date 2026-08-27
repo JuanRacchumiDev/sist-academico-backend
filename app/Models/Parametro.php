@@ -25,6 +25,18 @@ class Parametro extends Model
         "estado"
     ];
 
+    protected $hidden = [
+        'user_crea',
+        'user_actualiza',
+        'user_elimina',
+        'created_at',
+        'updated_at'
+    ];
+
+    protected $casts = [
+        'estado' => 'boolean'
+    ];
+
     /**
      * Obtener el detalle de un parámetro
      * @return HasMany<DetalleParametro, $this>

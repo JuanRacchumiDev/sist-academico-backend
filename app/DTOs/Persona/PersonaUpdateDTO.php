@@ -38,6 +38,13 @@ class PersonaUpdateDTO extends Data
         public ?bool $estado = null
     ) {}
 
+    public static function withDefaults(): array
+    {
+        return [
+            'estado' => true
+        ];
+    }
+
     public static function rules(): array
     {
         // Recuperamos el ID del parámetro de la ruta para el Rule::unique

@@ -31,6 +31,8 @@ use Endroid\QrCode\Writer\PngWriter;
 use Endroid\QrCode\ErrorCorrectionLevel;
 use Endroid\QrCode\RoundBlockSizeMode;
 use App\Helpers\CertificadoHelper;
+use App\Repositories\Contracts\IInstitucionRepository;
+use App\Services\Contracts\IStorageService;
 
 class CertificadoService implements ICertificadoService
 {
@@ -40,6 +42,8 @@ class CertificadoService implements ICertificadoService
     protected IPlantillaRepository $plantillaRepository;
     protected IDetalleParametroRepository $detalleRepository;
     protected IProgramaRepository $programaRepository;
+    protected IInstitucionRepository $institucionRepository;
+    protected IStorageService $storageService;
 
     public function __construct(
         ICertificadoRepository $certificadoRepository,
@@ -47,7 +51,9 @@ class CertificadoService implements ICertificadoService
         IModuloRepository $moduloRepository,
         IPlantillaRepository $plantillaRepository,
         IDetalleParametroRepository $detalleRepository,
-        IProgramaRepository $programaRepository
+        IProgramaRepository $programaRepository,
+        IInstitucionRepository $institucionRepository,
+        IStorageService $storageService
     ) {
         $this->certificadoRepository = $certificadoRepository;
         $this->personaRepository = $personaRepository;
@@ -55,6 +61,8 @@ class CertificadoService implements ICertificadoService
         $this->plantillaRepository = $plantillaRepository;
         $this->detalleRepository = $detalleRepository;
         $this->programaRepository = $programaRepository;
+        $this->institucionRepository = $institucionRepository;
+        $this->storageService = $storageService;
     }
 
     public function getAllCertificados(?array $searchParams = null): Collection
@@ -82,9 +90,13 @@ class CertificadoService implements ICertificadoService
         // Asegurar que la carpeta storage/fonts exista antes de invocar DomPDF
         CertificadoHelper::ensureFontCacheDirExists();
 
-        // Obtener datos de programa y plantilla
+        // Obtener datos de programa, plantilla y tipo de programa
         $programa = $certificado->programa;
         $plantilla = $certificado->plantilla;
+        $tipoPrograma = $programa->tipoPrograma;
+
+        $esCapacitacion = ($tipoPrograma->nombre_url === "capacitacion");
+        Log::info("Validando variable esCapacitacion", ['esCapacitacion' => $esCapacitacion]);
 
         Log::info("Información de plantilla", ["plantilla" => $plantilla]);
 
@@ -101,22 +113,32 @@ class CertificadoService implements ICertificadoService
         $this->generateCodeQR($qrUrl, $certificado->codigo_qr_path);
 
         // Obtener el QR persistido y convertirlo a Base64 para embeder en DomPDF
-        $qrBinary = Storage::disk('local')->get($certificado->codigo_qr_path);
+        // $qrBinary = Storage::disk('local')->get($certificado->codigo_qr_path);
+        $qrBinary = $this->storageService->get($certificado->codigo_qr_path);
         $qrBase64 = "data:image/png;base64," . base64_encode($qrBinary);
 
         // Cargar fondo de pantalla
         $templateBase64 = null;
 
-        $existPlantilla = $plantilla && $plantilla->path && Storage::disk('public')->exists($plantilla->path);
+        // $existPlantilla = $plantilla && $plantilla->path && Storage::disk('public')->exists($plantilla->path);
+
+        // Especificar el disco 'public' ya que las plantillas están almacenadas en /storage/app/public
+        $existPlantilla = $plantilla
+            && $plantilla->path_imagen_fondo
+            && $this->storageService->exists($plantilla->path_imagen_fondo, 'public');
+
         Log::info("Validando exists plantilla", ['existPlantilla' => $existPlantilla]);
 
         if ($existPlantilla) {
-            Log::info('Validando ruta de plantilla', ['path' => $plantilla->path]);
+            Log::info('Validando ruta de plantilla', ['path' => $plantilla->path_imagen_fondo]);
 
-            $fileData = Storage::disk('public')->get($plantilla->path);
+            // $fileData = Storage::disk('public')->get($plantilla->path);
+
+            // Leer el archivo desde el disco 'public'
+            $fileData = $this->storageService->get($plantilla->path_imagen_fondo, 'public');
 
             // Obtener la extensión y construir el mime type manualmente
-            $extension = strtolower(pathinfo($plantilla->path, PATHINFO_EXTENSION));
+            $extension = strtolower(pathinfo($plantilla->path_imagen_fondo, PATHINFO_EXTENSION));
 
             Log::info('Validando extension', ['extension' => $extension]);
 
@@ -135,9 +157,12 @@ class CertificadoService implements ICertificadoService
         // Definir fuentes
         $fonts = [
             'alumno' => CertificadoHelper::getFontBase64('GreatVibes-Regular.ttf'),
-            'programa' => CertificadoHelper::getFontBase64('Anton.ttf'),
-            'fechas' => CertificadoHelper::getFontBase64('Archivo-Regular.ttf'),
-            'director' => CertificadoHelper::getFontBase64('Archivo-Medium.ttf')
+            'programa' => $esCapacitacion ? 'Calibri, sans-serif' : CertificadoHelper::getFontBase64('Anton.ttf'),
+            'fechas' => $esCapacitacion ? 'Calibri, sans-serif' : CertificadoHelper::getFontBase64('Archivo-Regular.ttf'),
+            'director' => CertificadoHelper::getFontBase64('Archivo-Medium.ttf'),
+            'is_custom_alumno' => true,
+            'is_custom_programa' => !$esCapacitacion,
+            'is_custom_fechas' => !$esCapacitacion
         ];
 
         // Definir las fechas del evento en texto
@@ -146,9 +171,18 @@ class CertificadoService implements ICertificadoService
         $descFechasPrograma = ($fechaInicio && $fechaFinal) ? "Realizado del {$fechaInicio} al {$fechaFinal}" : "";
 
         // Calcular los estilos dinámicos
-        $baseFontSizeAlumno = config('params.styles_pdfs.baseFontSize.alumno');
-        $baseFontSizePrograma = config('params.styles_pdfs.baseFontSize.programa');
-        $baseFontSizeFechas = config('params.styles_pdfs.baseFontSize.fechas');
+        $baseFontSizeAlumno = $esCapacitacion
+            ? config('params.styles_pdfs.' . $tipoPrograma->nombre_url . '.fontSize.alumno')
+            : config('params.styles_pdfs.baseFontSize.alumno');
+
+        $baseFontSizePrograma = $esCapacitacion
+            ? config('params.styles_pdfs.' . $tipoPrograma->nombre_url . '.fontSize.programa')
+            : config('params.styles_pdfs.baseFontSize.programa');
+
+        $baseFontSizeFechas = $esCapacitacion
+            ? config('params.styles_pdfs.' . $tipoPrograma->nombre_url . '.fontSize.fechas')
+            : config('params.styles_pdfs.baseFontSize.fechas');
+
         $longitudMaxima = config('params.styles_pdfs.longitudMaxima');
 
         Log::info('Evaluando parámetros de estilos', [
@@ -162,7 +196,7 @@ class CertificadoService implements ICertificadoService
         $estilosPrograma = CertificadoHelper::calcularEstilosTexto($programa->titulo ?? '', $baseFontSizePrograma, $longitudMaxima);
         $estilosFechas = CertificadoHelper::calcularEstilosTexto($descFechasPrograma, $baseFontSizeFechas, $longitudMaxima);
 
-        Log::info('Evaluando resultados de estilos calc', [
+        Log::info('Evaluando resultados de estilos', [
             'estilosAlumno'   => $estilosAlumno,
             'estilosPrograma' => $estilosPrograma,
             'estilosFechas'   => $estilosFechas,
@@ -171,15 +205,14 @@ class CertificadoService implements ICertificadoService
         // Definiendo horas académicas
         $horasAcademicasDefault = config('params.horas_academicas_default');
 
+        Log::info('Evaluando horas académicas', ['horasAcademicasDefault' => $horasAcademicasDefault]);
+
         // Definiendo nombre director
         Log::info('Evaluando objeto institución', ['institucion' => $plantilla->institucion]);
 
         $nombreDirector = ($plantilla->institucion && $plantilla->institucion->nombre_director)
             ? $plantilla->institucion->nombre_director
             : "----";
-
-        // Definir tipo de programa
-        $tipoPrograma = $programa->tipoPrograma;
 
         // Mapear objeto para la vista
         $info = (object)[
@@ -238,9 +271,13 @@ class CertificadoService implements ICertificadoService
         ])->setPaper('a4', 'landscape')
             ->setOption('isFontSubsettingEnabled', false);
 
-        Storage::disk('local')->put($pdfRelativePath, $pdf->output());
+        // Guarda el PDF generado directamente a través de IStorageService
+        $this->storageService->put($pdfRelativePath, $pdf->output());
 
-        return Storage::disk('local')->path($pdfRelativePath);
+        return $this->storageService->getLocalPath($pdfRelativePath);
+
+        // Storage::disk('local')->put($pdfRelativePath, $pdf->output());
+        // return Storage::disk('local')->path($pdfRelativePath);
     }
 
     public function downloadCertificado(int $id): array
@@ -253,11 +290,17 @@ class CertificadoService implements ICertificadoService
 
         $relativePath = "{$certificado->path_file}/{$certificado->filename}";
 
-        if (!Storage::disk('local')->exists($relativePath)) {
+        if (!$this->storageService->exists($relativePath)) {
             $fullPath = $this->generatePDF($id);
         } else {
-            $fullPath = Storage::disk('local')->path($relativePath);
+            $fullPath = $this->storageService->getLocalPath($relativePath);
         }
+
+        // if (!Storage::disk('local')->exists($relativePath)) {
+        //     $fullPath = $this->generatePDF($id);
+        // } else {
+        //     $fullPath = Storage::disk('local')->path($relativePath);
+        // }
 
         $filename = $certificado->filename ?? "Certificado_{$certificado->codigo_verificacion}.pdf";
 
@@ -405,7 +448,8 @@ class CertificadoService implements ICertificadoService
         // Obtener la información requerida para construir las rutas jerárquicas
         $persona = $this->personaRepository->findById($data['id_persona']);
         $programa = $this->programaRepository->findById($data['id_programa']);
-        $sucursal = $this->detalleRepository->findByCodigo($data['id_sucursal']);
+        // $sucursal = $this->detalleRepository->findByCodigo($data['id_sucursal']);
+        $sucursal = $this->institucionRepository->findById($data['id_sucursal']);
 
         if (!$persona) {
             throw new Exception("La persona especificada no existe.", 404);

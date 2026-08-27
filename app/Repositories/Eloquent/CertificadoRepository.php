@@ -2,11 +2,9 @@
 
 namespace App\Repositories\Eloquent;
 
-use App\DTOs\Certificado\CertificadoCreateDTO;
-use App\DTOs\Certificado\CertificadoUpdateDTO;
 use App\Models\Certificado;
-use App\Models\Matricula;
 use App\Repositories\Contracts\ICertificadoRepository;
+use App\Services\Contracts\IStorageService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -15,6 +13,13 @@ use Illuminate\Support\Facades\Storage;
 
 class CertificadoRepository implements ICertificadoRepository
 {
+    protected IStorageService $storageService;
+
+    public function __construct(IStorageService $storageService)
+    {
+        $this->storageService = $storageService;
+    }
+
     public function getAll(?array $searchParams = null): Collection
     {
         $query = $this->applyFilters($searchParams ?? []);
@@ -65,12 +70,17 @@ class CertificadoRepository implements ICertificadoRepository
 
         if (!$certificado) return false;
 
-        Storage::disk('local')->delete(
-            [
-                $certificado->path_file . '/' . $certificado->filename,
-                $certificado->codigo_qr_path
-            ]
-        );
+        // Storage::disk('local')->delete(
+        //     [
+        //         $certificado->path_file . '/' . $certificado->filename,
+        //         $certificado->codigo_qr_path
+        //     ]
+        // );
+
+        $this->storageService->delete([
+            $certificado->path_file . '/' . $certificado->filename,
+            $certificado->codigo_qr_path
+        ]);
 
         return $certificado->delete();
     }

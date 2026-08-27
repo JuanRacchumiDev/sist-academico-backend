@@ -12,7 +12,7 @@ class ParametroCreateDTO extends Data
     public function __construct(
         public string $nombre,
         public string $nombre_url,
-        public bool $estado = true,
+        public bool $estado,
         public ?string $descripcion = null,
         public ?string $fecha_crea = null,
         public ?string $fecha_actualiza = null,
@@ -21,6 +21,13 @@ class ParametroCreateDTO extends Data
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null,
     ) {}
+
+    public static function withDefaults(): array
+    {
+        return [
+            'estado' => true
+        ];
+    }
 
     public static function rules(): array
     {

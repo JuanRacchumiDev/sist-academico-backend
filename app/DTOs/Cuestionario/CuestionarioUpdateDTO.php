@@ -26,6 +26,13 @@ class CuestionarioUpdateDTO extends Data
         public ?array $preguntas = null,
     ) {}
 
+    public static function withDefaults(): array
+    {
+        return [
+            'estado' => true
+        ];
+    }
+
     public static function rules(): array
     {
         return [

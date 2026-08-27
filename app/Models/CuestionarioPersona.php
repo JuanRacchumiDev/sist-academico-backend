@@ -34,6 +34,10 @@ class CuestionarioPersona extends Pivot
         'updated_at'
     ];
 
+    protected $casts = [
+        'estado' => 'boolean'
+    ];
+
     public function cuestionario(): BelongsTo
     {
         return $this->belongsTo(Cuestionario::class, "id_cuestionario", "id");

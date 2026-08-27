@@ -9,15 +9,23 @@ class CuestionarioRespuestaCreateDTO extends Data
     public function __construct(
         public int $id_cuestionario_persona,
         public int $id_pregunta,
-        public bool $estado = true,
+        public bool $estado,
+        public float $puntaje_obtenido,
         public ?int $id_pregunta_opcion = null,
         public ?string $respuesta_texto = null,
-        public float $puntaje_obtenido = 0.00,
         public ?bool $es_correcta = null,
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null,
     ) {}
+
+    public static function withDefaults(): array
+    {
+        return [
+            'estado' => true,
+            'puntaje_obtenido' => 0.00
+        ];
+    }
 
     public static function rules(): array
     {

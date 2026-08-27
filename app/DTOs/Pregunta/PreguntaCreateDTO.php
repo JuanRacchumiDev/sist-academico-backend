@@ -11,13 +11,22 @@ class PreguntaCreateDTO extends Data
         public string $enunciado,
         public string $tipo_respuesta,
         public bool $estado,
-        public float $puntos = 1.00,
-        public int $orden = 1,
+        public float $puntos,
+        public int $orden,
         public ?int $id_cuestionario = null,
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null,
     ) {}
+
+    public static function withDefaults(): array
+    {
+        return [
+            'estado' => true,
+            'puntos' => 1.00,
+            'orden' => 1
+        ];
+    }
 
     public static function rules(): array
     {

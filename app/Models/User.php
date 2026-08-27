@@ -38,6 +38,10 @@ class User extends Authenticatable implements JWTSubject
         'updated_at'
     ];
 
+    protected $casts = [
+        'estado' => 'boolean'
+    ];
+
     /**
      * Get the attributes that should be cast.
      *

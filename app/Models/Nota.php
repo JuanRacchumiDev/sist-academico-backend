@@ -35,6 +35,10 @@ class Nota extends Model
         'updated_at'
     ];
 
+    protected $casts = [
+        'estado' => 'boolean'
+    ];
+
     public function alumno(): BelongsTo
     {
         return $this->belongsTo(Persona::class, 'id_alumno', 'id');

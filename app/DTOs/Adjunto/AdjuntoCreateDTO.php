@@ -8,9 +8,9 @@ class AdjuntoCreateDTO extends Data
 {
     public function __construct(
         public string $titulo,
-        public bool $is_descargable = true,
-        public bool $is_visible = true,
-        public bool $estado = true,
+        public bool $is_descargable,
+        public bool $is_visible,
+        public bool $estado,
 
         public ?int $id_programa = null,
         public ?int $id_modulo = null,

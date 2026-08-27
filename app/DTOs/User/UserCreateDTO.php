@@ -11,12 +11,19 @@ class UserCreateDTO extends Data
         public string $email,
         public string $password,
         public int $codigo_perfil,
-        public bool $estado = true,
+        public bool $estado,
         public ?int $id_persona = null,
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null,
     ) {}
+
+    public static function withDefaults(): array
+    {
+        return [
+            'estado' => true
+        ];
+    }
 
     public static function rules(): array
     {

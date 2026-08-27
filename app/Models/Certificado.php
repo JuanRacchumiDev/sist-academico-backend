@@ -41,6 +41,10 @@ class Certificado extends Model
         'updated_at'
     ];
 
+    protected $casts = [
+        'estado' => 'boolean'
+    ];
+
     /**
      * Obtener la persona asociada a un certificado
      * @return BelongsTo<Persona, $this>
@@ -61,11 +65,11 @@ class Certificado extends Model
 
     /**
      * Obtener la institución asociado a un certificado
-     * @return BelongsTo<DetalleParametro, $this>
+     * @return BelongsTo<Institucion, $this>
      */
     public function sucursal(): BelongsTo
     {
-        return $this->belongsTo(DetalleParametro::class, 'id_sucursal', 'codigo');
+        return $this->belongsTo(Institucion::class, 'id_sucursal', 'id');
     }
 
     /**
