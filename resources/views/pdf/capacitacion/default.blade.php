@@ -86,7 +86,7 @@
 
         .layer-alumno {
             position: absolute;
-            top: 315px;
+            top: 310px;
             left: 7%;
             width: 86%;
             text-align: center;
