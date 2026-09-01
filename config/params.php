@@ -24,7 +24,7 @@ return [
         'anchoMaximoFechas' => 673.51,
         'baseFontSize' => [
             'alumno' => 77,
-            'programa' => 32,
+            'programa' => 31,
             'fechas' => 19
         ],
         'certificacion' => [
