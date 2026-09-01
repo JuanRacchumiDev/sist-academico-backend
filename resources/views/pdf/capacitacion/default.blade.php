@@ -135,27 +135,35 @@
         /* --- HOJA 2 --- */
         .page-second {
             page-break-before: always;
-            padding: 40px 50px;
+            padding-top: 45px;
+            padding-bottom: 45px;
             background-color: #ffffff;
             width: 100%;
+        }
+
+        /* Contenedor con ancho de 90% y centrado (margin left/right 5%) */
+        .wrapper-hoja2 {
+            width: 90%;
+            margin: 0 auto;
         }
 
         .table-container {
             width: 100%;
             border-collapse: collapse;
-            table-layout: fixed;
         }
 
+        /* Columna Izquierda: Ajustada al 62% del contenedor */
         .col-left {
-            width: 60%;
+            width: 62%;
             vertical-align: top;
-            padding-right: 25px;
+            padding-right: 30px;
+            text-align: left;
         }
 
+        /* Columna Derecha: Ajustada al 38% del contenedor con alineación a la derecha */
         .col-right {
-            width: 40%;
+            width: 38%;
             vertical-align: top;
-            padding-left: 15px;
             text-align: right;
         }
 
@@ -192,31 +200,32 @@
             font-size: 13px;
             color: #1a1a1a;
             margin-bottom: 5px;
-            line-height: 1.3;
+            line-height: 1.35;
         }
 
         .logo-container {
             width: 100%;
             text-align: right;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         .logo-img {
             max-width: 220px;
-            max-height: 90px;
+            max-height: 85px;
             height: auto;
         }
 
-        /* Cuadro del QR Simétrico */
+        /* Cuadro del QR con ancho ideal (250px) para no desbordar */
         .qr-block {
-            width: 100%;
+            width: 250px;
             border-collapse: collapse;
+            margin-left: auto; /* Empuja el bloque QR totalmente a la derecha */
             margin-top: 10px;
         }
 
         .qr-header-cell {
             border: 1px solid #000000;
-            padding: 6px;
+            padding: 5px;
             text-align: center;
             font-size: 11px;
             font-weight: bold;
@@ -225,19 +234,19 @@
 
         .qr-body-cell {
             border: 1px solid #000000;
-            padding: 6px 8px;
+            padding: 5px 8px;
             font-size: 11px;
         }
 
         .qr-image-cell {
             border: 1px solid #000000;
-            padding: 12px;
+            padding: 10px;
             text-align: center;
         }
 
         .qr-image-cell img {
-            width: 140px;
-            height: 140px;
+            width: 145px;
+            height: 145px;
             display: block;
             margin: 0 auto;
         }
@@ -267,82 +276,82 @@
             </div>
         </div>
     </div><!-- HOJA 2 --><div class="page-second">
-        <table class="table-container">
-            <tr>
-                <!-- Columna Izquierda: Texto Legal + Temario -->
-                <td class="col-left">
-                    <div class="text-legal">
-                        Esta es una copia auténtica imprimible de un documento electrónico archivado por PerúAgro, aplicando lo dispuesto por el Art. 25 de D.S. 070-2013-PCM y la Tercera Disposición Complementaria Final del D.S. 026-2016-PCM.
-                    </div>
-
-                    <div class="title-curso">
-                        {{ $info->titulo_programa }}
-                    </div>
-
-                    @if(!empty($info->temario))
-                        <div class="temario-box">
-                            Temario
+        <div class="wrapper-hoja2">
+            <table class="table-container">
+                <tr>
+                    <!-- Columna Izquierda: Texto Legal + Titulo + Temario (Alineación Izquierda) -->
+                    <td class="col-left">
+                        <div class="text-legal">
+                            Esta es una copia auténtica imprimible de un documento electrónico archivado por PerúAgro, aplicando lo dispuesto por el Art. 25 de D.S. 070-2013-PCM y la Tercera Disposición Complementaria Final del D.S. 026-2016-PCM.
                         </div>
 
-                        <ul class="temario-list">
-                            @if(is_array($info->temario))
-                                @foreach($info->temario as $item)
-                                    <li>{{ $item }}</li>
-                                @endforeach
-                            @else
-                                <li>{!! nl2br(e($info->temario)) !!}</li>
-                            @endif
-                        </ul>
-                    @endif
-                </td>
+                        <div class="title-curso">
+                            {{ $info->titulo_programa }}
+                        </div>
 
-                <!-- Columna Derecha: Logo + QR y Código -->
-                <td class="col-right">
-                    <div class="logo-container">
-                        @php
-                            // Carga directa de la imagen mediante ruta física absoluta / public_path
-                            $logoNombre = $info->logo ?? 'logo.png'; 
-                            $logoPath = public_path('images/' . ltrim($logoNombre, '/'));
-                            
-                            // Si en $info->logo viene el path completo o relativo, verificamos si existe:
-                            if (!file_exists($logoPath) && isset($info->logo) && file_exists(public_path($info->logo))) {
-                                $logoPath = public_path($info->logo);
-                            }
-                        @endphp
+                        @if(!empty($info->temario))
+                            <div class="temario-box">
+                                Temario
+                            </div>
 
-                        @if(file_exists($logoPath))
-                            <img src="data:image/png;base64,{{ base64_encode(file_get_contents($logoPath)) }}" class="logo-img" alt="Logo Institución">
-                        @elseif(isset($info->logo) && filter_var($info->logo, FILTER_VALIDATE_URL))
-                            <img src="{{ $info->logo }}" class="logo-img" alt="Logo Institución">
-                        @endif
-                    </div>
-
-                    <table class="qr-block">
-                        <tr>
-                            <td colspan="2" class="qr-header-cell">
-                                REGISTRO ELECTRÓNICO
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="qr-body-cell" style="width: 55%; font-weight: bold; text-align: left;">Código Validación</td>
-                            <td class="qr-body-cell" style="width: 45%; text-align: center;">{{ $info->codigo_verificacion }}</td>
-                        </tr>
-                        <tr>
-                            <td colspan="2" class="qr-header-cell">
-                                VERIFICACIÓN EN LÍNEA
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="2" class="qr-image-cell">
-                                @if(isset($info->qrCode) && $info->qrCode)
-                                    <img src="{{ $info->qrCode }}" alt="Código QR">
+                            <ul class="temario-list">
+                                @if(is_array($info->temario))
+                                    @foreach($info->temario as $item)
+                                        <li>{{ $item }}</li>
+                                    @endforeach
+                                @else
+                                    <li>{!! nl2br(e($info->temario)) !!}</li>
                                 @endif
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-        </table>
+                            </ul>
+                        @endif
+                    </td>
+
+                    <!-- Columna Derecha: Logo + Bloque QR (Alineación Derecha) -->
+                    <td class="col-right">
+                        <div class="logo-container">
+                            @php
+                                $logoNombre = $info->logo ?? 'logo.png'; 
+                                $logoPath = public_path('images/' . ltrim($logoNombre, '/'));
+                                
+                                if (!file_exists($logoPath) && isset($info->logo) && file_exists(public_path($info->logo))) {
+                                    $logoPath = public_path($info->logo);
+                                }
+                            @endphp
+
+                            @if(file_exists($logoPath))
+                                <img src="data:image/png;base64,{{ base64_encode(file_get_contents($logoPath)) }}" class="logo-img" alt="Logo Institución">
+                            @elseif(isset($info->logo) && filter_var($info->logo, FILTER_VALIDATE_URL))
+                                <img src="{{ $info->logo }}" class="logo-img" alt="Logo Institución">
+                            @endif
+                        </div>
+
+                        <table class="qr-block">
+                            <tr>
+                                <td colspan="2" class="qr-header-cell">
+                                    REGISTRO ELECTRÓNICO
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="qr-body-cell" style="width: 55%; font-weight: bold; text-align: left;">Código Validación</td>
+                                <td class="qr-body-cell" style="width: 45%; text-align: center;">{{ $info->codigo_verificacion }}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" class="qr-header-cell">
+                                    VERIFICACIÓN EN LÍNEA
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" class="qr-image-cell">
+                                    @if(isset($info->qrCode) && $info->qrCode)
+                                        <img src="{{ $info->qrCode }}" alt="Código QR">
+                                    @endif
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </div>
     </div>
 
 </body>
