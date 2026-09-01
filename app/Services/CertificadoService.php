@@ -168,9 +168,13 @@ class CertificadoService implements ICertificadoService
         ];
 
         // Definir las fechas del evento en texto
-        $fechaInicio = CertificadoHelper::fechaEnLetras($programa->fecha_inicio ?? null);
-        $fechaFinal = CertificadoHelper::fechaEnLetras($programa->fecha_final ?? null);
-        $descFechasPrograma = ($fechaInicio && $fechaFinal) ? "Realizado del {$fechaInicio} al {$fechaFinal}" : "";
+        // $fechaInicio = CertificadoHelper::fechaEnLetras($programa->fecha_inicio ?? null);
+        // $fechaFinal = CertificadoHelper::fechaEnLetras($programa->fecha_final ?? null);
+        // $descFechasPrograma = ($fechaInicio && $fechaFinal) ? "Realizado del {$fechaInicio} al {$fechaFinal}" : "";
+        $descFechasPrograma = CertificadoHelper::formatearRangoFechas(
+            $programa->fecha_inicio ?? null,
+            $programa->fecha_final ?? null
+        );
 
         // Calcular los estilos dinámicos
         $baseFontSizeAlumno = $esCapacitacion
@@ -210,6 +214,11 @@ class CertificadoService implements ICertificadoService
 
         // Definiendo horas académicas
         $horasAcademicasDefault = config('params.horas_academicas_default');
+        $horasAcademicas = $programa->horas_academicas ?? $horasAcademicasDefault;
+
+        $textoFechasConHoras = ($descFechasPrograma !== '')
+            ? "{$descFechasPrograma} con una duración de {$horasAcademicas} horas"
+            : "";
 
         Log::info('Evaluando horas académicas', ['horasAcademicasDefault' => $horasAcademicasDefault]);
 
@@ -240,10 +249,10 @@ class CertificadoService implements ICertificadoService
             'titulo_programa'       => $programa->titulo ?? 'Programa Académico',
             'estilos_programa'      => $estilosPrograma,
 
-            'fechas_programa'       => $descFechasPrograma,
+            'fechas_programa'       => $textoFechasConHoras,
             'estilos_fechas'        => $estilosFechas,
 
-            'horas_academicas'      => $programa->horas_academicas ?? $horasAcademicasDefault,
+            'horas_academicas'      => $horasAcademicas,
             'fecha_emision'         => CertificadoHelper::fechaEnLetras($certificado->fecha_crea),
             'codigo_verificacion'   => $certificado->codigo_verificacion,
             'qrCode'                => $qrBase64,
@@ -524,7 +533,7 @@ class CertificadoService implements ICertificadoService
             ->data($url)
             ->encoding(new Encoding('UTF-8'))
             ->errorCorrectionLevel(ErrorCorrectionLevel::High)
-            ->size(300)
+            ->size(400)
             ->margin(10)
             ->roundBlockSizeMode(RoundBlockSizeMode::Margin)
             ->build();

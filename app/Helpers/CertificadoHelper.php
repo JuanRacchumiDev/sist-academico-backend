@@ -33,6 +33,52 @@ class CertificadoHelper
     }
 
     /**
+     * Formatea un rango de fechas para el evento.
+     * Ejemplo mismo año: Realizado del 01 de Octubre al 31 de Octubre del 2025
+     * Ejemplo distinto año: Realizado del 15 de Diciembre del 2024 al 15 de Enero del 2025
+     */
+    public static function formatearRangoFechas(?string $fechaInicio, ?string $fechaFinal): string
+    {
+        if (!$fechaInicio && !$fechaFinal) {
+            return '';
+        }
+
+        if (!$fechaInicio) {
+            return "Realizado el " . self::fechaEnLetras($fechaFinal);
+        }
+
+        if (!$fechaFinal) {
+            return "Realizado el " . self::fechaEnLetras($fechaInicio);
+        }
+
+        $inicio = Carbon::parse($fechaInicio)->locale('es');
+        $final = Carbon::parse($fechaFinal)->locale('es');
+
+        $diaInicio = str_pad($inicio->day, 2, '0', STR_PAD_LEFT);
+        $diaFinal  = str_pad($final->day, 2, '0', STR_PAD_LEFT);
+
+        $mesInicio = ucfirst($inicio->translatedFormat('F'));
+        $mesFinal  = ucfirst($final->translatedFormat('F'));
+
+        $anioInicio = $inicio->year;
+        $anioFinal  = $final->year;
+
+        // Caso 1: Mismo Año
+        if ($anioInicio === $anioFinal) {
+            // Mismo mes
+            if ($inicio->month === $final->month) {
+                return "Realizado del {$diaInicio} de {$mesInicio} al {$diaFinal} de {$mesFinal} del {$anioFinal}";
+            }
+
+            // Distinto mes
+            return "Realizado del {$diaInicio} de {$mesInicio} al {$diaFinal} de {$mesFinal} del {$anioFinal}";
+        }
+
+        // Caso 2: Años distintos
+        return "Realizado del {$diaInicio} de {$mesInicio} del {$anioInicio} al {$diaFinal} de {$mesFinal} del {$anioFinal}";
+    }
+
+    /**
      * Convierte una fuente TTF/OTF local a base64 para inscrustarla en el CSS del PDF.
      */
     public static function getFontBase64(string $fontName): ?string

@@ -1,3 +1,4 @@
+<!-- /resources/views/pdf/capacitacion/default.blade.php -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -18,7 +19,6 @@
             font-family: 'Helvetica', 'Arial', sans-serif;
         }
 
-        /* FUENTES PERSONALIZADAS */
         @font-face {
             font-family: 'FuenteAlumno';
             src: url("{{ $fonts['alumno'] }}") format('truetype');
@@ -51,12 +51,12 @@
             font-style: normal;
         }
 
-        /* --- PRIMERA HOJA --- */
+        /* --- HOJA 1 --- */
         .page-first {
             position: relative;
             width: 100%;
             height: 100%;
-            page-break-after: always; /* Forza el salto de página */
+            page-break-after: always;
         }
 
         .cert-background {
@@ -128,9 +128,9 @@
             font-weight: normal;
         }
 
-        /* --- SEGUNDA HOJA --- */
+        /* --- HOJA 2 (Ajustes de tamaño de letra y QR) --- */
         .page-second {
-            padding: 40px 50px;
+            padding: 45px 55px;
             box-sizing: border-box;
             background-color: #ffffff;
             height: 100%;
@@ -142,41 +142,44 @@
         }
 
         .col-left {
-            width: 65%;
+            width: 62%;
             vertical-align: top;
-            padding-right: 20px;
+            padding-right: 25px;
         }
 
         .col-right {
-            width: 35%;
+            width: 38%;
             vertical-align: top;
             text-align: right;
         }
 
+        /* Fuente incrementada a 15px */
         .text-legal {
-            font-size: 13px;
+            font-size: 15px;
             color: #1a1a1a;
-            line-height: 1.4;
-            margin-bottom: 18px;
+            line-height: 1.45;
+            margin-bottom: 22px;
         }
 
+        /* Título del Programa incrementado a 18px */
         .title-curso {
+            font-size: 18px;
+            font-weight: bold;
+            color: #0b2239;
+            margin-bottom: 16px;
+        }
+
+        /* Cabecera Temario incrementada a 15px */
+        .temario-box {
+            border: 1px dashed #000000;
+            padding: 6px 12px;
             font-size: 15px;
             font-weight: bold;
-            color: #0d2a4a;
             margin-bottom: 12px;
-        }
-
-        .temario-box {
-            border: 1px solid #000000;
-            padding: 4px 8px;
-            font-size: 13px;
-            font-weight: bold;
-            display: inline-block;
-            margin-bottom: 10px;
             width: 95%;
         }
 
+        /* Lista de Temario incrementada a 15px */
         .temario-list {
             margin: 0;
             padding-left: 0;
@@ -184,55 +187,56 @@
         }
 
         .temario-list li {
-            font-size: 13px;
+            font-size: 15px;
             color: #1a1a1a;
-            margin-bottom: 6px;
-            line-height: 1.3;
+            margin-bottom: 8px;
+            line-height: 1.4;
         }
 
         .logo-img {
-            max-width: 180px;
+            max-width: 210px;
             height: auto;
         }
 
-        /* Cuadro de Verificación QR */
+        /* Cuadro de QR Agrandado */
         .qr-block {
-            margin-top: 130px;
-            width: 230px;
+            margin-top: 60px;
+            width: 270px;
             float: right;
             border-collapse: collapse;
         }
 
         .qr-header-cell {
             border: 1px solid #000000;
-            padding: 4px;
+            padding: 6px;
             text-align: center;
-            font-size: 11px;
+            font-size: 13px;
             font-weight: bold;
             background-color: #ffffff;
         }
 
         .qr-body-cell {
             border: 1px solid #000000;
-            padding: 4px;
-            font-size: 11px;
+            padding: 6px 8px;
+            font-size: 13px;
         }
 
         .qr-image-cell {
             border: 1px solid #000000;
-            padding: 10px;
+            padding: 12px;
             text-align: center;
         }
 
+        /* Tamaño del QR incrementado a 170px */
         .qr-image-cell img {
-            width: 130px;
-            height: 130px;
+            width: 170px;
+            height: 170px;
         }
     </style>
 </head>
 <body>
 
-    <!-- PRIMERA HOJA -->
+    <!-- HOJA 1 -->
     <div class="page-first">
         @if(isset($info->fondo) && $info->fondo)
             <div class="cert-background">
@@ -250,16 +254,16 @@
             </div>
 
             <div class="layer-fechas">
-                <p class="txt-fechas" style="font-size: {{ $info->estilos_fechas['font_size'] }}px; line-height: {{ $info->estilos_fechas['line_height'] }};">{{ $info->fechas_programa }}, con una duración de {{ $info->horas_academicas }} horas</p>
+                <p class="txt-fechas" style="font-size: {{ $info->estilos_fechas['font_size'] }}px; line-height: {{ $info->estilos_fechas['line_height'] }};">{{ $info->fechas_programa }}</p>
             </div>
         </div>
     </div>
 
-    <!-- SEGUNDA HOJA -->
+    <!-- HOJA 2 -->
     <div class="page-second">
         <table class="table-container">
             <tr>
-                <!-- Columna Izquierda: Párrafo legal, Nombre del programa y Temario -->
+                <!-- Columna Izquierda: Texto Legal + Temario -->
                 <td class="col-left">
                     <div class="text-legal">
                         Esta es una copia auténtica imprimible de un documento electrónico archivado por PerúAgro, aplicando lo dispuesto por el Art. 25 de D.S. 070-2013-PCM y la Tercera Disposición Complementaria Final del D.S. 026-2016-PCM.
@@ -286,7 +290,7 @@
                     @endif
                 </td>
 
-                <!-- Columna Derecha: Logo y Tabla del Código QR -->
+                <!-- Columna Derecha: Logo + QR y Código -->
                 <td class="col-right">
                     @if(isset($info->logo) && $info->logo)
                         <img src="{{ $info->logo }}" class="logo-img" alt="Logo Institución">
