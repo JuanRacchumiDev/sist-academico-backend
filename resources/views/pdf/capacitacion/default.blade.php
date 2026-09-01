@@ -1,10 +1,13 @@
-<!-- /resources/views/pdf/capacitacion/default.blade.php -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>Certificado de Estudios</title>
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         @page {
             margin: 0px;
             size: A4 landscape;
@@ -56,7 +59,7 @@
             position: relative;
             width: 100%;
             height: 100%;
-            page-break-after: always;
+            overflow: hidden;
         }
 
         .cert-background {
@@ -82,7 +85,7 @@
 
         .layer-alumno {
             position: absolute;
-            top: 325px;
+            top: 320px;
             left: 7%;
             width: 86%;
             text-align: center;
@@ -114,7 +117,7 @@
 
         .layer-fechas {
             position: absolute;
-            top: 498px;
+            top: 493px;
             left: 10%;
             width: 80%;
             text-align: center;
@@ -128,12 +131,12 @@
             font-weight: normal;
         }
 
-        /* --- HOJA 2 (Ajustes de tamaño de letra y QR) --- */
+        /* --- HOJA 2 --- */
         .page-second {
-            padding: 45px 55px;
-            box-sizing: border-box;
+            page-break-before: always; /* Forzamos el salto justo antes de la 2ª hoja */
+            padding: 40px 50px;
             background-color: #ffffff;
-            height: 100%;
+            width: 100%;
         }
 
         .table-container {
@@ -144,7 +147,7 @@
         .col-left {
             width: 62%;
             vertical-align: top;
-            padding-right: 25px;
+            padding-right: 20px;
         }
 
         .col-right {
@@ -153,33 +156,29 @@
             text-align: right;
         }
 
-        /* Fuente incrementada a 15px */
         .text-legal {
-            font-size: 15px;
+            font-size: 14px;
             color: #1a1a1a;
-            line-height: 1.45;
-            margin-bottom: 22px;
+            line-height: 1.4;
+            margin-bottom: 20px;
         }
 
-        /* Título del Programa incrementado a 18px */
         .title-curso {
-            font-size: 18px;
+            font-size: 17px;
             font-weight: bold;
             color: #0b2239;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
         }
 
-        /* Cabecera Temario incrementada a 15px */
         .temario-box {
             border: 1px dashed #000000;
-            padding: 6px 12px;
-            font-size: 15px;
+            padding: 5px 10px;
+            font-size: 14px;
             font-weight: bold;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             width: 95%;
         }
 
-        /* Lista de Temario incrementada a 15px */
         .temario-list {
             margin: 0;
             padding-left: 0;
@@ -187,50 +186,51 @@
         }
 
         .temario-list li {
-            font-size: 15px;
+            font-size: 14px;
             color: #1a1a1a;
-            margin-bottom: 8px;
-            line-height: 1.4;
+            margin-bottom: 6px;
+            line-height: 1.35;
         }
 
         .logo-img {
-            max-width: 210px;
+            max-width: 200px;
             height: auto;
         }
 
-        /* Cuadro de QR Agrandado */
+        /* Cuadro del QR Alineado a la Derecha */
         .qr-block {
-            margin-top: 60px;
-            width: 270px;
-            float: right;
+            margin-top: 40px;
+            margin-left: auto;
+            width: 260px;
             border-collapse: collapse;
         }
 
         .qr-header-cell {
             border: 1px solid #000000;
-            padding: 6px;
+            padding: 5px;
             text-align: center;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: bold;
             background-color: #ffffff;
         }
 
         .qr-body-cell {
             border: 1px solid #000000;
-            padding: 6px 8px;
-            font-size: 13px;
+            padding: 5px 8px;
+            font-size: 12px;
         }
 
         .qr-image-cell {
             border: 1px solid #000000;
-            padding: 12px;
+            padding: 10px;
             text-align: center;
         }
 
-        /* Tamaño del QR incrementado a 170px */
         .qr-image-cell img {
-            width: 170px;
-            height: 170px;
+            width: 160px;
+            height: 160px;
+            display: block;
+            margin: 0 auto;
         }
     </style>
 </head>
@@ -257,10 +257,7 @@
                 <p class="txt-fechas" style="font-size: {{ $info->estilos_fechas['font_size'] }}px; line-height: {{ $info->estilos_fechas['line_height'] }};">{{ $info->fechas_programa }}</p>
             </div>
         </div>
-    </div>
-
-    <!-- HOJA 2 -->
-    <div class="page-second">
+    </div><!-- HOJA 2 --><div class="page-second">
         <table class="table-container">
             <tr>
                 <!-- Columna Izquierda: Texto Legal + Temario -->

@@ -229,7 +229,7 @@ class CertificadoService implements ICertificadoService
             ? $plantilla->institucion->nombre_director
             : "----";
 
-        $logoPath = public_path('images/logo-peruagro.png');
+        $logoPath = public_path('images/logo-innovaperu.jpg');
         $logoBase64 = null;
 
         if (file_exists($logoPath)) {
