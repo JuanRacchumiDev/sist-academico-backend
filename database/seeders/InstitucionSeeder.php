@@ -26,7 +26,7 @@ class InstitucionSeeder extends Seeder
                 'ruc' => '20204040200',
                 'direccion' => 'Chiclayo',
                 'telefono_contacto' => '998877665',
-                'logo_path' => 'logo_innovaperu.png',
+                'logo_path' => 'logo-innovaperu.png',
                 'nombre_director' => 'ALEXANDER ROBERTO FLORES GONZÁLES',
                 'is_cliente' => false,
                 'fecha_crea' => $fechaCrea,

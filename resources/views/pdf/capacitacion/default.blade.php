@@ -282,7 +282,7 @@
                     <!-- Columna Izquierda: Texto Legal + Titulo + Temario (Alineación Izquierda) -->
                     <td class="col-left">
                         <div class="text-legal">
-                            Esta es una copia auténtica imprimible de un documento electrónico archivado por PerúAgro, aplicando lo dispuesto por el Art. 25 de D.S. 070-2013-PCM y la Tercera Disposición Complementaria Final del D.S. 026-2016-PCM.
+                            Esta es una copia auténtica imprimible de un documento electrónico archivado por INNOVAPERU, aplicando lo dispuesto por el Art. 25 de D.S. 070-2013-PCM y la Tercera Disposición Complementaria Final del D.S. 026-2016-PCM.
                         </div>
 
                         <div class="title-curso">
