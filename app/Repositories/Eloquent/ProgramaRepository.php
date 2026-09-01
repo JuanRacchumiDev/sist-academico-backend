@@ -108,30 +108,30 @@ class ProgramaRepository implements IProgramaRepository
 
     private function applyFilters(Builder $query, array $filters): Builder
     {
-        if (isset($filters['codigo_segmento'])) {
+        if (!empty($filters['codigo_segmento'])) {
             $query->where('codigo_segmento', $filters['codigo_segmento']);
         }
 
-        if (isset($filters['codigo_tipoprograma'])) {
+        if (!empty($filters['codigo_tipoprograma'])) {
             $query->where('codigo_tipoprograma', $filters['codigo_tipoprograma']);
         }
 
-        if (isset($filters['codigo_categoriaprograma'])) {
+        if (!empty($filters['codigo_categoriaprograma'])) {
             $query->where('codigo_categoriaprograma', $filters['codigo_categoriaprograma']);
         }
 
-        if (isset($filters['id_sucursal'])) {
+        if (!empty($filters['id_sucursal'])) {
             $query->where('id_sucursal', $filters['id_sucursal']);
         }
 
-        if (isset($filters['titulo'])) {
+        if (!empty($filters['titulo'])) {
             $search = '%' . strtolower($filters['titulo']) . '%';
             $query->where(function ($q) use ($search) {
                 $q->whereRaw('LOWER(titulo) LIKE ?', [$search]);
             });
         }
 
-        if (isset($filters['modalidad'])) {
+        if (!empty($filters['modalidad'])) {
             $query->where('modalidad', $filters['modalidad']);
         }
 

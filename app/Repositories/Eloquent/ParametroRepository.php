@@ -29,15 +29,15 @@ class ParametroRepository implements IParametroRepository
     {
         $query = Parametro::with('detalle');
 
-        if (isset($filters['nombre'])) {
+        if (!empty($filters['nombre'])) {
             $query->where('nombre', 'like', '%' . $filters['nombre'] . '%');
         }
 
-        if (isset($filters['descripcion'])) {
+        if (!empty($filters['descripcion'])) {
             $query->where('descripcion', 'like', '%' . $filters['descripcion'] . '%');
         }
 
-        if (isset($filters['estado'])) {
+        if (!empty($filters['estado'])) {
             $query->where('estado', (bool)$filters['estado']);
         }
 

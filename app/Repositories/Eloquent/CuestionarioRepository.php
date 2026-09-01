@@ -74,15 +74,15 @@ class CuestionarioRepository implements ICuestionarioRepository
 
     private function applyFilters(Builder $query, array $filters): Builder
     {
-        if (isset($filters['id_programa'])) {
+        if (!empty($filters['id_programa'])) {
             $query->where('id_programa', $filters['id_programa']);
         }
 
-        if (isset($filters['id_modulo'])) {
+        if (!empty($filters['id_modulo'])) {
             $query->where('id_modulo', $filters['id_modulo']);
         }
 
-        if (isset($filters['titulo'])) {
+        if (!empty($filters['titulo'])) {
             $search = '%' . strtolower($filters['titulo']) . '%';
             $query->where(function ($q) use ($search) {
                 $q->whereRaw('LOWER(titulo) LIKE ?', [$search]);

@@ -19,39 +19,24 @@ class InstitucionRepository implements IInstitucionRepository
     public function getAll(): Collection
     {
         return Institucion::with([
-            'sede'
+            'sede',
+            'plantillas'
         ])->get();
     }
 
     public function getAllFiltered(?array $filters = null): Collection
     {
-        // $query = Institucion::with([
-        //     'sede'
-        // ]);
-
-        // $query = $this->applyFilters($query, $filters ?? []);
-
-        // return $query->orderBy('nombre', 'ASC')->get();
-
         return $this->applyFilters($filters)->get();
     }
 
     public function getAllFilteredPaginate(array $filters, int $perPage = 10): LengthAwarePaginator
     {
-        // $query = Institucion::with([
-        //     'sede'
-        // ]);
-
-        // $query = $this->applyFilters($query, $filters);
-
-        // return $query->orderBy('nombre', 'ASC')->paginate($perPage);
-
         return $this->applyFilters($filters)->paginate($perPage);
     }
 
     public function findById(int $id): ?Institucion
     {
-        return Institucion::findOrFail($id);
+        return Institucion::find($id);
     }
 
     public function create(array $data): Institucion
@@ -83,25 +68,26 @@ class InstitucionRepository implements IInstitucionRepository
         Log::info('Validando filters in applyFilters', ['filters' => $filters]);
 
         $query = Institucion::with([
-            'sede'
+            'sede',
+            'plantillas'
         ]);
 
-        if (isset($filters['codigo_sede'])) {
+        if (!empty($filters['codigo_sede'])) {
             $query->where('codigo_sede', $filters['codigo_sede']);
         }
 
-        if (isset($filters['nombre'])) {
+        if (!empty($filters['nombre'])) {
             $nombre = "%" . strtolower($filters['nombre']) . "%";
             $query->where(function ($q) use ($nombre) {
                 $q->whereRaw('LOWER(nombre) LIKE ?', [$nombre]);
             });
         }
 
-        if (isset($filters['is_cliente']) && $filters['is_cliente'] !== '') {
+        if (!empty($filters['is_cliente']) && $filters['is_cliente'] !== '') {
             $query->where('is_cliente', (bool) $filters['is_cliente']);
         }
 
-        if (isset($filters['estado']) && $filters['estado'] !== '') {
+        if (!empty($filters['estado']) && $filters['estado'] !== '') {
             $query->where('estado', (bool) $filters['estado']);
         }
 

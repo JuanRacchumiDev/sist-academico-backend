@@ -90,26 +90,29 @@ class AdjuntoRepository implements IAdjuntoRepository
         if (!empty($filters['search'])) {
             $search = $filters['search'];
 
-            $query->where(function (Builder $q) use ($search) {
-                // Convertimos el término de búsqueda a minúsculas
+            $query->whereHas('programa', function (Builder $q) use ($search) {
                 $searchTerm = '%' . mb_strtolower($search, 'UTF-8') . '%';
-
-                // Búsqueda insensible a mayúsculas/minúsculas usando LOWER()
                 $q->whereRaw('LOWER(titulo) LIKE ?', [$searchTerm]);
+            });
+        }
+
+        if (!empty($filters['codigo_tipoprograma'])) {
+            $query->whereHas('programa', function (Builder $q) use ($filters) {
+                $q->where('codigo_tipoprograma', $filters['codigo_tipoprograma']);
             });
         }
 
         // Filtro por programa
         if (!empty($filters['id_programa'])) {
-            $query->where('codigo_tipocertificado', $filters['codigo_tipocertificado']);
+            $query->where('id_programa', $filters['id_programa']);
         }
 
-        // 2. Filtro por modulo
-        if (isset($filters['id_modulo'])) {
+        // Filtro por modulo
+        if (!empty($filters['id_modulo'])) {
             $query->where('id_modulo', $filters['id_modulo']);
         }
 
-        // 3. Filtro por rango de fechas de pago
+        // Filtro por rango de fechas de pago
         if (!empty($filters['fecha_inicio'])) {
             $query->whereDate('fecha_crea', '>=', $filters['fecha_inicio']);
         }

@@ -88,7 +88,7 @@ class PreguntaRepository implements IPreguntaRepository
             ->delete();
 
         foreach ($preguntasData as $data) {
-            if (isset($data['id'])) {
+            if (!empty($data['id'])) {
                 Pregunta::where('id', $data['id'])->update($data);
             } else {
                 Pregunta::create(array_merge($data, ['id_cuestionario', $cuestionarioId]));
@@ -98,11 +98,11 @@ class PreguntaRepository implements IPreguntaRepository
 
     private function applyFilters(Builder $query, array $filters): Builder
     {
-        if (isset($filters['id_cuestionario'])) {
+        if (!empty($filters['id_cuestionario'])) {
             $query->where('id_cuestionario', $filters['id_cuestionario']);
         }
 
-        if (isset($filters['enunciado'])) {
+        if (!empty($filters['enunciado'])) {
             $search = '%' . strtolower($filters['enunciado']) . '%';
             $query->where(function ($q) use ($search) {
                 $q->whereRaw('LOWER(enunciado) LIKE ?', [$search]);

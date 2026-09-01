@@ -25,7 +25,8 @@ class PlantillaRepository implements IPlantillaRepository
     public function getAllFiltered(array $filters, int $perPage): LengthAwarePaginator
     {
         $query = Plantilla::with([
-            'institucion'
+            'institucion',
+            'tipoPrograma'
         ]);
 
         $query = $this->applyFilters($query, $filters);
@@ -68,11 +69,15 @@ class PlantillaRepository implements IPlantillaRepository
 
     private function applyFilters(Builder $query, array $filters): Builder
     {
-        if (isset($filters['id_institucion'])) {
+        if (!empty($filters['id_institucion'])) {
             $query->where('id_institucion', $filters['id_institucion']);
         }
 
-        if (isset($filters['search'])) {
+        if (!empty($filters['codigo_tipoprograma'])) {
+            $query->where('codigo_tipoprograma', $filters['codigo_tipoprograma']);
+        }
+
+        if (!empty($filters['search'])) {
             $search = '%' . strtolower($filters['search']) . '%';
             $query->where(function ($q) use ($search) {
                 $q->whereRaw('LOWER(nombre) LIKE ?', [$search]);

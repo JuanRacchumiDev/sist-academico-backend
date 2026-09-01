@@ -93,4 +93,13 @@ class DetalleParametro extends Model
     {
         return $this->hasMany(Programa::class, 'codigo_segmento', 'codigo');
     }
+
+    /**
+     * Plantillas asociadas por tipo de programa
+     * @return HasMany<Plantilla, $this>
+     */
+    public function plantillas(): HasMany
+    {
+        return $this->hasMany(Plantilla::class, 'codigo_tipoprograma', 'codigo');
+    }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\DTOs\Adjunto\AdjuntoCreateDTO;
+use App\Helpers\FechaHelper;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 // use App\DTOs\Adjunto\AdjuntoCreateDTO;
@@ -57,7 +58,7 @@ class AdjuntoController extends Controller
     public function getFilteredPaginate(Request $request): JsonResponse
     {
         try {
-            $filters = $request->only(['id_programa', 'id_modulo', 'search', 'fecha_inicio', 'fecha_final']);
+            $filters = $request->only(['codigo_tipoprograma', 'id_programa', 'id_modulo', 'search', 'fecha_inicio', 'fecha_final']);
 
             $perPage = (int)$request->input('per_page', 10);
 
@@ -183,6 +184,18 @@ class AdjuntoController extends Controller
             $data = $dto->toArray();
             $data['user_crea'] = $username;
             $data['id_modulo'] = $idModulo;
+
+            if (!isset($data['estado'])) {
+                $data['estado'] = true;
+            }
+
+            if (!isset($data['is_descargable'])) {
+                $data['is_descargable'] = true;
+            }
+
+            if (!isset($data['is_visible'])) {
+                $data['is_visible'] = true;
+            }
 
             $adjunto = $this->adjuntoService->createAdjunto($data, $request->file('file'));
 

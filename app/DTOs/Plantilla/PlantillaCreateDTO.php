@@ -10,6 +10,7 @@ class PlantillaCreateDTO extends Data
     public function __construct(
         public string $nombre,
         public ?int $id_institucion = null,
+        public ?int $codigo_tipoprograma = null,
         public UploadedFile|string|null $path_imagen_fondo = null,
         public UploadedFile|string|null $path_imagen_publica = null,
         public UploadedFile|string|null $path_pdf_fondo = null,
@@ -44,6 +45,12 @@ class PlantillaCreateDTO extends Data
                 'sometimes',
                 'integer',
                 'exists:institucion,id',
+                'nullable'
+            ],
+            'codigo_tipoprograma' => [
+                'sometimes',
+                'integer',
+                'exists:detalle_parametro,codigo',
                 'nullable'
             ],
             'nombre' => [

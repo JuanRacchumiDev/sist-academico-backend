@@ -20,7 +20,8 @@ class DetalleParametroRepository implements IDetalleParametroRepository
             'programasPorTipo',
             'programasPorCategoria',
             'programasPorSegmento',
-            'personas'
+            'personas',
+            'plantillas'
         ])
             ->where('parametro_clase', $parametro_clase)
             ->get();
@@ -58,7 +59,8 @@ class DetalleParametroRepository implements IDetalleParametroRepository
             'programasPorTipo',
             'programasPorCategoria',
             'programasPorSegmento',
-            'personas'
+            'personas',
+            'plantillas'
         ])->where('codigo', $codigo)->first();
     }
 
@@ -137,32 +139,33 @@ class DetalleParametroRepository implements IDetalleParametroRepository
             'programasPorTipo',
             'programasPorCategoria',
             'programasPorSegmento',
-            'personas'
+            'personas',
+            'plantillas'
         ]);
 
         // Filtro por parametro_clase (admite un valor individual o un array de valores)
-        if (isset($filters['parametro_clase']) && $filters['parametro_clase'] !== '') {
+        if (!empty($filters['parametro_clase']) && $filters['parametro_clase'] !== '') {
             $clases = is_array($filters['parametro_clase']) ? $filters['parametro_clase'] : [$filters['parametro_clase']];
             $query->whereIn('parametro_clase', $clases);
         }
 
         // Filtro booleano: en_persona
-        if (isset($filters['en_persona']) && $filters['en_persona'] !== '') {
+        if (!empty($filters['en_persona']) && $filters['en_persona'] !== '') {
             $query->where('en_persona', (bool) $filters['en_persona']);
         }
 
         // Filtro booleano: en_empresa
-        if (isset($filters['en_empresa']) && $filters['en_empresa'] !== '') {
+        if (!empty($filters['en_empresa']) && $filters['en_empresa'] !== '') {
             $query->where('en_empresa', (bool) $filters['en_empresa']);
         }
 
         // Filtro booleano: visible
-        if (isset($filters['visible']) && $filters['visible'] !== '') {
+        if (!empty($filters['visible']) && $filters['visible'] !== '') {
             $query->where('visible', (bool) $filters['visible']);
         }
 
         // Filtro booleano: estado
-        if (isset($filters['estado']) && $filters['estado'] !== '') {
+        if (!empty($filters['estado']) && $filters['estado'] !== '') {
             $query->where('estado', (bool) $filters['estado']);
         }
 

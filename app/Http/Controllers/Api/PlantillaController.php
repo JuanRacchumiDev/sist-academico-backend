@@ -29,7 +29,7 @@ class PlantillaController extends Controller
     {
         try {
             $perPage = $request->query('per_page');
-            $filters = $request->only(['id_institucion', 'search']);
+            $filters = $request->only(['id_institucion', 'codigo_tipoprograma', 'search']);
 
             if ($perPage) {
                 $plantillas = $this->plantillaService->getAllPlantillasWithFilters($filters, (int) $perPage);

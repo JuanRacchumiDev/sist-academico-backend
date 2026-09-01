@@ -23,23 +23,23 @@ class EventoRepository implements IEventoRepository
 
         if ($searchParams) {
             $query->where(function ($q) use ($searchParams) {
-                if (isset($searchParams['codigo_tipoevento'])) {
+                if (!empty($searchParams['codigo_tipoevento'])) {
                     $q->where('codigo_tipoevento', $searchParams['codigo_tipoevento']);
                 }
 
-                if (isset($searchParams['codigo_categoriaevento'])) {
+                if (!empty($searchParams['codigo_categoriaevento'])) {
                     $q->where('codigo_categoriaevento', $searchParams['codigo_categoriaevento']);
                 }
 
-                if (isset($searchParams['fecha_inicio'])) {
+                if (!empty($searchParams['fecha_inicio'])) {
                     $q->where('fecha_inicio', $searchParams['fecha_inicio']);
                 }
 
-                if (isset($searchParams['fecha_final'])) {
+                if (!empty($searchParams['fecha_final'])) {
                     $q->where('fecha_final', $searchParams['fecha_final']);
                 }
 
-                if (isset($searchParams['search'])) {
+                if (!empty($searchParams['search'])) {
                     $search = '%' . strtolower($searchParams['search']) . '%';
 
                     $q->whereRaw('LOWER(titulo) LIKE ?', [$search])
@@ -65,20 +65,20 @@ class EventoRepository implements IEventoRepository
         ]);
 
         // Aplicar filtros directos
-        if (isset($filters['codigo_tipoevento'])) {
+        if (!empty($filters['codigo_tipoevento'])) {
             $query->where('codigo_tipoevento', $filters['codigo_tipoevento']);
         }
 
-        if (isset($filters['codigo_categoriaevento'])) {
+        if (!empty($filters['codigo_categoriaevento'])) {
             $query->where('codigo_categoriaevento', $filters['codigo_categoriaevento']);
         }
 
-        if (isset($filters['estado'])) {
+        if (!empty($filters['estado'])) {
             $query->where('estado', (bool)$filters['estado']);
         }
 
         // Aplicar búsqueda por texto
-        if (isset($filters['search'])) {
+        if (!empty($filters['search'])) {
             $search = '%' . strtolower($filters['search']) . '%';
 
             $query->where(function ($q) use ($search) {

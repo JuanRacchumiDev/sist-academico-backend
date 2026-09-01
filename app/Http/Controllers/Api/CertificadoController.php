@@ -117,46 +117,11 @@ class CertificadoController extends Controller
     public function download(int $id): BinaryFileResponse|JsonResponse
     {
         return $this->servePdfResponse($id, 'attachment');
-
-        // try {
-        //     $fileData = $this->certificadoService->downloadCertificado($id);
-
-        //     return response()->download($fileData['full_path'], $fileData['filename'], [
-        //         'Content-Type' => 'application/pdf',
-        //     ]);
-        // } catch (Exception $e) {
-        //     $statusCode = $e->getCode() === 404 ? 404 : 500;
-
-        //     Log::error("Error al descargar el certificado {$id}: " . $e->getMessage());
-
-        //     return response()->json([
-        //         'status'  => 'error',
-        //         'message' => $e->getMessage()
-        //     ], $statusCode);
-        // }
     }
 
     public function downloadPDF(int $id): BinaryFileResponse|JsonResponse
     {
         return $this->servePdfResponse($id, 'inline');
-
-        // try {
-        //     $fileData = $this->certificadoService->downloadCertificado($id);
-
-        //     return response()->file($fileData['full_path'], [
-        //         'Content-Type'        => 'application/pdf',
-        //         'Content-Disposition' => 'inline; filename="' . $fileData['filename'] . '"'
-        //     ]);
-        // } catch (Exception $e) {
-        //     $statusCode = $e->getCode() === 404 ? 404 : 500;
-
-        //     Log::error("Error al previsualizar el certificado {$id}: " . $e->getMessage());
-
-        //     return response()->json([
-        //         'status'  => 'error',
-        //         'message' => $e->getMessage()
-        //     ], $statusCode);
-        // }
     }
 
     public function store(Request $request): JsonResponse

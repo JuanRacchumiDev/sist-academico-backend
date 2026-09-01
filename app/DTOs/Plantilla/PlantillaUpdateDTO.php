@@ -9,6 +9,7 @@ class PlantillaUpdateDTO extends Data
 {
     public function __construct(
         public ?int $id_institucion = null,
+        public ?int $codigo_tipoprograma = null,
         public ?string $nombre = null,
         public UploadedFile|string|null $path_imagen_fondo = null,
         public UploadedFile|string|null $path_imagen_publica = null,
@@ -44,6 +45,12 @@ class PlantillaUpdateDTO extends Data
                 'sometimes',
                 'integer',
                 'exists:institucion,id',
+                'nullable'
+            ],
+            'codigo_tipoprograma' => [
+                'sometimes',
+                'integer',
+                'exists:detalle_parametro,id',
                 'nullable'
             ],
             'nombre' => [

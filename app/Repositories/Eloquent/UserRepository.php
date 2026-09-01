@@ -62,7 +62,7 @@ class UserRepository implements IUserRepository
 
         if ($user) {
             // Si el password viene en la data, se encripta antes de guardar
-            if (isset($data['password']) && !empty($data['password'])) {
+            if (!empty($data['password']) && !empty($data['password'])) {
                 $data['password'] = Hash::make($data['password']);
             }
 
@@ -86,26 +86,26 @@ class UserRepository implements IUserRepository
 
     private function applyFilters(Builder $query, array $filters): Builder
     {
-        if (isset($filters['id'])) {
+        if (!empty($filters['id'])) {
             $query->where('id', $filters['id']);
         }
 
-        if (isset($filters['codigo_perfil'])) {
+        if (!empty($filters['codigo_perfil'])) {
             $query->where('codigo_perfil', $filters['codigo_perfil']);
         }
 
-        if (isset($filters['id_persona'])) {
+        if (!empty($filters['id_persona'])) {
             $query->where('id_persona', $filters['id_persona']);
         }
 
-        if (isset($filters['name']) && !empty($filters['name'])) {
+        if (!empty($filters['name']) && !empty($filters['name'])) {
             $search = '%' . strtolower($filters['name']) . '%';
             $query->where(function ($q) use ($search) {
                 $q->whereRaw('LOWER(name) LIKE ?', [$search]);
             });
         }
 
-        if (isset($filters['email']) && !empty($filters['email'])) {
+        if (!empty($filters['email']) && !empty($filters['email'])) {
             $search = '%' . strtolower($filters['email']) . '%';
             $query->where(function ($q) use ($search) {
                 $q->whereRaw('LOWER(email) LIKE ?', [$search]);

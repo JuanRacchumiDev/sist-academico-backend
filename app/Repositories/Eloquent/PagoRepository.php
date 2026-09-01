@@ -64,13 +64,13 @@ class PagoRepository implements IPagoRepository
         $mId = sprintf('%05d', $filters['id_matricula']);
 
         // Caso Pago de módulo
-        if (isset($filters['tipo']) && $filters['tipo'] === 'pago-modulo') {
+        if (!empty($filters['tipo']) && $filters['tipo'] === 'pago-modulo') {
             $modNo = sprintf('%02d', $filters['numero_modulo']);
             return "{$this->pathModulo}recibo_modulo_{$modNo}_mat_{$mId}.pdf";
         }
 
         // Caso Pago de matrícula
-        if (isset($filters['tipo']) && $filters['tipo'] === 'matricula') {
+        if (!empty($filters['tipo']) && $filters['tipo'] === 'matricula') {
             return "{$this->pathMatricula}recibo_matricula_{$mId}.pdf";
         }
 
@@ -232,7 +232,7 @@ class PagoRepository implements IPagoRepository
         }
 
         // 1. Filtro por estado del pago
-        if (isset($filters['estado'])) {
+        if (!empty($filters['estado'])) {
             $query->where('estado', (bool)$filters['estado']);
         }
 
@@ -253,16 +253,6 @@ class PagoRepository implements IPagoRepository
                 $qPersona->whereRaw('LOWER(nombre_completo) LIKE ?', [$search]);
             });
         }
-
-        // 4. Búsqueda por texto (concepto del pago o número de operación)
-        // if (!empty($filters['search'])) {
-        //     $search = '%' . strtolower($filters['search']) . '%';
-
-        //     $query->where(function (Builder $q) use ($search) {
-        //         $q->whereRaw('LOWER(concepto) LIKE ?', [$search])
-        //             ->orWhereRaw('LOWER(numero_operacion) LIKE ?', [$search]);
-        //     });
-        // }
 
         return $query;
     }

@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('plantilla', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('id_institucion')->nullable();
+            $table->unsignedBigInteger('codigo_tipoprograma')->nullable();
 
             $table->string('nombre', 100);
             $table->string('descripcion', 150)->nullable();
@@ -38,6 +39,10 @@ return new class extends Migration
             $table->foreign('id_institucion')
                 ->references('id')
                 ->on('institucion');
+
+            $table->foreign('codigo_tipoprograma')
+                ->references('codigo')
+                ->on('detalle_parametro');
         });
     }
 
@@ -49,6 +54,9 @@ return new class extends Migration
         Schema::table('plantilla', function (Blueprint $table) {
             $table->dropForeign('id_institucion');
             $table->dropColumn('id_institucion');
+
+            $table->dropForeign('codigo_tipoprograma');
+            $table->dropColumn('codigo_tipoprograma');
         });
 
         Schema::dropIfExists('plantilla');

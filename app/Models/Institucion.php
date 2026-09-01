@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Institucion extends Model
 {
@@ -52,5 +53,10 @@ class Institucion extends Model
     public function sede(): BelongsTo
     {
         return $this->belongsTo(DetalleParametro::class, 'codigo_sede', 'codigo');
+    }
+
+    public function plantillas(): HasMany
+    {
+        return $this->hasMany(Plantilla::class, 'id_institucion', 'id');
     }
 }

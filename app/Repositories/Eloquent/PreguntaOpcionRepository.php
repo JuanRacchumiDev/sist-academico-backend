@@ -71,11 +71,11 @@ class PreguntaOpcionRepository implements IPreguntaOpcionRepository
 
     private function applyFilters(Builder $query, array $filters): Builder
     {
-        if (isset($filters['id_pregunta'])) {
+        if (!empty($filters['id_pregunta'])) {
             $query->where('id_pregunta', $filters['id_pregunta']);
         }
 
-        if (isset($filters['texto_opcion'])) {
+        if (!empty($filters['texto_opcion'])) {
             $search = '%' . strtolower($filters['texto_opcion']) . '%';
             $query->where(function ($q) use ($search) {
                 $q->whereRaw('LOWER(texto_opcion) LIKE ?', [$search]);

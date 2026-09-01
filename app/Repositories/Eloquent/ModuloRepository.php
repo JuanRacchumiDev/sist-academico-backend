@@ -23,7 +23,7 @@ class ModuloRepository implements IModuloRepository
 
         if ($searchParams) {
             $query->where(function ($q) use ($searchParams) {
-                if (isset($searchParams['search'])) {
+                if (!empty($searchParams['search'])) {
                     $search = '%' . strtolower($searchParams['search']) . '%';
 
                     $q->whereRaw('LOWER(titulo) LIKE ?', [$search]);
@@ -46,12 +46,12 @@ class ModuloRepository implements IModuloRepository
             'programa'
         ]);
 
-        if (isset($filters['estado'])) {
+        if (!empty($filters['estado'])) {
             $query->where('estado', (bool)$filters['estado']);
         }
 
         // Aplicar búsqueda por texto
-        if (isset($filters['search'])) {
+        if (!empty($filters['search'])) {
             $search = '%' . strtolower($filters['search']) . '%';
 
             $query->where(function ($q) use ($search) {

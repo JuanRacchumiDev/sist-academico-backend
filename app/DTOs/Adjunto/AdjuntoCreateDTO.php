@@ -8,9 +8,6 @@ class AdjuntoCreateDTO extends Data
 {
     public function __construct(
         public string $titulo,
-        public bool $is_descargable,
-        public bool $is_visible,
-        public bool $estado,
 
         public ?int $id_programa = null,
         public ?int $id_modulo = null,
@@ -30,6 +27,9 @@ class AdjuntoCreateDTO extends Data
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null,
+        public ?bool $is_descargable = null,
+        public ?bool $is_visible = null,
+        public ?bool $estado = null,
     ) {}
 
     public static function withDefaults(): array
@@ -157,8 +157,9 @@ class AdjuntoCreateDTO extends Data
                 'nullable'
             ],
             'estado' => [
-                'required',
-                'boolean'
+                'sometimes',
+                'boolean',
+                'nullable'
             ]
         ];
     }

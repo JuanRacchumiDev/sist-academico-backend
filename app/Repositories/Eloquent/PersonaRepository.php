@@ -77,7 +77,7 @@ class PersonaRepository implements IPersonaRepository
         // Obteniendo el código de la clase grupo
         $clase = config('params.clases.grupo');
 
-        if (isset($data['nombre_grupo'])) {
+        if (!empty($data['nombre_grupo'])) {
             $grupo = DetalleParametro::where('nombre_url', $data['nombre_grupo'])
                 ->where('parametro_clase', $clase)
                 ->first();
@@ -112,7 +112,7 @@ class PersonaRepository implements IPersonaRepository
         $persona->update($data);
 
         // Opcional: Actualizar grupos
-        if (isset($data['grupos_ids'])) {
+        if (!empty($data['grupos_ids'])) {
             $this->syncGrupos($persona, $data['grupos_ids']);
         }
 
@@ -173,25 +173,25 @@ class PersonaRepository implements IPersonaRepository
 
     private function applyFilters(Builder $query, array $filters): Builder
     {
-        if (isset($filters['codigo_tipodocumento'])) {
+        if (!empty($filters['codigo_tipodocumento'])) {
             $query->where('codigo_tipodocumento', $filters['codigo_tipodocumento']);
         }
 
-        if (isset($filters['numero_documento'])) {
+        if (!empty($filters['numero_documento'])) {
             $query->where('numero_documento', $filters['numero_documento']);
         }
 
-        if (isset($filters['estado'])) {
+        if (!empty($filters['estado'])) {
             $query->where('estado', filter_var($filters['estado'], FILTER_VALIDATE_BOOLEAN));
         }
 
-        if (isset($filters['grupo'])) {
+        if (!empty($filters['grupo'])) {
             $query->whereHas('grupos', function ($q) use ($filters) {
                 $q->where('nombre_url', $filters['grupo']);
             });
         }
 
-        if (isset($filters['search'])) {
+        if (!empty($filters['search'])) {
             $search = '%' . strtolower($filters['search']) . '%';
             $query->where(function ($q) use ($search) {
                 $q->whereRaw('LOWER(numero_documento) LIKE ?', [$search])

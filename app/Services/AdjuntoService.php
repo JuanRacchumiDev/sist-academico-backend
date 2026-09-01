@@ -41,6 +41,8 @@ class AdjuntoService implements IAdjuntoService
 
     public function getAllAdjuntosWithFilters(array $filters, int $perPage): LengthAwarePaginator
     {
+        Log::info('Evaluando filters', ['filters' => $filters]);
+
         return $this->adjuntoRepository->getAllFiltered($filters, $perPage);
     }
 
