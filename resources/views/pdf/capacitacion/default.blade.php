@@ -118,7 +118,7 @@
 
         .layer-fechas {
             position: absolute;
-            top: 493px;
+            top: 498px;
             left: 10%;
             width: 80%;
             text-align: center;
