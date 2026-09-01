@@ -105,8 +105,10 @@ class CertificadoService implements ICertificadoService
         Log::info("Información de pdf", ["pdfRelativePath" => $pdfRelativePath]);
 
         // Construir la URL pública de verificación accesible por el escáner del smartphone
-        $appUrl = rtrim(config('app.url'), '/');
-        $qrUrl = "{$appUrl}/validar-certificado/{$certificado->codigo_verificacion}";
+        // $appUrl = rtrim(config('app.url'), '/');
+        $frontendUrl = config('app.frontend_url', 'https://app.innovaperu.edu.pe');
+        // $qrUrl = "{$appUrl}/validar-certificado/{$certificado->codigo_verificacion}";
+        $qrUrl = rtrim($frontendUrl, '/') . "/validar-certificado/{$certificado->codigo_verificacion}";
 
         Log::info("URL de verificación para el código QR", ['qrUrl' => $qrUrl]);
 
@@ -218,6 +220,15 @@ class CertificadoService implements ICertificadoService
             ? $plantilla->institucion->nombre_director
             : "----";
 
+        $logoPath = public_path('images/logo-peruagro.png');
+        $logoBase64 = null;
+
+        if (file_exists($logoPath)) {
+            $logoData = file_get_contents($logoPath);
+            $logoMime = mime_content_type($logoPath);
+            $logoBase64 = "data:{$logoMime};base64," . base64_encode($logoData);
+        }
+
         // Mapear objeto para la vista
         $info = (object)[
             'nombre_alumno'         => $certificado->nombre_impresion,
@@ -236,7 +247,9 @@ class CertificadoService implements ICertificadoService
             'fecha_emision'         => CertificadoHelper::fechaEnLetras($certificado->fecha_crea),
             'codigo_verificacion'   => $certificado->codigo_verificacion,
             'qrCode'                => $qrBase64,
-            'fondo'                 => $templateBase64
+            'fondo'                 => $templateBase64,
+            'logo'                  => $logoBase64,
+            'temario'               => $programa->temario ?? ''
         ];
 
         Log::info('Validando información que se creará en el certificado, variable $info', [
