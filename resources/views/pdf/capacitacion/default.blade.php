@@ -1,3 +1,4 @@
+<!-- /resources/views/pdf/capacitacion/default.blade.php -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -133,7 +134,7 @@
 
         /* --- HOJA 2 --- */
         .page-second {
-            page-break-before: always; /* Forzamos el salto justo antes de la 2ª hoja */
+            page-break-before: always;
             padding: 40px 50px;
             background-color: #ffffff;
             width: 100%;
@@ -142,29 +143,31 @@
         .table-container {
             width: 100%;
             border-collapse: collapse;
+            table-layout: fixed;
         }
 
         .col-left {
-            width: 62%;
+            width: 60%;
             vertical-align: top;
-            padding-right: 20px;
+            padding-right: 25px;
         }
 
         .col-right {
-            width: 38%;
+            width: 40%;
             vertical-align: top;
+            padding-left: 15px;
             text-align: right;
         }
 
         .text-legal {
-            font-size: 14px;
+            font-size: 13px;
             color: #1a1a1a;
             line-height: 1.4;
             margin-bottom: 20px;
         }
 
         .title-curso {
-            font-size: 17px;
+            font-size: 16px;
             font-weight: bold;
             color: #0b2239;
             margin-bottom: 14px;
@@ -173,10 +176,10 @@
         .temario-box {
             border: 1px dashed #000000;
             padding: 5px 10px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: bold;
             margin-bottom: 10px;
-            width: 95%;
+            width: 100%;
         }
 
         .temario-list {
@@ -186,49 +189,55 @@
         }
 
         .temario-list li {
-            font-size: 14px;
+            font-size: 13px;
             color: #1a1a1a;
-            margin-bottom: 6px;
-            line-height: 1.35;
+            margin-bottom: 5px;
+            line-height: 1.3;
+        }
+
+        .logo-container {
+            width: 100%;
+            text-align: right;
+            margin-bottom: 25px;
         }
 
         .logo-img {
-            max-width: 200px;
+            max-width: 220px;
+            max-height: 90px;
             height: auto;
         }
 
-        /* Cuadro del QR Alineado a la Derecha */
+        /* Cuadro del QR Simétrico */
         .qr-block {
-            margin-top: 40px;
-            margin-left: auto;
-            width: 260px;
+            width: 100%;
             border-collapse: collapse;
+            margin-top: 10px;
         }
 
         .qr-header-cell {
             border: 1px solid #000000;
-            padding: 5px;
+            padding: 6px;
             text-align: center;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: bold;
             background-color: #ffffff;
         }
 
         .qr-body-cell {
             border: 1px solid #000000;
-            padding: 5px 8px;
-            font-size: 12px;
+            padding: 6px 8px;
+            font-size: 11px;
         }
 
         .qr-image-cell {
             border: 1px solid #000000;
-            padding: 10px;
+            padding: 12px;
             text-align: center;
         }
 
         .qr-image-cell img {
-            width: 160px;
-            height: 160px;
+            width: 140px;
+            height: 140px;
             display: block;
             margin: 0 auto;
         }
@@ -289,9 +298,24 @@
 
                 <!-- Columna Derecha: Logo + QR y Código -->
                 <td class="col-right">
-                    @if(isset($info->logo) && $info->logo)
-                        <img src="{{ $info->logo }}" class="logo-img" alt="Logo Institución">
-                    @endif
+                    <div class="logo-container">
+                        @php
+                            // Carga directa de la imagen mediante ruta física absoluta / public_path
+                            $logoNombre = $info->logo ?? 'logo.png'; 
+                            $logoPath = public_path('images/' . ltrim($logoNombre, '/'));
+                            
+                            // Si en $info->logo viene el path completo o relativo, verificamos si existe:
+                            if (!file_exists($logoPath) && isset($info->logo) && file_exists(public_path($info->logo))) {
+                                $logoPath = public_path($info->logo);
+                            }
+                        @endphp
+
+                        @if(file_exists($logoPath))
+                            <img src="data:image/png;base64,{{ base64_encode(file_get_contents($logoPath)) }}" class="logo-img" alt="Logo Institución">
+                        @elseif(isset($info->logo) && filter_var($info->logo, FILTER_VALIDATE_URL))
+                            <img src="{{ $info->logo }}" class="logo-img" alt="Logo Institución">
+                        @endif
+                    </div>
 
                     <table class="qr-block">
                         <tr>
@@ -300,7 +324,7 @@
                             </td>
                         </tr>
                         <tr>
-                            <td class="qr-body-cell" style="width: 55%; font-weight: bold;">Código Validación</td>
+                            <td class="qr-body-cell" style="width: 55%; font-weight: bold; text-align: left;">Código Validación</td>
                             <td class="qr-body-cell" style="width: 45%; text-align: center;">{{ $info->codigo_verificacion }}</td>
                         </tr>
                         <tr>
