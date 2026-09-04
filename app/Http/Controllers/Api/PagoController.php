@@ -69,7 +69,7 @@ class PagoController extends Controller
                 $filters['fecha_final'] = $request->input('fechaFinal');
             }
 
-            $perPage = $request->input('per_page', 10);
+            $perPage = (int)$request->input('limit', 10);
 
             $filters = array_map(function ($value) {
                 if ($value === 'true') return true;
@@ -92,14 +92,14 @@ class PagoController extends Controller
             return response()->json([
                 'result' => true,
                 'data' => $pagos,
-                'message' => 'Resultados encontrados correctamente',
+                'message' => 'Pagos encontrados correctamente',
                 'pagination' => [
-                    'total' => $pagos->total(),
-                    'per_page' => $pagos->perPage(),
-                    'current_page' => $pagos->currentPage(),
-                    'last_page' => $pagos->lastPage(),
-                    'from' => $pagos->firstItem(),
-                    'to' => $pagos->lastItem()
+                    'totalItems' => $pagos->total(),
+                    'perPage' => $pagos->perPage(),
+                    'currentPage' => $pagos->currentPage(),
+                    'totalPages' => $pagos->lastPage(),
+                    'nextPage' => $pagos->hasMorePages() ? $pagos->currentPage() + 1 : null,
+                    'previousPage' => $pagos->currentPage() > 1 ? $pagos->currentPage() - 1 : null,
                 ]
             ], 200);
         } catch (\Exception $e) {

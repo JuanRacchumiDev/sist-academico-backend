@@ -72,7 +72,7 @@ class ProgramaController extends Controller
                 'modalidad'
             ]);
 
-            $perPage = $request->input('per_page', 10);
+            $perPage = (int)$request->input('limit', 10);
 
             $programas = $this->programaService->getAllProgramasWithFilters($filters, $perPage);
 
@@ -89,12 +89,12 @@ class ProgramaController extends Controller
                 'data' => $programas,
                 'message' => 'Resultados encontrados correctamente',
                 'pagination' => [
-                    'total' => $programas->total(),
-                    'per_page' => $programas->perPage(),
-                    'current_page' => $programas->currentPage(),
-                    'last_page' => $programas->lastPage(),
-                    'from' => $programas->firstItem(),
-                    'to' => $programas->lastItem()
+                    'totalItems' => $programas->total(),
+                    'perPage' => $programas->perPage(),
+                    'currentPage' => $programas->currentPage(),
+                    'totalPages' => $programas->lastPage(),
+                    'nextPage' => $programas->hasMorePages() ? $programas->currentPage() + 1 : null,
+                    'previousPage' => $programas->currentPage() > 1 ? $programas->currentPage() - 1 : null,
                 ]
             ], 200);
         } catch (\Exception $e) {

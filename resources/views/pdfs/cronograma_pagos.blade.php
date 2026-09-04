@@ -5,60 +5,64 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>Estado de Cuenta y Cronograma de Pagos</title>
     <style>
-        @page { margin: 40px 35px; }
+        @page { 
+            margin: 35px 30px; 
+        }
         body { 
             font-family: 'Helvetica', 'Arial', sans-serif; 
             color: #1e293b; 
-            font-size: 11px; 
+            font-size: 10px; 
             line-height: 1.4;
         }
         
-        /* Cabecera Profesional */
+        /* Header Struct */
         .header-table { 
             width: 100%; 
             border-collapse: collapse; 
             margin-bottom: 20px; 
+            border-bottom: 2px solid #0f172a;
+            padding-bottom: 12px;
         }
         .header-table td { 
             vertical-align: middle; 
         }
         .logo-container {
-            width: 80px;
-        }
-        .logo-placeholder {
-            width: 70px;
-            height: 70px;
-            background-color: #4f46e5;
-            color: #ffffff;
-            border-radius: 8px;
-            text-align: center;
-            line-height: 70px;
-            font-weight: bold;
-            font-size: 24px;
+            width: 130px;
         }
         .logo-img {
-            max-width: 75px;
-            max-height: 75px;
+            max-width: 120px;
+            max-height: 60px;
+            object-fit: contain;
+        }
+        .logo-placeholder {
+            width: 100px;
+            height: 45px;
+            background-color: #0f172a;
+            color: #ffffff;
             border-radius: 4px;
+            text-align: center;
+            line-height: 45px;
+            font-weight: bold;
+            font-size: 14px;
         }
         .inst-info {
-            padding-left: 15px;
+            padding-left: 10px;
         }
         .inst-title { 
-            font-size: 16px; 
-            font-weight: bold; 
+            font-size: 15px; 
+            font-weight: 800; 
             color: #0f172a; 
             text-transform: uppercase; 
             margin: 0;
+            letter-spacing: 0.5px;
         }
         .inst-slogan { 
-            font-size: 10px; 
+            font-size: 9px; 
             color: #64748b; 
-            font-style: italic;
-            margin: 2px 0 5px 0;
+            margin: 2px 0 4px 0;
         }
         .inst-contact {
-            font-size: 9px;
+            font-size: 8.5px;
             color: #475569;
         }
 
@@ -67,29 +71,31 @@
             vertical-align: top !important;
         }
         .doc-badge {
-            background-color: #f1f5f9;
+            background-color: #f8fafc;
             border: 1px solid #cbd5e1;
             padding: 8px 12px;
             border-radius: 6px;
             display: inline-block;
+            text-align: right;
         }
         .doc-id { 
-            font-size: 12px; 
+            font-size: 11px; 
             font-weight: bold; 
-            color: #4f46e5; 
+            color: #2563eb; 
             margin: 0;
+            text-transform: uppercase;
         }
         .doc-date {
             font-size: 9px;
-            color: #64748b;
+            color: #475569;
             margin-top: 3px;
         }
 
-        /* Bloques Informativos de Dos Columnas */
+        /* Two Column Grid */
         .info-container {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
         .info-column {
             width: 49%;
@@ -98,44 +104,51 @@
         .info-card { 
             background: #f8fafc; 
             border: 1px solid #e2e8f0; 
-            padding: 12px; 
+            padding: 10px 12px; 
             border-radius: 6px; 
-            height: 115px; /* Altura uniforme */
+            min-height: 105px;
         }
         .info-card-title {
-            font-size: 10px;
+            font-size: 9.5px;
             font-weight: bold;
             text-transform: uppercase;
-            color: #4f46e5;
+            color: #1e293b;
             margin-top: 0;
-            margin-bottom: 8px;
-            border-bottom: 1px solid #e2e8f0;
-            padding-bottom: 3px;
+            margin-bottom: 6px;
+            border-bottom: 1px solid #cbd5e1;
+            padding-bottom: 4px;
+            letter-spacing: 0.3px;
         }
         .info-grid {
             width: 100%;
             border-collapse: collapse;
         }
         .info-grid td {
-            padding: 2px 0;
-            font-size: 10.5px;
-        }
-        .label { 
-            font-weight: bold; 
-            color: #475569; 
-            width: 30%;
+            padding: 3px 0;
+            font-size: 9.5px;
+            vertical-align: top;
         }
         
-        /* Tabla de Cronograma */
+        /* MEJORA EN LA CLASE LABEL: Ancho controlado y espacio uniforme */
+        .label { 
+            font-weight: 600; 
+            color: #64748b;
+            width: 80px; /* Ancho fijo para alineación vertical perfecta */
+            white-space: nowrap;
+            padding-right: 10px; /* Separación garantizada con la siguiente celda */
+        }
+        
+        /* Table Content */
         .section-title { 
             color: #0f172a; 
-            border-bottom: 2px solid #cbd5e1; 
+            border-bottom: 1px solid #e2e8f0; 
             padding-bottom: 4px; 
             text-transform: uppercase; 
-            font-size: 11px; 
+            font-size: 10px; 
             font-weight: bold;
-            margin-top: 10px;
-            margin-bottom: 10px;
+            margin-top: 15px;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
         }
         .table-data { 
             width: 100%; 
@@ -146,25 +159,30 @@
             background-color: #0f172a; 
             color: #ffffff; 
             text-transform: uppercase; 
-            font-size: 9px; 
-            padding: 8px 6px; 
+            font-size: 8.5px; 
+            padding: 7px 6px; 
             text-align: left; 
             letter-spacing: 0.5px;
         }
         .table-data td { 
-            padding: 8px 6px; 
-            border-bottom: 1px solid #e2e8f0; 
-            font-size: 10px; 
+            padding: 7px 6px; 
+            border-bottom: 1px solid #f1f5f9; 
+            font-size: 9.5px; 
             vertical-align: middle; 
         }
         .table-data tr:nth-child(even) {
             background-color: #f8fafc;
         }
+        .table-data tfoot td {
+            background-color: #f1f5f9;
+            font-weight: bold;
+            border-top: 1px solid #cbd5e1;
+        }
         
-        /* Estados */
+        /* Badges */
         .badge {
             font-weight: bold; 
-            padding: 3px 6px; 
+            padding: 2px 6px; 
             border-radius: 4px; 
             font-size: 8px; 
             display: inline-block;
@@ -172,23 +190,23 @@
         }
         .status-pagado { 
             background-color: #d1fae5; 
-            color: #065f46; 
+            color: #047857; 
         }
         .status-pendiente { 
-            background-color: #fee2e2; 
-            color: #991b1b; 
+            background-color: #ffe4e6; 
+            color: #be123c; 
         }
         
         .footer { 
             position: fixed; 
-            bottom: -15px; 
+            bottom: -10px; 
             left: 0; 
             right: 0; 
             text-align: center; 
-            font-size: 9px; 
+            font-size: 8.5px; 
             color: #94a3b8; 
-            border-top: 1px solid #e2e8f0; 
-            padding-top: 5px; 
+            border-top: 1px solid #f1f5f9; 
+            padding-top: 6px; 
         }
     </style>
 </head>
@@ -197,11 +215,11 @@
     <table class="header-table">
         <tr>
             <td class="logo-container">
-                @if($institucion['logo'])
-                    <img class="logo-img" src="{{ $institucion['logo'] }}" alt="Logo">
+                @if(!empty($institucion['logo']))
+                    <img class="logo-img" src="{{ $institucion['logo'] }}" alt="Logo Institución">
                 @else
                     <div class="logo-placeholder">
-                        {{ substr($institucion['nombre'], 0, 1) }}
+                        INNOVA
                     </div>
                 @endif
             </td>
@@ -214,7 +232,7 @@
             </td>
             <td class="doc-meta">
                 <div class="doc-badge">
-                    <h2 class="doc-id">ESTADO DE CUENTA</h2>
+                    <h2 class="doc-id">Estado de Cuenta</h2>
                     <div class="doc-date">Matrícula: <strong>#{{ str_pad($matricula->id, 4, '0', STR_PAD_LEFT) }}</strong></div>
                 </div>
             </td>
@@ -223,17 +241,18 @@
 
     <table class="info-container">
         <tr>
+            <!-- INFORMACIÓN DEL ESTUDIANTE -->
             <td class="info-column">
                 <div class="info-card">
                     <h3 class="info-card-title">Información del Estudiante</h3>
                     <table class="info-grid">
                         <tr>
                             <td class="label">Estudiante:</td>
-                            <td>{{ mb_strtoupper($matricula->persona->nombre_completo ?? 'N/A', 'UTF-8') }}</td>
+                            <td><strong>{{ mb_strtoupper($matricula->persona->nombre_completo ?? 'N/A', 'UTF-8') }}</strong></td>
                         </tr>
                         <tr>
                             <td class="label">Documento:</td>
-                            <td>{{ $matricula->persona->numero_documento ?? 'N/A' }}</td>
+                            <td><strong>{{ $matricula->persona->numero_documento ?? 'N/A' }}</strong></td>
                         </tr>
                         <tr>
                             <td class="label">Correo:</td>
@@ -246,24 +265,27 @@
                     </table>
                 </div>
             </td>
+            
             <td style="width: 2%;"></td>
+            
+            <!-- DETALLES ACADÉMICOS -->
             <td class="info-column">
                 <div class="info-card">
                     <h3 class="info-card-title">Detalles Académicos</h3>
                     <table class="info-grid">
                         <tr>
                             <td class="label">F. Matrícula:</td>
-                            <td>{{ \Carbon\Carbon::parse($matricula->fecha_matricula)->format('d/m/Y') }}</td>
+                            <td><strong>{{ \Carbon\Carbon::parse($matricula->fecha_matricula)->format('d/m/Y') }}</strong></td>
                         </tr>
                         <tr>
                             <td class="label">F. Impresión:</td>
-                            <td>{{ $fecha_emision }}</td>
+                            <td><strong>{{ $fecha_emision }}</strong></td>
                         </tr>
                         <tr>
-                            <td class="label" style="vertical-align: top;">Programas:</td>
-                            <td style="font-size: 9.5px; line-height: 1.2;">
+                            <td class="label">Programas:</td>
+                            <td style="font-size: 8.5px; line-height: 1.3;">
                                 @foreach($matricula->detalles as $det)
-                                    • {{ mb_strtoupper($det->programa?->titulo ?? 'Programa', 'UTF-8') }} 
+                                    <div style="margin-bottom: 2px;"><strong>{{ mb_strtoupper($det->programa?->titulo ?? 'Programa', 'UTF-8') }}</strong></div>
                                 @endforeach
                             </td>
                         </tr>
@@ -279,11 +301,11 @@
         <thead>
             <tr>
                 <th style="width: 10%;">Módulo</th>
-                <th style="width: 15%;">Vencimiento</th>
-                <th style="width: 13%;">Estado</th>
-                <th style="width: 15%;">F. Pago</th>
-                <th style="width: 17%;">Forma de Pago</th>
-                <th style="width: 15%;">N° Operación</th>
+                <th style="width: 14%;">Vencimiento</th>
+                <th style="width: 12%;">Estado</th>
+                <th style="width: 14%;">F. Pago</th>
+                <th style="width: 18%;">Forma de Pago</th>
+                <th style="width: 17%;">N° Operación</th>
                 <th style="width: 15%; text-align: right;">Monto</th>
             </tr>
         </thead>
@@ -306,10 +328,16 @@
                 </tr>
             @endforeach
         </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="6" style="text-align: right;">TOTAL ABONADO:</td>
+                <td style="text-align: right; color: #047857;">S/. {{ number_format($montoTotal, 2) }}</td>
+            </tr>
+        </tfoot>
     </table>
 
     <div class="footer">
-        Documento generado automáticamente por el sistema académico. <strong>{{ $institucion['nombre'] }}</strong> © {{ date('Y') }}
+        Documento oficial generado automáticamente por el sistema académico. <strong>{{ $institucion['nombre'] }}</strong> © {{ date('Y') }}
     </div>
 
 </body>

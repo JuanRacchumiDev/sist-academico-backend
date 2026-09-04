@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -62,10 +63,10 @@ class UserController extends Controller
             $filters = $request->only([
                 'name',
                 'email',
-                'id_perfil'
+                'codigo_perfil'
             ]);
 
-            $perPage = $request->input('per_page', 10);
+            $perPage = (int)$request->input('limit', 10);
 
             $users = $this->userService->getAllUsersWithFilters($filters, $perPage);
 
@@ -80,14 +81,14 @@ class UserController extends Controller
             return response()->json([
                 'result' => true,
                 'data' => $users,
-                'message' => 'Resultados encontrados correctamente',
+                'message' => 'Usuarios obtenidos correctamente',
                 'pagination' => [
-                    'total' => $users->total(),
-                    'per_page' => $users->perPage(),
-                    'current_page' => $users->currentPage(),
-                    'last_page' => $users->lastPage(),
-                    'from' => $users->firstItem(),
-                    'to' => $users->lastItem()
+                    'totalItems' => $users->total(),
+                    'perPage' => $users->perPage(),
+                    'currentPage' => $users->currentPage(),
+                    'totalPages' => $users->lastPage(),
+                    'nextPage' => $users->hasMorePages() ? $users->currentPage() + 1 : null,
+                    'previousPage' => $users->currentPage() > 1 ? $users->currentPage() - 1 : null,
                 ]
             ], 200);
         } catch (\Exception $e) {
@@ -109,7 +110,11 @@ class UserController extends Controller
         try {
             $data = $request->all();
 
-            $userCreateDTO = UserCreateDTO::validateAndCreate($data);
+            $usuarioAutenticado = Auth::user();
+            $username = $usuarioAutenticado ? ($usuarioAutenticado->name) : 'systemapi';
+            $data['user_crea'] = $username;
+
+            $userCreateDTO = UserCreateDTO::from($data);
 
             $usuario = $this->userService->createUser($userCreateDTO);
 

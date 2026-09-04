@@ -97,10 +97,12 @@ class PersonaController extends Controller
                 'data' => $personas->items(),
                 'message' => $personas->isEmpty() ? 'No se encontraron personas en este grupo' : 'Listado por grupo obtenido correctamente',
                 'pagination' => [
-                    'total' => $personas->total(),
-                    'per_page' => $personas->perPage(),
-                    'current_page' => $personas->currentPage(),
-                    'last_page' => $personas->lastPage()
+                    'totalItems' => $personas->total(),
+                    'perPage' => $personas->perPage(),
+                    'currentPage' => $personas->currentPage(),
+                    'totalPages' => $personas->lastPage(),
+                    'nextPage' => $personas->hasMorePages() ? $personas->currentPage() + 1 : null,
+                    'previousPage' => $personas->currentPage() > 1 ? $personas->currentPage() - 1 : null,
                 ]
             ], 200);
         } catch (\Exception $e) {

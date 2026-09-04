@@ -51,6 +51,8 @@ class PersonaAPIService implements IPersonaAPIService
 
         Log::debug('PersonaAPIService: Respuesta de callAPI recibida.', ['api_response_data' => $response]);
 
+        $clase = 'grupo';
+
         // Crear DTO a partir de la respuesta
         try {
             // Aquí usamos el DTO para mapear y validar los datos de la respuesta
@@ -86,8 +88,10 @@ class PersonaAPIService implements IPersonaAPIService
 
         Log::info('Obteniendo data userCrea', ['userCrea' => $userCrea]);
 
+        $parametroClase = config('params.clases.' . $clase);
+
         // Obteniendo grupo
-        $grupo = $this->detalleRepository->findByNombreUrl($nombreGrupo);
+        $grupo = $this->detalleRepository->findByNombreUrl($parametroClase, $nombreGrupo);
 
         Log::info('Obteniendo detalle de grupo', ['grupo' => $grupo]);
 

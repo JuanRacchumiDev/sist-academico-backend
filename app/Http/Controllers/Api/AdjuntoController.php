@@ -3,10 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\DTOs\Adjunto\AdjuntoCreateDTO;
-use App\Helpers\FechaHelper;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-// use App\DTOs\Adjunto\AdjuntoCreateDTO;
 use App\Services\AdjuntoService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
@@ -60,7 +58,7 @@ class AdjuntoController extends Controller
         try {
             $filters = $request->only(['codigo_tipoprograma', 'id_programa', 'id_modulo', 'search', 'fecha_inicio', 'fecha_final']);
 
-            $perPage = (int)$request->input('per_page', 10);
+            $perPage = (int)$request->input('limit', 10);
 
             $adjuntos = $this->adjuntoService->getAllAdjuntosWithFilters($filters, $perPage);
 
@@ -75,12 +73,14 @@ class AdjuntoController extends Controller
             return response()->json([
                 'result' => true,
                 'data' => $adjuntos->items(),
-                'message' => $adjuntos->isEmpty() ? 'No se encontraron resultados' : 'Listado de adjuntos correctos',
+                'message' => 'Listado de adjuntos correctos',
                 'pagination' => [
-                    'total' => $adjuntos->total(),
-                    'per_page' => $adjuntos->perPage(),
-                    'current_page' => $adjuntos->currentPage(),
-                    'last_page' => $adjuntos->lastPage()
+                    'totalItems' => $adjuntos->total(),
+                    'perPage' => $adjuntos->perPage(),
+                    'currentPage' => $adjuntos->currentPage(),
+                    'totalPages' => $adjuntos->lastPage(),
+                    'nextPage' => $adjuntos->hasMorePages() ? $adjuntos->currentPage() + 1 : null,
+                    'previousPage' => $adjuntos->currentPage() > 1 ? $adjuntos->currentPage() - 1 : null,
                 ]
             ], 200);
         } catch (\Exception $e) {

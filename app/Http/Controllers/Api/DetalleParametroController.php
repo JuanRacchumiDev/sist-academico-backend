@@ -93,7 +93,7 @@ class DetalleParametroController extends Controller
                 $filters['search'] = $request->input('search');
             }
 
-            $perPage = (int)$request->input('per_page', 10);
+            $perPage = (int)$request->input('limit', 10);
 
             $filters = array_map(function ($value) {
                 if ($value === 'true') return true;
@@ -116,13 +116,14 @@ class DetalleParametroController extends Controller
                 'data' => $detalleParametros,
                 'message' => 'Resultados encontrados correctamente',
                 'pagination' => [
-                    'total' => $detalleParametros->total(),
-                    'per_page' => $detalleParametros->perPage(),
-                    'current_page' => $detalleParametros->currentPage(),
-                    'last_page' => $detalleParametros->lastPage(),
-                    'from' => $detalleParametros->firstItem(),
-                    'to' => $detalleParametros->lastItem()
+                    'totalItems' => $detalleParametros->total(),
+                    'perPage' => $detalleParametros->perPage(),
+                    'currentPage' => $detalleParametros->currentPage(),
+                    'totalPages' => $detalleParametros->lastPage(),
+                    'nextPage' => $detalleParametros->hasMorePages() ? $detalleParametros->currentPage() + 1 : null,
+                    'previousPage' => $detalleParametros->currentPage() > 1 ? $detalleParametros->currentPage() - 1 : null,
                 ]
+
             ], 200);
         } catch (\Exception $e) {
             Log::error("Error filtering catálogos paginados: " . $e->getMessage());

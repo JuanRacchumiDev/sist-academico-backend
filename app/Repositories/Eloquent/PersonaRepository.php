@@ -23,7 +23,7 @@ class PersonaRepository implements IPersonaRepository
 
         $query = $this->applyFilters($query, $searchParams ?? []);
 
-        return $query->get();
+        return $query->orderBy('id', 'DESC')->get();
     }
 
     /**
@@ -38,7 +38,7 @@ class PersonaRepository implements IPersonaRepository
 
         $query = $this->applyFilters($query, $filters);
 
-        return $query->orderBy('apellido_paterno', 'ASC')->paginate($perPage);
+        return $query->orderBy('id', 'DESC')->paginate($perPage);
     }
 
     public function getByGrupo(array $filters, ?int $limit = null): Collection
@@ -51,7 +51,7 @@ class PersonaRepository implements IPersonaRepository
             $query->limit($limit);
         }
 
-        return $query->orderBy('apellido_paterno', 'ASC')->get();
+        return $query->orderBy('id', 'DESC')->get();
     }
 
     /**

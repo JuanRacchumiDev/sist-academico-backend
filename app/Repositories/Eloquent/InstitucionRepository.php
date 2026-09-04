@@ -78,17 +78,28 @@ class InstitucionRepository implements IInstitucionRepository
 
         if (!empty($filters['nombre'])) {
             $nombre = "%" . strtolower($filters['nombre']) . "%";
-            $query->where(function ($q) use ($nombre) {
-                $q->whereRaw('LOWER(nombre) LIKE ?', [$nombre]);
-            });
+            $query->whereRaw('LOWER(nombre) LIKE ?', [$nombre]);
         }
 
-        if (!empty($filters['is_cliente']) && $filters['is_cliente'] !== '') {
-            $query->where('is_cliente', (bool) $filters['is_cliente']);
+        if (array_key_exists('is_cliente', $filters) && $filters['is_cliente'] !== null && $filters['is_cliente'] !== '') {
+            $isCliente = filter_var($filters['is_cliente'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+
+            if ($isCliente === true) {
+                $query->where('is_cliente', true);
+            } elseif ($isCliente === false) {
+                $query->where(function (Builder $q) {
+                    $q->where('is_cliente', false)
+                        ->orWhereNull('is_cliente');
+                });
+            }
         }
 
-        if (!empty($filters['estado']) && $filters['estado'] !== '') {
-            $query->where('estado', (bool) $filters['estado']);
+        // Filtro condicional para estado (soporta booleanos y strings "true"/"false")
+        if (array_key_exists('estado', $filters) && $filters['estado'] !== null && $filters['estado'] !== '') {
+            $estado = filter_var($filters['estado'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+            if ($estado !== null) {
+                $query->where('estado', $estado);
+            }
         }
 
         return $query;

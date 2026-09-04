@@ -78,7 +78,7 @@ class CertificadoController extends Controller
                 'search'
             ]);
 
-            $perPage = (int) $request->input('per_page', $request->input('limit', 10));
+            $perPage = (int)$request->input('limit', 10);
 
             $certificados = $this->certificadoService->getAllCertificadosWithFilters($filters, $perPage);
 
@@ -93,14 +93,14 @@ class CertificadoController extends Controller
             return response()->json([
                 'result' => true,
                 'data' => $certificados,
-                'message' => 'Resultados encontrados correctamente',
+                'message' => 'Certificados obtenidos correctamente',
                 'pagination' => [
-                    'total' => $certificados->total(),
-                    'per_page' => $certificados->perPage(),
-                    'current_page' => $certificados->currentPage(),
-                    'last_page' => $certificados->lastPage(),
-                    'from' => $certificados->firstItem(),
-                    'to' => $certificados->lastItem()
+                    'totalItems' => $certificados->total(),
+                    'perPage' => $certificados->perPage(),
+                    'currentPage' => $certificados->currentPage(),
+                    'totalPages' => $certificados->lastPage(),
+                    'nextPage' => $certificados->hasMorePages() ? $certificados->currentPage() + 1 : null,
+                    'previousPage' => $certificados->currentPage() > 1 ? $certificados->currentPage() - 1 : null,
                 ]
             ], 200);
         } catch (\Exception $e) {

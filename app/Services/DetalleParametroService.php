@@ -67,38 +67,6 @@ class DetalleParametroService implements IDetalleParametroService
     }
 
     /**
-     * Obtiene un detalle por código
-     * @param int $codigo
-     * @return DetalleParametro|null
-     */
-    // public function getByCodigo(int $codigo): ?DetalleParametro
-    // {
-    //     return $this->repository->findByCodigo($codigo);
-    // }
-
-    /**
-     * Obtiene un detalle por clase y código
-     * @param int $clase
-     * @param int $codigo
-     * @return DetalleParametro|null
-     */
-    // public function getByClaseAndCodigo(int $clase, int $codigo): ?DetalleParametro
-    // {
-    //     return $this->repository->findByClaseAndCodigo($clase, $codigo);
-    // }
-
-    /**
-     * Obtiene un detalle por clase y nombre_url
-     * @param int $clase
-     * @param string $nombreUrl
-     * @return DetalleParametro|null
-     */
-    // public function getByClaseAndNombreUrl(int $clase, string $nombreUrl): ?DetalleParametro
-    // {
-    //     return $this->repository->findByClaseAndNombreUrl($clase, $nombreUrl);
-    // }
-
-    /**
      * Crea un detalle parámetro
      * @param DetalleParametroCreateDTO $detalleParametroCreateDTO
      * @return DetalleParametro

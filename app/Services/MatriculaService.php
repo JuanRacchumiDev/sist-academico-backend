@@ -249,20 +249,50 @@ class MatriculaService implements IMatriculaService
 
         // Definición de datos por defecto de la Institución si vienen vacíos o nulos
         $institucion = $matricula->institucion;
+
+        // Ruta del logo por defecto
+        $logoPath = public_path('images' . DIRECTORY_SEPARATOR . 'LOGO_INNOVAPERU.jpeg');
+
+        Log::info('Evaluando ruta de logo original public', ['logoPath' => $logoPath]);
+
+        // Si existe un logo propio de la institución, intentamos usarlo
+        if ($institucion && $institucion->logo_path) {
+            $path = 'app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'instituciones' . DIRECTORY_SEPARATOR . 'logos' . DIRECTORY_SEPARATOR . $institucion->logo_path;
+
+            Log::info('Evaluando path', ['path' => $path]);
+
+            $customLogoPath = storage_path($path);
+
+            Log::info('Evaluando ruta de customLogoPath', ['customLogoPath' => $customLogoPath]);
+
+            if (file_exists($customLogoPath)) {
+                Log::info('Evaluando si existe customLogoPath', ['validacion' => 'si']);
+                $logoPath = $customLogoPath;
+            } else {
+                Log::info('Evaluando si existe customLogoPath', ['validacion' => 'no']);
+            }
+        }
+
+        Log::info('Ruta final del logo a procesar', ['logoPath' => $logoPath]);
+
+        // Convertir la imagen a Base64 para garantizar compatibilidad con Dompdf
+        $logoBase64 = null;
+        if (file_exists($logoPath)) {
+            Log::info('Evaluando si existe logo institución', ['existe' => 'si']);
+            $type = pathinfo($logoPath, PATHINFO_EXTENSION);
+            $data = file_get_contents($logoPath);
+            $logoBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+        } else {
+            Log::warning('No se encontró el archivo del logo en el disco', ['logoPath' => $logoPath]);
+        }
+
         $institucionData = [
             'nombre' => $institucion->nombre ?? 'INSTITUCIÓN ACADÉMICA',
             'sigla' => $institucion->sigla ?? 'Innovación y aprendizaje continuo para ti',
             'telefono' => $institucion->telefono_contacto ?? '999-999-999',
             'email' => $institucion->email ?? 'contacto@institucion.edu.pe',
-            'logo' => ($institucion && $institucion->logo_path)
-                ? public_path('storage/' . $institucion->logo_path)
-                : public_path('images/default_logo.png') // Asegúrate de tener una imagen por defecto o usa un placeholder base64
+            'logo' => $logoBase64
         ];
-
-        // Si el logo físico no existe en la ruta de almacenamiento, usamos una alternativa base64 o texto
-        if (!file_exists($institucionData['logo'])) {
-            $institucionData['logo'] = null; // En la vista Blade manejaremos el fallback si es null
-        }
 
         $pagosReales = $this->pagoRepository->getPagosByMatricula($idMatricula);
 
@@ -272,21 +302,27 @@ class MatriculaService implements IMatriculaService
 
         $totalModulos = $matricula->numero_modulos;
 
+        $montoTotal = 0;
+
         for ($i = 1; $i <= $totalModulos; $i++) {
             $pagoEfectuado = $pagosReales->firstWhere('numero_modulo', $i);
 
             $fechaVencimiento = ItemPagoHelper::calcularFechaVencimiento($matricula->fecha_matricula, $i);
 
             if ($pagoEfectuado) {
+                $monto = ($pagoEfectuado->cantidad_efectivo ?? 0) + ($pagoEfectuado->cantidad_operacion ?? 0);
+
                 $cronograma[] = [
                     'numero_modulo' => $i,
                     'fecha_vencimiento' => $fechaVencimiento,
                     'estado' => 'PAGADO',
-                    'monto' => ($pagoEfectuado->cantidad_efectivo ?? 0) + ($pagoEfectuado->cantidad_operacion ?? 0),
+                    'monto' => $monto,
                     'fecha_pago' => $pagoEfectuado->fecha_pago,
                     'referencia' => $pagoEfectuado->numero_operacion ?? 'Efectivo',
                     'forma_pago' => $pagoEfectuado->formaPago->nombre ?? 'N/A'
                 ];
+
+                $montoTotal += $monto;
             } else {
                 $cronograma[] = [
                     'numero_modulo' => $i,
@@ -304,6 +340,7 @@ class MatriculaService implements IMatriculaService
             'matricula' => $matricula,
             'institucion' => $institucionData,
             'cronograma' => $cronograma,
+            'montoTotal' => $montoTotal,
             'fecha_emision' => now()->format('d/m/Y H:i')
         ];
 
@@ -378,6 +415,7 @@ class MatriculaService implements IMatriculaService
                     'id_programa' => $idPrograma,
                     'valor_matricula' => $valorMatricula,
                     'valor_modulo' => $valorModulo,
+                    'fecha_crea' => $fechaMatricula,
                     'user_crea' => $userCrea,
                     'estado' => true
                 ]);

@@ -59,7 +59,7 @@ class MatriculaController extends Controller
                 'nombreCompleto'
             ]);
 
-            $perPage = $request->input('per_page', 10);
+            $perPage = (int)$request->input('limit', 10);
 
             $matriculas = $this->matriculaService->getAllMatriculasWithFilters($filters, $perPage);
 
@@ -76,12 +76,12 @@ class MatriculaController extends Controller
                 'data' => $matriculas,
                 'message' => 'Resultados encontrados correctamente',
                 'pagination' => [
-                    'total' => $matriculas->total(),
-                    'per_page' => $matriculas->perPage(),
-                    'current_page' => $matriculas->currentPage(),
-                    'last_page' => $matriculas->lastPage(),
-                    'from' => $matriculas->firstItem(),
-                    'to' => $matriculas->lastItem()
+                    'totalItems' => $matriculas->total(),
+                    'perPage' => $matriculas->perPage(),
+                    'currentPage' => $matriculas->currentPage(),
+                    'totalPages' => $matriculas->lastPage(),
+                    'nextPage' => $matriculas->hasMorePages() ? $matriculas->currentPage() + 1 : null,
+                    'previousPage' => $matriculas->currentPage() > 1 ? $matriculas->currentPage() - 1 : null,
                 ]
             ], 200);
         } catch (\Exception $e) {

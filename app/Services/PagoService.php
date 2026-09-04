@@ -168,41 +168,57 @@ class PagoService implements IPagoService
     {
         $pago = $this->pagoRepository->findById($idPago);
 
-        Log::info('Validando variable $pago', ['pago' => $pago]);
-
         if (!$pago) {
-            return [
-                'status' => false,
-                'message' => 'El pago especificado no existe',
-                'detalle' => null,
-                'code' => 404
-            ];
+            throw new \Exception('El pago especificado no existe');
         }
 
-        // Definición de datos por defecto de la Institución si vienen vacíos o nulos
-        $institucion = $pago->matricula->institucion;
-        $institucionData = [
-            'nombre' => $institucion->nombre ?? 'INSTITUCIÓN ACADÉMICA',
-            'sigla' => $institucion->sigla ?? 'Innovación y aprendizaje continuo para ti',
-            'telefono' => $institucion->telefono_contacto ?? '999-999-999',
-            'email' => $institucion->email ?? 'contacto@institucion.edu.pe',
-            'logo' => ($institucion && $institucion->logo_path)
-                ? public_path('storage/' . $institucion->logo_path)
-                : public_path('images/default_logo.png') // Asegúrate de tener una imagen por defecto o usa un placeholder base64
-        ];
+        $matricula = $pago->matricula;
+        $institucion = $pago->institucion ?? $matricula->institucion ?? null;
 
-        // Si el logo físico no existe en la ruta de almacenamiento, usamos una alternativa base64 o texto
-        if (!file_exists($institucionData['logo'])) {
-            $institucionData['logo'] = null; // En la vista Blade manejaremos el fallback si es null
+        // --- Procesamiento del Logo para DomPDF (Base64) ---
+        $logoPath = "";
+        $logoBase64 = null;
+
+        if ($institucion && $institucion->logo_path) {
+            $path = 'app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'instituciones' . DIRECTORY_SEPARATOR . 'logos' . DIRECTORY_SEPARATOR . $institucion->logo_path;
+
+            Log::info('Evaluando path', ['path' => $path]);
+
+            $customLogoPath = storage_path($path);
+
+            Log::info('Evaluando de customLogoPath', ['customLogoPath' => $customLogoPath]);
+
+            if (file_exists($customLogoPath)) {
+                $logoPath = $customLogoPath;
+            }
         }
+
+        Log::info('Ruta final del logo a procesar', ['logoPath' => $logoPath]);
+
+        // Convertir la imagen a Base64 para garantizar compatibilidad con DomPdf
+        if (file_exists($logoPath)) {
+            $type = pathinfo($logoPath, PATHINFO_EXTENSION);
+            $data = file_get_contents($logoPath);
+            $logoBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+        }
+
+        // --- Cálculo de Montos para Formas de Pago ---
+        $efectivo = (float) ($pago->cantidad_efectivo ?? 0);
+        $operacion = (float) ($pago->cantidad_operacion ?? 0);
+
+        // Si no es pago mixto pero los valores vienen en 0, asignamos el total según el tipo
+        $totalGeneral = $efectivo + $operacion;
 
         $dataPdf = [
-            'pago' => $pago,
-            'institucion' => $institucion,
-            'fecha_emision' => now()->format('d/m/Y H:i')
+            'pago'          => $pago,
+            'matricula'     => $matricula,
+            'institucion'   => $institucion,
+            'logoBase64'    => $logoBase64,
+            'efectivo'      => $efectivo,
+            'operacion'     => $operacion,
+            'totalGeneral'  => $totalGeneral,
+            'fecha_emision' => now()->format('d/m/Y H:i:s')
         ];
-
-        Log::info('Evaluando variable dataPdf', ['dataPdf' => $dataPdf]);
 
         $pdf = Pdf::loadView('pdfs.constancia_pago', $dataPdf)
             ->setPaper('a4', 'portrait');
