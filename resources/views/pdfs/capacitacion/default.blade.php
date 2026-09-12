@@ -59,7 +59,6 @@
         }
         @endif
 
-        /* --- HOJA 1 --- */
         .page-first {
             position: relative;
             width: 100%;
@@ -97,10 +96,8 @@
         }
 
         .txt-alumno {
-            /* font-family: {{ !empty($fonts['alumno']['custom_font']) ? "'FuenteAlumno', sans-serif" : ($fonts['alumno']['font_family'] ?? 'sans-serif') }}; */
             font-family: 'FuenteAlumno', sans-serif;
             color: {{ $estilos['alumno']['color'] ?? '#000000' }};
-            /* font-size: {{ $info->estilos_alumno['fontSize'] ?? ($estilos['alumno']['fontSize'].'px' ?? '78px') }}; */
             font-size: {{ ($info->estilos_alumno['font_size'] ?? $estilos['alumno']['fontSize']) . 'px' }};
             line-height: {{ $info->estilos_alumno['line_height'] ?? 1.0 }};
             white-space: nowrap;
@@ -119,10 +116,8 @@
         }
 
         .txt-programa {
-            /* font-family: {{ !empty($fonts['programa']['custom_font']) ? "'FuentePrograma', sans-serif" : ($fonts['programa']['font_family'] ?? 'sans-serif') }}; */
             font-family: 'FuentePrograma', sans-serif;
             color: {{ $estilos['programa']['color'] ?? '#000000' }};
-            /* font-size: {{ $info->estilos_programa['fontSize'] ?? ($estilos['programa']['fontSize'].'px' ?? '30px') }}; */
             font-size: {{ ($info->estilos_programa['font_size'] ?? $estilos['programa']['fontSize']) . 'px' }};
             line-height: {{ $info->estilos_programa['line_height'] ?? 1.0 }};
             white-space: nowrap;
@@ -141,10 +136,8 @@
         }
 
         .txt-fechas {
-            /* font-family: {{ !empty($fonts['fechas']['custom_font']) ? "'FuenteFechas', sans-serif" : ($fonts['fechas']['font_family'] ?? 'sans-serif') }}; */
             font-family: 'FuenteFechas', sans-serif;
             color: {{ $estilos['fechas']['color'] ?? '#000000' }};
-            /* font-size: {{ $info->estilos_fechas['fontSize'] ?? ($estilos['fechas']['fontSize'].'px' ?? '17px') }}; */
             font-size: {{ ($info->estilos_fechas['font_size'] ?? $estilos['fechas']['fontSize']) . 'px' }};
             line-height: {{ $info->estilos_fechas['line_height'] ?? 1.0 }};
             white-space: nowrap;
@@ -164,10 +157,8 @@
         }
 
         .txt-director {
-            /* font-family: {{ !empty($fonts['director']['custom_font']) ? "'FuenteDirector', sans-serif" : ($fonts['director']['font_family'] ?? 'sans-serif') }}; */
             font-family: 'FuenteDirector', sans-serif;
             color: {{ $estilos['director']['color'] ?? '#000000' }};
-            /* font-size: {{ $estilos['director']['fontSize'].'px' ?? '12px' }}; */
             font-size: {{ ($info->estilos_director['font_size'] ?? $estilos['director']['fontSize']) . 'px' }};
             line-height: {{ $info->estilos_director['line_height'] ?? 1.0 }};
             white-space: nowrap;
@@ -178,7 +169,6 @@
         }
         @endif
 
-        /* --- HOJA 2 --- */
         .page-second {
             page-break-before: always;
             padding-top: 45px;
@@ -187,7 +177,6 @@
             width: 100%;
         }
 
-        /* Contenedor con ancho de 90% y centrado (margin left/right 5%) */
         .wrapper-hoja2 {
             width: 90%;
             margin: 0 auto;
@@ -198,7 +187,6 @@
             border-collapse: collapse;
         }
 
-        /* Columna Izquierda: Ajustada al 62% del contenedor */
         .col-left {
             width: 62%;
             vertical-align: top;
@@ -206,7 +194,6 @@
             text-align: left;
         }
 
-        /* Columna Derecha: Ajustada al 38% del contenedor con alineación a la derecha */
         .col-right {
             width: 38%;
             vertical-align: top;
@@ -261,11 +248,10 @@
             height: auto;
         }
 
-        /* Cuadro del QR con ancho ideal (250px) para no desbordar */
         .qr-block {
             width: 250px;
             border-collapse: collapse;
-            margin-left: auto; /* Empuja el bloque QR totalmente a la derecha */
+            margin-left: auto;
             margin-top: 10px;
         }
 
