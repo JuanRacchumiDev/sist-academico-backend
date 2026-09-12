@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 class PlantillaService implements IPlantillaService
 {
@@ -24,6 +25,10 @@ class PlantillaService implements IPlantillaService
 
     public function getAllPlantillas(?array $searchParams = null): Collection
     {
+        Log::info('Validando searchParams in PlantillaService', [
+            'searchParams' => $searchParams
+        ]);
+
         return $this->plantillaRepository->getAll($searchParams);
     }
 

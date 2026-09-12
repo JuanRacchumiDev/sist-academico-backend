@@ -30,16 +30,9 @@ class CertificadoController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request): JsonResponse
+    public function index(): JsonResponse
     {
         try {
-            // $filters = $request->only([
-            //     'fecha_inicio',
-            //     'fecha_final',
-            //     'search'
-            // ]);
-
-            // $certificados = $this->certificadoService->getAllCertificados($filters);
             $certificados = $this->certificadoService->getAllCertificados();
 
             if ($certificados->isEmpty()) {
@@ -114,6 +107,39 @@ class CertificadoController extends Controller
         }
     }
 
+    /**
+     * Display the specified resource.
+     */
+    public function show(int $id): JsonResponse
+    {
+        try {
+            $certificado = $this->certificadoService->getCertificadoById($id);
+
+            Log::info('Información de certificado obtenido', ['certificado' => $certificado]);
+
+            if (!$certificado) {
+                return response()->json([
+                    'result' => false,
+                    'message' => 'Certificado no encontrado',
+                    'data' => []
+                ], 404);
+            }
+
+            return response()->json([
+                'result' => true,
+                'message' => 'Certificado obtenida exitosamente',
+                'data' => $certificado
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error("Error fetching certificado: " . $e->getMessage());
+
+            return response()->json([
+                'result' => false,
+                'message' => 'Error al obtener el certificado: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function download(int $id): BinaryFileResponse|JsonResponse
     {
         return $this->servePdfResponse($id, 'attachment');
@@ -122,6 +148,63 @@ class CertificadoController extends Controller
     public function downloadPDF(int $id): BinaryFileResponse|JsonResponse
     {
         return $this->servePdfResponse($id, 'inline');
+    }
+
+    /**
+     * Verifica la autenticidad del certificado a través de su código QR / Verificación.
+     */
+    public function verificar(string $codigoQR): JsonResponse
+    {
+        try {
+            $data = $this->certificadoService->getCertificadoByCodigo($codigoQR);
+
+            if (!$data) {
+                return response()->json([
+                    'result'  => false,
+                    'message' => 'El código de verificación proporcionado no es válido o no existe.',
+                    'data'    => null
+                ], 404);
+            }
+
+            return response()->json([
+                'result'  => true,
+                'data'    => $data,
+                'message' => 'Certificado verificado exitosamente'
+            ], 200);
+        } catch (Exception $e) {
+            Log::error('Error al verificar certificado: ' . $e->getMessage());
+
+            return response()->json([
+                'result'  => false,
+                'message' => 'Ocurrió un error al procesar la verificación.'
+            ], 500);
+        }
+    }
+
+    /**
+     * Descarga / Visualiza el archivo PDF públicamente usando el código de verificación.
+     */
+    public function downloadByCodigo(string $codigo, Request $request): BinaryFileResponse|JsonResponse
+    {
+        try {
+            $fileData = $this->certificadoService->downloadCertificadoByCodigo($codigo);
+
+            $disposition = $request->query('disposition', 'inline'); // 'inline' para ver en navegador, 'attachment' para forzar descarga
+
+            return response()->file($fileData['full_path'], [
+                'Content-Type'        => 'application/pdf',
+                'Content-Disposition' => "{$disposition}; filename=\"{$fileData['filename']}\"",
+            ]);
+        } catch (Exception $e) {
+            Log::error("Error al descargar PDF del certificado con código {$codigo}: " . $e->getMessage());
+
+            $statusCode = $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500;
+
+            return response()->json([
+                'result'  => false,
+                'message' => $e->getMessage()
+            ], $statusCode);
+        }
     }
 
     public function store(Request $request): JsonResponse
@@ -245,39 +328,6 @@ class CertificadoController extends Controller
             return response()->json([
                 'status'  => 'error',
                 'message' => 'Error al generar el certificado: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(int $id): JsonResponse
-    {
-        try {
-            $certificado = $this->certificadoService->getCertificadoById($id);
-
-            Log::info('Información de certificado obtenido', ['certificado' => $certificado]);
-
-            if (!$certificado) {
-                return response()->json([
-                    'result' => false,
-                    'message' => 'Certificado no encontrado',
-                    'data' => []
-                ], 404);
-            }
-
-            return response()->json([
-                'result' => true,
-                'message' => 'Certificado obtenida exitosamente',
-                'data' => $certificado
-            ], 200);
-        } catch (\Exception $e) {
-            Log::error("Error fetching certificado: " . $e->getMessage());
-
-            return response()->json([
-                'result' => false,
-                'message' => 'Error al obtener el certificado: ' . $e->getMessage()
             ], 500);
         }
     }

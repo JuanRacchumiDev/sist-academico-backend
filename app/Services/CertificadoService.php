@@ -94,9 +94,7 @@ class CertificadoService implements ICertificadoService
         $programa = $certificado->programa;
         $plantilla = $certificado->plantilla;
         $tipoPrograma = $programa->tipoPrograma;
-
-        $esCapacitacion = ($tipoPrograma->nombre_url === "capacitacion");
-        Log::info("Validando variable esCapacitacion", ['esCapacitacion' => $esCapacitacion]);
+        $sucursal = $certificado->sucursal;
 
         Log::info("Información de plantilla", ["plantilla" => $plantilla]);
 
@@ -105,42 +103,39 @@ class CertificadoService implements ICertificadoService
         Log::info("Información de pdf", ["pdfRelativePath" => $pdfRelativePath]);
 
         // Construir la URL pública de verificación accesible por el escáner del smartphone
-        // $appUrl = rtrim(config('app.url'), '/');
-        $frontendUrl = config('app.frontend_url', 'https://app.innovaperu.edu.pe');
-        // $qrUrl = "{$appUrl}/validar-certificado/{$certificado->codigo_verificacion}";
+        $frontendUrl = config('app.frontend_url', 'http://localhost:3000');
         $qrUrl = rtrim($frontendUrl, '/') . "/validar-certificado/{$certificado->codigo_verificacion}";
 
+        Log::info("Evaluando frontendUrl", ['frontendUrl' => $frontendUrl]);
         Log::info("URL de verificación para el código QR", ['qrUrl' => $qrUrl]);
 
         $this->generateCodeQR($qrUrl, $certificado->codigo_qr_path);
 
         // Obtener el QR persistido y convertirlo a Base64 para embeder en DomPDF
-        // $qrBinary = Storage::disk('local')->get($certificado->codigo_qr_path);
         $qrBinary = $this->storageService->get($certificado->codigo_qr_path);
         $qrBase64 = "data:image/png;base64," . base64_encode($qrBinary);
 
         // Cargar fondo de pantalla
         $templateBase64 = null;
 
-        // $existPlantilla = $plantilla && $plantilla->path && Storage::disk('public')->exists($plantilla->path);
-
-        // Especificar el disco 'public' ya que las plantillas están almacenadas en /storage/app/public
+        // Obteniendo validación si existe plantilla
         $existPlantilla = $plantilla
             && $plantilla->path_imagen_fondo
             && $this->storageService->exists($plantilla->path_imagen_fondo, 'public');
 
         Log::info("Validando exists plantilla", ['existPlantilla' => $existPlantilla]);
 
+        // Evaluando si existe plantilla
         if ($existPlantilla) {
-            Log::info('Validando ruta de plantilla', ['path' => $plantilla->path_imagen_fondo]);
+            $pathImagenFondo = $plantilla->path_imagen_fondo;
 
-            // $fileData = Storage::disk('public')->get($plantilla->path);
+            Log::info('Validando ruta de plantilla', ['path' => $pathImagenFondo]);
 
             // Leer el archivo desde el disco 'public'
-            $fileData = $this->storageService->get($plantilla->path_imagen_fondo, 'public');
+            $fileData = $this->storageService->get($pathImagenFondo, 'public');
 
             // Obtener la extensión y construir el mime type manualmente
-            $extension = strtolower(pathinfo($plantilla->path_imagen_fondo, PATHINFO_EXTENSION));
+            $extension = strtolower(pathinfo($pathImagenFondo, PATHINFO_EXTENSION));
 
             Log::info('Validando extension', ['extension' => $extension]);
 
@@ -156,63 +151,88 @@ class CertificadoService implements ICertificadoService
             $templateBase64 = "data:{$mime};base64," . base64_encode($fileData);
         }
 
-        // Definir fuentes
-        $fonts = [
-            'alumno' => CertificadoHelper::getFontBase64('GreatVibes-Regular.ttf'),
-            'programa' => $esCapacitacion ? 'Calibri, sans-serif' : CertificadoHelper::getFontBase64('Anton.ttf'),
-            'fechas' => $esCapacitacion ? 'Calibri, sans-serif' : CertificadoHelper::getFontBase64('Archivo-Regular.ttf'),
-            'director' => CertificadoHelper::getFontBase64('Archivo-Medium.ttf'),
-            'is_custom_alumno' => true,
-            'is_custom_programa' => !$esCapacitacion,
-            'is_custom_fechas' => !$esCapacitacion
-        ];
-
-        // Definir las fechas del evento en texto
-        // $fechaInicio = CertificadoHelper::fechaEnLetras($programa->fecha_inicio ?? null);
-        // $fechaFinal = CertificadoHelper::fechaEnLetras($programa->fecha_final ?? null);
-        // $descFechasPrograma = ($fechaInicio && $fechaFinal) ? "Realizado del {$fechaInicio} al {$fechaFinal}" : "";
         $descFechasPrograma = CertificadoHelper::formatearRangoFechas(
             $programa->fecha_inicio ?? null,
             $programa->fecha_final ?? null
         );
 
-        // Calcular los estilos dinámicos
-        $baseFontSizeAlumno = $esCapacitacion
-            ? config('params.styles_pdfs.' . $tipoPrograma->nombre_url . '.fontSize.alumno')
-            : config('params.styles_pdfs.baseFontSize.alumno');
+        Log::info('descFechasPrograma', ['descFechasPrograma' => $descFechasPrograma]);
 
-        $baseFontSizePrograma = $esCapacitacion
-            ? config('params.styles_pdfs.' . $tipoPrograma->nombre_url . '.fontSize.programa')
-            : config('params.styles_pdfs.baseFontSize.programa');
+        $nombreTipoPrograma = $tipoPrograma->nombre_url;
+        $disenio = $plantilla->tipo_disenio;
+        $nombreImpresion = $certificado->nombre_impresion;
+        $tituloPrograma = $programa->titulo;
 
-        $baseFontSizeFechas = $esCapacitacion
-            ? config('params.styles_pdfs.' . $tipoPrograma->nombre_url . '.fontSize.fechas')
-            : config('params.styles_pdfs.baseFontSize.fechas');
+        $nombreDirector = ($plantilla->institucion && $plantilla->institucion->nombre_director)
+            ? $plantilla->institucion->nombre_director
+            : "----";
 
-        $anchoMaximoAlumno = config('params.styles_pdfs.anchoMaximoAlumno');
-        $anchoMaximoPrograma = config('params.styles_pdfs.anchoMaximoPrograma');
-        $anchoMaximoFechas = config('params.styles_pdfs.anchoMaximoFechas');
+        $grupoEstilosKey = "params.styles_pdfs.{$nombreTipoPrograma}.{$disenio}";
 
-        Log::info('Evaluando parámetros de estilos por ancho', [
-            'baseFontSizeAlumno'     => $baseFontSizeAlumno,
-            'baseFontSizePrograma'   => $baseFontSizePrograma,
-            'baseFontSizeFechas'     => $baseFontSizeFechas,
-            'anchoMaximoAlumno'  => $anchoMaximoAlumno,
+        Log::info('grupoEstilosKey', ['grupoEstilosKey' => $grupoEstilosKey]);
+
+        $estilos = config($grupoEstilosKey, []);
+
+        if (empty($estilos) && isset(config("params.styles_pdfs.{$nombreTipoPrograma}")['default_uno'])) {
+            $estilos = config("params.styles_pdfs.{$nombreTipoPrograma}.default_uno");
+        }
+
+        $fontSizeAlumno = $estilos['alumno']['fontSize'] ?? '78';
+        $fontSizePrograma = $estilos['programa']['fontSize'] ?? '30';
+        $fontSizeFechas = $estilos['fechas']['fontSize'] ?? '17';
+        $fontSizeDirector = $estilos['director']['fontSize'] ?? '12';
+
+        $anchosDisponibles = "params.styles_pdfs.{$nombreTipoPrograma}";
+        $anchoMaximoAlumno   = config("{$anchosDisponibles}.anchoMaximoAlumno", 673.51);
+        $anchoMaximoPrograma = config("{$anchosDisponibles}.anchoMaximoPrograma", 673.51);
+        $anchoMaximoFechas   = config("{$anchosDisponibles}.anchoMaximoFechas", 673.51);
+        $anchoMaximoDirector = config("{$anchosDisponibles}.anchoMaximoDirector", 200.00);
+
+        Log::info('Evaluando anchos disponibles', [
+            'anchoMaximoAlumno' => $anchoMaximoAlumno,
             'anchoMaximoPrograma' => $anchoMaximoPrograma,
-            'anchoMaximoFechas' => $anchoMaximoFechas
+            'anchoMaximoFechas' => $anchoMaximoFechas,
+            'anchoMaximoDirector' => $anchoMaximoDirector
         ]);
 
-        $estilosAlumno = CertificadoHelper::calcularEstilosTexto($certificado->nombre_impresion, $baseFontSizeAlumno, $anchoMaximoAlumno);
-        $estilosPrograma = CertificadoHelper::calcularEstilosTexto($programa->titulo ?? '', $baseFontSizePrograma, $anchoMaximoPrograma);
-        $estilosFechas = CertificadoHelper::calcularEstilosTexto($descFechasPrograma, $baseFontSizeFechas, $anchoMaximoFechas);
+        // Carga de fuentes (Ruta física de archivos TTF)
+        $fontsPath = public_path('fonts') . DIRECTORY_SEPARATOR;
 
-        Log::info('Evaluando resultados de estilos', [
-            'estilosAlumno'   => $estilosAlumno,
+        $buildFontConfig = function (array $seccionConfig, string $defaultFontFile) use ($fontsPath) {
+            $isCustom = $seccionConfig['custom_font'] ?? false;
+            $fontFile = $seccionConfig['font'] ?? $defaultFontFile;
+
+            return [
+                'custom_font' => $isCustom,
+                'path' => $isCustom ? $fontsPath . $fontFile : null,
+                'font_family' => $isCustom ? 'sans-serif' : ($seccionConfig['font'] ?? 'sans-serif')
+            ];
+        };
+
+        $fonts = [
+            'alumno'   => $buildFontConfig($estilos['alumno'] ?? [], 'GreatVibes-Regular.ttf'),
+            'programa' => $buildFontConfig($estilos['programa'] ?? [], 'Anton.ttf'),
+            'fechas'   => $buildFontConfig($estilos['fechas'] ?? [], 'Archivo-Regular.ttf'),
+            'director' => isset($estilos['director'])
+                ? $buildFontConfig($estilos['director'], 'Archivo-Medium.ttf')
+                : null,
+        ];
+
+        Log::info('fonts', ['fonts' => $fonts]);
+        Log::info('estilos', ['estilos' => $estilos]);
+
+        $estilosAlumno   = CertificadoHelper::calcularEstilosTexto($nombreImpresion, $fontSizeAlumno, $anchoMaximoAlumno);
+        $estilosPrograma = CertificadoHelper::calcularEstilosTexto($tituloPrograma ?? '', $fontSizePrograma, $anchoMaximoPrograma);
+        $estilosFechas   = CertificadoHelper::calcularEstilosTexto($descFechasPrograma, $fontSizeFechas, $anchoMaximoFechas);
+        $estilosDirector = CertificadoHelper::calcularEstilosTexto($nombreDirector, $fontSizeDirector, $anchoMaximoDirector);
+
+        Log::info('Evaluando estilos', [
+            'estilosAlumno' => $estilosAlumno,
             'estilosPrograma' => $estilosPrograma,
-            'estilosFechas'   => $estilosFechas,
+            'estilosFechas' => $estilosFechas,
+            'estilosDirector' => $estilosDirector
         ]);
 
-        // Definiendo horas académicas
         $horasAcademicasDefault = config('params.horas_academicas_default');
         $horasAcademicas = $programa->horas_academicas ?? $horasAcademicasDefault;
 
@@ -220,37 +240,45 @@ class CertificadoService implements ICertificadoService
             ? "{$descFechasPrograma} con una duración de {$horasAcademicas} horas"
             : "";
 
-        Log::info('Evaluando horas académicas', ['horasAcademicasDefault' => $horasAcademicasDefault]);
+        $logoRelative = $sucursal?->logo_path ?? ($plantilla?->institucion?->logo_path ?? null);
+        Log::info('Evaluando logoRelative', ['logoRelative' => $logoRelative]);
 
-        // Definiendo nombre director
-        Log::info('Evaluando objeto institución', ['institucion' => $plantilla->institucion]);
-
-        $nombreDirector = ($plantilla->institucion && $plantilla->institucion->nombre_director)
-            ? $plantilla->institucion->nombre_director
-            : "----";
-
-        $logoPath = public_path('images/logo-innovaperu.jpg');
         $logoBase64 = null;
 
-        if (file_exists($logoPath)) {
-            $logoData = file_get_contents($logoPath);
-            $logoMime = mime_content_type($logoPath);
-            $logoBase64 = "data:{$logoMime};base64," . base64_encode($logoData);
+        if ($logoRelative) {
+            // Si logo_path incluye "logo/", se limpia para apuntar exactamente a public/images/logos/
+            $cleanPath = ltrim($logoRelative, '/');
+            if (str_starts_with($cleanPath, 'logos/')) {
+                $cleanPath = substr($cleanPath, 6);
+            } elseif (str_starts_with($cleanPath, 'logo/')) {
+                $cleanPath = substr($cleanPath, 5);
+            }
+
+            $logoPath = public_path('images' . DIRECTORY_SEPARATOR . 'logos' . DIRECTORY_SEPARATOR . $cleanPath);
+
+            Log::info('Evaluando logoPath', ['logoPath' => $logoPath]);
+
+            if (file_exists($logoPath) && is_file($logoPath)) {
+                $logoData = file_get_contents($logoPath);
+                $logoMime = mime_content_type($logoPath) ?: 'image/jpeg';
+                $logoBase64 = "data:{$logoMime};base64," . base64_encode($logoData);
+            }
         }
 
-        // Mapear objeto para la vista
         $info = (object)[
-            'nombre_alumno'         => $certificado->nombre_impresion,
+            'nombre_alumno'         => $nombreImpresion,
             'estilos_alumno'        => $estilosAlumno,
 
-            'nombre_tipoprograma'   => $tipoPrograma->nombre ?? 'Programa Académico',
-            'nombre_director'       => $nombreDirector,
-
-            'titulo_programa'       => $programa->titulo ?? 'Programa Académico',
+            'titulo_programa'       => $tituloPrograma ?? 'Programa Académico',
             'estilos_programa'      => $estilosPrograma,
+
+            'nombre_tipoprograma'   => $nombreTipoPrograma ?? 'Tipo Programa Académico',
 
             'fechas_programa'       => $textoFechasConHoras,
             'estilos_fechas'        => $estilosFechas,
+
+            'nombre_director'       => $nombreDirector,
+            'estilos_director'      => $estilosDirector,
 
             'horas_academicas'      => $horasAcademicas,
             'fecha_emision'         => CertificadoHelper::fechaEnLetras($certificado->fecha_crea),
@@ -261,38 +289,14 @@ class CertificadoService implements ICertificadoService
             'temario'               => $programa->temario ?? ''
         ];
 
-        Log::info('Validando información que se creará en el certificado, variable $info', [
-            'nombre_alumno'         => $info->nombre_alumno,
-            'nombre_tipoprograma'   => $info->nombre_tipoprograma,
-            'nombre_director'       => $info->nombre_director,
-            'titulo_programa'       => $info->titulo_programa,
-            'fechas_programa'       => $info->fechas_programa,
-            'horas_academicas'      => $info->horas_academicas,
-            'fecha_emision'         => $info->fecha_emision,
-        ]);
-
         // Determinar la plantilla/diseño correspondiente
-        $disenio = $plantilla->tipo_disenio;
-        $viewNameDefault = CertificadoHelper::resolveTemplateDefault($tipoPrograma->nombre_url);
+        $viewNameDefault = CertificadoHelper::resolveTemplateDefault($nombreTipoPrograma);
 
-        Log::info('Validando viewNameDefault', ['viewNameDefault' => $viewNameDefault]);
-
-        // config('params.clases.horas_academicas_default');
-
-        // Definir los parámetros para obtener los estilos en el certificado
-        $nombreTipoPrograma = $programa->tipoPrograma->nombre_url;
-        $grupoEstilos = "params.styles_pdfs.{$nombreTipoPrograma}.{$disenio}";
-        $estilos = config($grupoEstilos);
-
-        Log::info("Validando mapeo de estilos", [
-            'nombreTipoPrograma' => $nombreTipoPrograma,
-            'grupoEstilos'       => $grupoEstilos,
-            'estilos'            => $estilos
-        ]);
+        Log::info('viewNameDefault', ['viewNameDefault' => $viewNameDefault]);
 
         $pdf = Pdf::loadView($viewNameDefault, [
-            'info' => $info,
-            'fonts' => $fonts,
+            'info'    => $info,
+            'fonts'   => $fonts,
             'estilos' => $estilos
         ])->setPaper('a4', 'landscape')
             ->setOption('isFontSubsettingEnabled', false);
@@ -301,9 +305,6 @@ class CertificadoService implements ICertificadoService
         $this->storageService->put($pdfRelativePath, $pdf->output());
 
         return $this->storageService->getLocalPath($pdfRelativePath);
-
-        // Storage::disk('local')->put($pdfRelativePath, $pdf->output());
-        // return Storage::disk('local')->path($pdfRelativePath);
     }
 
     public function downloadCertificado(int $id): array
@@ -334,6 +335,21 @@ class CertificadoService implements ICertificadoService
             'filename'  => $filename,
         ];
     }
+
+    /**
+     * Obtiene la ruta absoluta y nombre del PDF a partir del código de verificación.
+     */
+    public function downloadCertificadoByCodigo(string $codigo): array
+    {
+        $certificado = $this->certificadoRepository->findByCodigo($codigo);
+
+        if (!$certificado) {
+            throw new Exception("El certificado con código {$codigo} no fue encontrado.", 404);
+        }
+
+        return $this->downloadCertificado($certificado->id);
+    }
+
 
     public function generateCertificadoModular(?array $searchParams): string
     {
@@ -460,6 +476,20 @@ class CertificadoService implements ICertificadoService
         return $this->certificadoRepository->findById($id);
     }
 
+    /**
+     * Obtiene y formatea los datos públicos del certificado para ser presentados en el frontend.
+     */
+    public function getCertificadoByCodigo(string $codigo): ?Certificado
+    {
+        $certificado = $this->certificadoRepository->findByCodigo($codigo);
+
+        if (!$certificado) {
+            return null;
+        }
+
+        return $certificado;
+    }
+
     public function createCertificado(CertificadoCreateDTO $dto): Certificado
     {
         $data = $dto->toArray();
@@ -473,7 +503,6 @@ class CertificadoService implements ICertificadoService
         // Obtener la información requerida para construir las rutas jerárquicas
         $persona = $this->personaRepository->findById($data['id_persona']);
         $programa = $this->programaRepository->findById($data['id_programa']);
-        // $sucursal = $this->detalleRepository->findByCodigo($data['id_sucursal']);
         $sucursal = $this->institucionRepository->findById($data['id_sucursal']);
 
         if (!$persona) {

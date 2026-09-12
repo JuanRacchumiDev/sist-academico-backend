@@ -92,10 +92,7 @@ class CertificadoHelper
         }
 
         $fontData = File::get($fullPath);
-        // $extension = pathinfo($fullPath, PATHINFO_EXTENSION);
-        // $mime = $extension === "otf" ? "font/otf" : "font/ttf";
 
-        // return 'data:' . $mime . ';base64,' . base64_encode($fontData);
         return 'data:font/truetype;base64,' . base64_encode($fontData);
     }
 
@@ -112,7 +109,7 @@ class CertificadoHelper
 
     public static function resolveTemplateDefault(string $tipoPrograma): string
     {
-        $view = "pdf.{$tipoPrograma}.default";
+        $view = "pdfs.{$tipoPrograma}.default";
 
         return $view;
     }
@@ -129,14 +126,14 @@ class CertificadoHelper
     public static function calcularEstilosTexto(
         string $texto,
         float $fontSizeBase,
-        float $anchoMaximoDisponible = 673.51,
+        float $anchoMaximoDisponible = 673.60,
         float $factorFuente = 0.38
     ): array {
         $textoLimpio = trim($texto);
 
         if ($textoLimpio === '') {
             return [
-                'font_size' => (int) round($fontSizeBase * 0.80),
+                'font_size' => (int) round($fontSizeBase),
                 'line_height' => 1.0
             ];
         }
@@ -183,25 +180,46 @@ class CertificadoHelper
             ];
         }
 
-        // CASO 2: Requiere escalar la fuente o dividirse en 2 líneas (hasta 2x el ancho)
-        if ($anchoProyectado <= ($anchoMaximoDisponible * 2)) {
-            // Se calcula una reducción proporcional o se aplica un 75% del tamaño base
-            $newFontSize = (int) round($fontSizeBase * 0.75);
-            Log::info("Resultado: Requiere 2 líneas o escala moderada (Caso 2)", ['fontSize' => $newFontSize]);
+        // Si sobrepasa el ancho máximo, calculamos la escala exacta necesaria
+        $ratio = $anchoMaximoDisponible / $anchoProyectado;
 
-            return [
-                'font_size'   => $newFontSize,
-                'line_height' => 0.95
-            ];
-        }
+        // Aplicamos el ratio para reducir solo el porcentaje necesario
+        $fontSizeCalculado = $fontSizeBase * $ratio;
 
-        // CASO 3: Texto muy largo (requiere 3 líneas o escala mayor)
-        $newFontSize = (int) round($fontSizeBase * 0.55);
-        Log::info("Resultado: Requiere 3 líneas o escala fuerte (Caso 3)", ['fontSize' => $newFontSize]);
+        // Definimos un tamaño mínimo de seguridad (35% del base)
+        $minFontSize = $fontSizeBase * 0.35;
+        $newFontSize = (int) round(max($fontSizeCalculado, $minFontSize));
+
+        Log::info("Resultado: Ajuste dinámico proporcional a 1 línea", [
+            'ratio' => $ratio,
+            'fontSizeOriginal' => $fontSizeBase,
+            'fontSizeAjustado' => $newFontSize
+        ]);
 
         return [
             'font_size'   => $newFontSize,
-            'line_height' => 0.85
+            'line_height' => 1.0
         ];
+
+        // CASO 2: Requiere escalar la fuente o dividirse en 2 líneas (hasta 2x el ancho)
+        // if ($anchoProyectado <= ($anchoMaximoDisponible * 2)) {
+        //     // Se calcula una reducción proporcional o se aplica un 75% del tamaño base
+        //     $newFontSize = (int) round($fontSizeBase * 0.60);
+        //     Log::info("Resultado: Requiere 2 líneas o escala moderada (Caso 2)", ['fontSize' => $newFontSize]);
+
+        //     return [
+        //         'font_size'   => $newFontSize,
+        //         'line_height' => 0.95
+        //     ];
+        // }
+
+        // // CASO 3: Texto muy largo (requiere 3 líneas o escala mayor)
+        // $newFontSize = (int) round($fontSizeBase * 0.55);
+        // Log::info("Resultado: Requiere 3 líneas o escala fuerte (Caso 3)", ['fontSize' => $newFontSize]);
+
+        // return [
+        //     'font_size'   => $newFontSize,
+        //     'line_height' => 0.85
+        // ];
     }
 }

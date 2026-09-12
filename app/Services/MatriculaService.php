@@ -173,7 +173,7 @@ class MatriculaService implements IMatriculaService
         $data->fecha_emision = Carbon::now()->translatedFormat('d \d\e F \d\e Y');
 
         // Cargar vista blade y pasar los datos orientados de forma horizontal (landscape)
-        $pdf = Pdf::loadView('pdf.certificado', ['info' => $data])
+        $pdf = Pdf::loadView('pdfs.certificado', ['info' => $data])
             ->setPaper('a4', 'landscape');
 
         return $pdf->output();

@@ -76,9 +76,9 @@ class InstitucionRepository implements IInstitucionRepository
             $query->where('codigo_sede', $filters['codigo_sede']);
         }
 
-        if (!empty($filters['nombre'])) {
-            $nombre = "%" . strtolower($filters['nombre']) . "%";
-            $query->whereRaw('LOWER(nombre) LIKE ?', [$nombre]);
+        if (!empty($filters['search'])) {
+            $search = "%" . strtolower($filters['search']) . "%";
+            $query->whereRaw('LOWER(nombre) LIKE ?', [$search]);
         }
 
         if (array_key_exists('is_cliente', $filters) && $filters['is_cliente'] !== null && $filters['is_cliente'] !== '') {

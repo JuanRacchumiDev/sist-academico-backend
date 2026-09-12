@@ -103,16 +103,15 @@ class InstitucionController extends Controller
     {
         try {
             $filters = $request->only([
-                'codigo_sede',
                 'is_cliente',
-                'estado'
+                'codigo_sede'
             ]);
 
             if ($request->has('search')) {
                 $filters['search'] = $request->input('search');
             }
 
-            $perPage = $request->input('per_page', 10);
+            $perPage = (int)$request->input('limit', 10);
 
             $instituciones = $this->institucionService->getAllFilteredPaginate($filters, $perPage);
 
@@ -129,12 +128,12 @@ class InstitucionController extends Controller
                 'data' => $instituciones,
                 'message' => 'Resultados encontrados correctamente',
                 'pagination' => [
-                    'total' => $instituciones->total(),
-                    'per_page' => $instituciones->perPage(),
-                    'current_page' => $instituciones->currentPage(),
-                    'last_page' => $instituciones->lastPage(),
-                    'from' => $instituciones->firstItem(),
-                    'to' => $instituciones->lastItem()
+                    'totalItems' => $instituciones->total(),
+                    'perPage' => $instituciones->perPage(),
+                    'currentPage' => $instituciones->currentPage(),
+                    'totalPages' => $instituciones->lastPage(),
+                    'nextPage' => $instituciones->hasMorePages() ? $instituciones->currentPage() + 1 : null,
+                    'previousPage' => $instituciones->currentPage() > 1 ? $instituciones->currentPage() - 1 : null,
                 ]
             ], 200);
         } catch (\Exception $e) {
@@ -176,6 +175,14 @@ class InstitucionController extends Controller
             $username = $usuarioAutenticado ? ($usuarioAutenticado->name) : 'systemapi';
             $data['user_crea'] = $username;
             $data['fecha_crea'] = FechaHelper::obtenerFechaActual();
+
+            if (!isset($data['is_cliente'])) {
+                $data['is_cliente'] = true;
+            }
+
+            if (!isset($data['estado'])) {
+                $data['estado'] = true;
+            }
 
             $institucionCreateDTO = InstitucionCreateDTO::from($data);
 

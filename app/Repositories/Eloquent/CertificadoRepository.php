@@ -12,6 +12,7 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Override;
 
 class CertificadoRepository implements ICertificadoRepository
 {
@@ -43,9 +44,23 @@ class CertificadoRepository implements ICertificadoRepository
             'tipoCertificado',
             'sucursal',
             'plantilla',
-            'programa',
+            'programa.tipoPrograma',
             'modulo'
         ])->find($id);
+    }
+
+    public function findByCodigo(string $codigo): ?Certificado
+    {
+        return Certificado::with([
+            'persona',
+            'tipoCertificado',
+            'sucursal',
+            'plantilla',
+            'programa.tipoPrograma',
+            'modulo'
+        ])
+            ->where('codigo_verificacion', $codigo)
+            ->first();
     }
 
     public function create(array $data): Certificado
@@ -100,7 +115,7 @@ class CertificadoRepository implements ICertificadoRepository
                 'tipoCertificado',
                 'sucursal',
                 'plantilla',
-                'programa',
+                'programa.tipoPrograma',
                 'modulo'
             ]);
 

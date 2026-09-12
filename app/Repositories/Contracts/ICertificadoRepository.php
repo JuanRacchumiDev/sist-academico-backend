@@ -26,6 +26,13 @@ interface ICertificadoRepository
     public function findById(int $id): ?Certificado;
 
     /**
+     * Obtener certificado por Código de verificación
+     * @param string $codigo
+     * @return Certificado|null
+     */
+    public function findByCodigo(string $codigo): ?Certificado;
+
+    /**
      * Crea un certificado
      * @param array<string, mixed> $data
      * @return Certificado

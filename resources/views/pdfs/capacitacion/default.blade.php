@@ -23,37 +23,41 @@
             font-family: 'Helvetica', 'Arial', sans-serif;
         }
 
+        @if(!empty($fonts['alumno']['custom_font']) && !empty($fonts['alumno']['path']))
         @font-face {
             font-family: 'FuenteAlumno';
-            src: url("{{ $fonts['alumno'] }}") format('truetype');
+            src: url("{{ $fonts['alumno']['path'] }}") format('truetype');
             font-weight: normal;
             font-style: normal;
         }
+        @endif
         
-        @if(!empty($fonts['is_custom_programa']))
+        @if(!empty($fonts['programa']['custom_font']) && !empty($fonts['programa']['path']))
         @font-face {
             font-family: 'FuentePrograma';
-            src: url("{{ $fonts['programa'] }}") format('truetype');
+            src: url("{{ $fonts['programa']['path'] }}") format('truetype');
             font-weight: normal;
             font-style: normal;
         }
         @endif
 
-        @if(!empty($fonts['is_custom_fechas']))
+        @if(!empty($fonts['fechas']['custom_font']) && !empty($fonts['fechas']['path']))
         @font-face {
             font-family: 'FuenteFechas';
-            src: url("{{ $fonts['fechas'] }}") format('truetype');
+            src: url("{{ $fonts['fechas']['path'] }}") format('truetype');
             font-weight: normal;
             font-style: normal;
         }
         @endif
 
+        @if(!empty($fonts['director']['custom_font']) && !empty($fonts['director']['path']))
         @font-face {
             font-family: 'FuenteDirector';
-            src: url("{{ $fonts['director'] }}") format('truetype');
+            src: url("{{ $fonts['director']['path'] }}") format('truetype');
             font-weight: normal;
             font-style: normal;
         }
+        @endif
 
         /* --- HOJA 1 --- */
         .page-first {
@@ -86,15 +90,21 @@
 
         .layer-alumno {
             position: absolute;
-            top: 310px;
+            top: 315px;
             left: 7%;
             width: 86%;
             text-align: center;
         }
 
         .txt-alumno {
+            /* font-family: {{ !empty($fonts['alumno']['custom_font']) ? "'FuenteAlumno', sans-serif" : ($fonts['alumno']['font_family'] ?? 'sans-serif') }}; */
             font-family: 'FuenteAlumno', sans-serif;
-            color: {{ $estilos['color_nombre_alumno'] ?? '#000000' }};
+            color: {{ $estilos['alumno']['color'] ?? '#000000' }};
+            /* font-size: {{ $info->estilos_alumno['fontSize'] ?? ($estilos['alumno']['fontSize'].'px' ?? '78px') }}; */
+            font-size: {{ ($info->estilos_alumno['font_size'] ?? $estilos['alumno']['fontSize']) . 'px' }};
+            line-height: {{ $info->estilos_alumno['line_height'] ?? 1.0 }};
+            white-space: nowrap;
+            text-align: center;
             margin: 0;
             padding: 0;
             font-weight: normal;
@@ -102,15 +112,21 @@
 
         .layer-programa {
             position: absolute;
-            top: 450px;
+            top: 458px;
             left: 10%;
             width: 80%;
             text-align: center;
         }
 
         .txt-programa {
-            font-family: {{ !empty($fonts['is_custom_programa']) ? "'FuentePrograma', sans-serif" : $fonts['programa'] }};
-            color: {{ $estilos['color_nombre_programa'] ?? '#000000' }};
+            /* font-family: {{ !empty($fonts['programa']['custom_font']) ? "'FuentePrograma', sans-serif" : ($fonts['programa']['font_family'] ?? 'sans-serif') }}; */
+            font-family: 'FuentePrograma', sans-serif;
+            color: {{ $estilos['programa']['color'] ?? '#000000' }};
+            /* font-size: {{ $info->estilos_programa['fontSize'] ?? ($estilos['programa']['fontSize'].'px' ?? '30px') }}; */
+            font-size: {{ ($info->estilos_programa['font_size'] ?? $estilos['programa']['fontSize']) . 'px' }};
+            line-height: {{ $info->estilos_programa['line_height'] ?? 1.0 }};
+            white-space: nowrap;
+            text-align: center;
             margin: 0;
             padding: 0;
             font-weight: bold;
@@ -125,12 +141,42 @@
         }
 
         .txt-fechas {
-            font-family: {{ !empty($fonts['is_custom_fechas']) ? "'FuenteFechas', sans-serif" : $fonts['fechas'] }};
-            color: {{ $estilos['color_fechas'] ?? '#000000' }};
+            /* font-family: {{ !empty($fonts['fechas']['custom_font']) ? "'FuenteFechas', sans-serif" : ($fonts['fechas']['font_family'] ?? 'sans-serif') }}; */
+            font-family: 'FuenteFechas', sans-serif;
+            color: {{ $estilos['fechas']['color'] ?? '#000000' }};
+            /* font-size: {{ $info->estilos_fechas['fontSize'] ?? ($estilos['fechas']['fontSize'].'px' ?? '17px') }}; */
+            font-size: {{ ($info->estilos_fechas['font_size'] ?? $estilos['fechas']['fontSize']) . 'px' }};
+            line-height: {{ $info->estilos_fechas['line_height'] ?? 1.0 }};
+            white-space: nowrap;
+            text-align: center;
             margin: 0;
             padding: 0;
             font-weight: normal;
         }
+
+        @if(isset($estilos['director']))
+        .layer-director {
+            position: absolute;
+            bottom: 80px;
+            left: 10%;
+            width: 80%;
+            text-align: center;
+        }
+
+        .txt-director {
+            /* font-family: {{ !empty($fonts['director']['custom_font']) ? "'FuenteDirector', sans-serif" : ($fonts['director']['font_family'] ?? 'sans-serif') }}; */
+            font-family: 'FuenteDirector', sans-serif;
+            color: {{ $estilos['director']['color'] ?? '#000000' }};
+            /* font-size: {{ $estilos['director']['fontSize'].'px' ?? '12px' }}; */
+            font-size: {{ ($info->estilos_director['font_size'] ?? $estilos['director']['fontSize']) . 'px' }};
+            line-height: {{ $info->estilos_director['line_height'] ?? 1.0 }};
+            white-space: nowrap;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            font-weight: normal;
+        }
+        @endif
 
         /* --- HOJA 2 --- */
         .page-second {
@@ -264,16 +310,22 @@
 
         <div class="cert-canvas">
             <div class="layer-alumno">
-                <h1 class="txt-alumno" style="font-size: {{ $info->estilos_alumno['font_size'] }}px; line-height: {{ $info->estilos_alumno['line_height'] }};">{{ $info->nombre_alumno }}</h1>
+                <h1 class="txt-alumno">{{ $info->nombre_alumno }}</h1>
             </div>
 
             <div class="layer-programa">
-                <h2 class="txt-programa" style="font-size: {{ $info->estilos_programa['font_size'] }}px; line-height: {{ $info->estilos_programa['line_height'] }};">{{ $info->titulo_programa }}</h2>
+                <h2 class="txt-programa">{{ $info->titulo_programa }}</h2>
             </div>
 
             <div class="layer-fechas">
-                <p class="txt-fechas" style="font-size: {{ $info->estilos_fechas['font_size'] }}px; line-height: {{ $info->estilos_fechas['line_height'] }};">{{ $info->fechas_programa }}</p>
+                <p class="txt-fechas">{{ $info->fechas_programa }}</p>
             </div>
+
+            @if(isset($estilos['director']))
+            <div class="layer-director">
+                <p class="txt-director">{{ $info->nombre_director }}</p>
+            </div>
+            @endif
         </div>
     </div><!-- HOJA 2 --><div class="page-second">
         <div class="wrapper-hoja2">
@@ -309,18 +361,7 @@
                     <!-- Columna Derecha: Logo + Bloque QR (Alineación Derecha) -->
                     <td class="col-right">
                         <div class="logo-container">
-                            @php
-                                $logoNombre = $info->logo ?? 'logo.png'; 
-                                $logoPath = public_path('images/' . ltrim($logoNombre, '/'));
-                                
-                                if (!file_exists($logoPath) && isset($info->logo) && file_exists(public_path($info->logo))) {
-                                    $logoPath = public_path($info->logo);
-                                }
-                            @endphp
-
-                            @if(file_exists($logoPath))
-                                <img src="data:image/png;base64,{{ base64_encode(file_get_contents($logoPath)) }}" class="logo-img" alt="Logo Institución">
-                            @elseif(isset($info->logo) && filter_var($info->logo, FILTER_VALIDATE_URL))
+                            @if(!empty($info->logo))
                                 <img src="{{ $info->logo }}" class="logo-img" alt="Logo Institución">
                             @endif
                         </div>
@@ -353,6 +394,5 @@
             </table>
         </div>
     </div>
-
 </body>
 </html>

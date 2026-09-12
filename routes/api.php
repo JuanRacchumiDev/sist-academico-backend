@@ -29,7 +29,11 @@ Route::prefix('v1')->group(function () {
         Route::get('consultar-documento/{tipoDocumento}/{numeroDocumento}', [PersonaController::class, 'consultarDocumento'])->name('personas.consultarDocumento');
     });
 
-    Route::get('/generate-ficha-pdf', [PdfController::class, 'fichaTest'])->name('generate.pdf.test');
+    // Rutas públicas de validación y descarga de certificados (sin autenticación)
+    Route::prefix('certificados')->group(function () {
+        Route::get('validar/{codigoQR}', [CertificadoController::class, 'verificar'])->name('certificados.validar');
+        Route::get('descargar/{codigo}', [CertificadoController::class, 'downloadByCodigo'])->name('certificados.downloadPDF.public');
+    });
 
     Route::prefix('auth')->group(function () {
         Route::post('login', [AuthController::class, 'validateUnique'])->name('login');
