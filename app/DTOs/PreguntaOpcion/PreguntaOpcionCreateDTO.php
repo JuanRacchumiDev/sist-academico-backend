@@ -32,7 +32,7 @@ class PreguntaOpcionCreateDTO extends Data
             'id_pregunta' => [
                 'required',
                 'integer',
-                'exists:pregunta,id',
+                'exists:academic.pregunta,id',
             ],
             'texto_opcion' => [
                 'required',

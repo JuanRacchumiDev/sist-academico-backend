@@ -8,9 +8,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class CuestionarioPersona extends Pivot
 {
-    protected $table = "cuestionario_persona";
+    protected $table = "academic.cuestionario_persona";
 
-    public $incrementing = true;
+    // public $incrementing = true;
 
     protected $fillable = [
         "id_cuestionario",
@@ -20,6 +20,11 @@ class CuestionarioPersona extends Pivot
         "fecha_fin",
         "puntaje_total",
         "estado_intento",
+
+        "fecha_crea",
+        "fecha_actualiza",
+        "fecha_elimina",
+
         "user_crea",
         "user_actualiza",
         "user_elimina",

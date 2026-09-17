@@ -33,17 +33,17 @@ class CuestionarioRespuestaCreateDTO extends Data
             'id_cuestionario_persona' => [
                 'required',
                 'integer',
-                'exists:cuestionario_persona,id',
+                'exists:academic.cuestionario_persona,id',
             ],
             'id_pregunta' => [
                 'required',
                 'integer',
-                'exists:pregunta,id',
+                'exists:academic.pregunta,id',
             ],
             'id_pregunta_opcion' => [
                 'sometimes',
                 'integer',
-                'exists:pregunta_opcion,id',
+                'exists:academic.pregunta_opcion,id',
                 'nullable',
             ],
             'respuesta_texto' => [

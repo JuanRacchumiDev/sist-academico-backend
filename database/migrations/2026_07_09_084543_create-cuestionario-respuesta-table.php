@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('cuestionario_respuesta', function (Blueprint $table) {
+        Schema::create('academic.cuestionario_respuesta', function (Blueprint $table) {
             $table->id();
 
             $table->unsignedBigInteger('id_cuestionario_persona');
@@ -21,7 +21,7 @@ return new class extends Migration
             $table->text('respuesta_texto')->nullable()->comment('Para respuestas en caja de texto');
 
             $table->decimal('puntaje_obtenido', 5, 2)->default('0.00');
-            $table->boolean('es_correcta')->nullable()->comment('Null si requiere revisión manual');
+            $table->boolean('is_correcta')->nullable()->comment('Null si requiere revisión manual');
 
             $table->string('fecha_crea', 10)->nullable();
             $table->string('fecha_actualiza', 10)->nullable();
@@ -36,15 +36,18 @@ return new class extends Migration
 
             $table->foreign('id_cuestionario_persona')
                 ->references('id')
-                ->on('cuestionario_persona');
+                ->on('academic.cuestionario_persona')
+                ->onDelete('cascade');
 
             $table->foreign('id_pregunta')
                 ->references('id')
-                ->on('pregunta');
+                ->on('academic.pregunta')
+                ->onDelete('cascade');
 
             $table->foreign('id_pregunta_opcion')
                 ->references('id')
-                ->on('pregunta_opcion');
+                ->on('academic.pregunta_opcion')
+                ->onDelete('cascade');
         });
     }
 
@@ -53,7 +56,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('cuestionario_respuesta', function (Blueprint $table) {
+        Schema::table('academic.cuestionario_respuesta', function (Blueprint $table) {
             $table->dropForeign('id_cuestionario_persona');
             $table->dropColumn('id_cuestionario_persona');
 
@@ -64,6 +67,6 @@ return new class extends Migration
             $table->dropColumn('id_pregunta_opcion');
         });
 
-        Schema::dropIfExists('cuestionario_respuesta');
+        Schema::dropIfExists('academic.cuestionario_respuesta');
     }
 };

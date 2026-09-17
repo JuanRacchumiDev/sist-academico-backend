@@ -34,7 +34,7 @@ class PreguntaCreateDTO extends Data
             'id_cuestionario' => [
                 'sometimes',
                 'integer',
-                'exists:cuestionario,id',
+                'exists:academic.cuestionario,id',
                 'nullable'
             ],
             'enunciado' => [

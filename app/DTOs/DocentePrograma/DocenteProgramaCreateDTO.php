@@ -31,12 +31,12 @@ class DocenteProgramaCreateDTO extends Data
             'id_persona' => [
                 'required',
                 'integer',
-                'exists:persona,id'
+                'exists:academic.persona,id'
             ],
             'id_programa' => [
                 'required',
                 'integer',
-                'exists:programa,id'
+                'exists:academic.programa,id'
             ],
             'fecha_crea' => [
                 'sometimes',

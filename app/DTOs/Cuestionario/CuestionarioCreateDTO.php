@@ -39,13 +39,13 @@ class CuestionarioCreateDTO extends Data
             'id_programa' => [
                 'sometimes',
                 'integer',
-                'exists:programa,id',
+                'exists:academic.programa,id',
                 'nullable'
             ],
             'id_modulo' => [
                 'sometimes',
                 'integer',
-                'exists:modulo,id',
+                'exists:academic.modulo,id',
                 'nullable'
             ],
             'titulo' => [

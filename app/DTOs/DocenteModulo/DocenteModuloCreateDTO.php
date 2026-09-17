@@ -31,12 +31,12 @@ class DocenteModuloCreateDTO extends Data
             'id_persona' => [
                 'required',
                 'integer',
-                'exists:persona,id'
+                'exists:academic.persona,id'
             ],
             'id_modulo' => [
                 'required',
                 'integer',
-                'exists:modulo,id'
+                'exists:academic.modulo,id'
             ],
             'fecha_crea' => [
                 'sometimes',
@@ -50,7 +50,7 @@ class DocenteModuloCreateDTO extends Data
                 'max:10',
                 'nullable'
             ],
-            'fecha_crea' => [
+            'fecha_elimina' => [
                 'sometimes',
                 'string',
                 'max:10',

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('docente_modulo', function (Blueprint $table) {
+        Schema::create('academic.docente_modulo', function (Blueprint $table) {
             $table->unsignedBigInteger('id_persona');
             $table->unsignedBigInteger('id_modulo');
 
@@ -29,11 +29,13 @@ return new class extends Migration
 
             $table->foreign('id_persona')
                 ->references('id')
-                ->on('persona');
+                ->on('persona')
+                ->onDelete('cascade');
 
             $table->foreign('id_modulo')
                 ->references('id')
-                ->on('modulo');
+                ->on('modulo')
+                ->onDelete('cascade');
         });
     }
 
@@ -42,7 +44,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('docente_programa', function (Blueprint $table) {
+        Schema::table('academic.docente_programa', function (Blueprint $table) {
             $table->dropForeign('id_persona');
             $table->dropColumn('id_persona');
 
@@ -50,6 +52,6 @@ return new class extends Migration
             $table->dropColumn('id_modulo');
         });
 
-        Schema::dropIfExists('docente_modulo');
+        Schema::dropIfExists('academic.docente_modulo');
     }
 };

@@ -11,21 +11,24 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('adjunto', function (Blueprint $table) {
+        Schema::create('academic.adjunto', function (Blueprint $table) {
             $table->id();
 
             $table->unsignedBigInteger('id_programa')->nullable();
             $table->unsignedBigInteger('id_modulo')->nullable();
             $table->unsignedBigInteger('id_sucursal')->nullable();
 
-            $table->string('titulo', 100);
-            $table->string('titulo_url', 120);
-            $table->string('descripcion', 150)->nullable();
-            $table->string('filename', 120);
-            $table->string('originalname', 180);
-            $table->string('filepath', 150);
-            $table->string('mimetype', 200);
-            $table->integer('size');
+            $table->enum('tipo', ['FILE', 'URL', 'YOUTUBE', 'DRIVE'])->default('FILE');
+            $table->string('titulo', 150);
+            $table->string('titulo_url', 180);
+            $table->string('descripcion', 250)->nullable();
+            $table->text('url')->nullable();
+            $table->string('filename', 120)->nullable();
+            $table->string('originalname', 180)->nullable();
+            $table->string('filepath', 150)->nullable();
+            $table->string('mimetype', 200)->nullable();
+            $table->unsignedBigInteger('size')->nullable();
+
             $table->boolean('is_descargable')->default(true);
             $table->boolean('is_visible')->default(true);
 
@@ -44,15 +47,18 @@ return new class extends Migration
 
             $table->foreign('id_programa')
                 ->references('id')
-                ->on('programa');
+                ->on('academic.programa')
+                ->onDelete('cascade');
 
             $table->foreign('id_modulo')
                 ->references('id')
-                ->on('modulo');
+                ->on('academic.modulo')
+                ->onDelete('cascade');
 
             $table->foreign('id_sucursal')
                 ->references('codigo')
-                ->on('detalle_parametro');
+                ->on('academic.detalle_parametro')
+                ->onDelete('cascade');
         });
     }
 
@@ -61,7 +67,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('adjunto', function (Blueprint $table) {
+        Schema::table('academic.adjunto', function (Blueprint $table) {
             $table->dropForeign('id_programa');
             $table->dropColumn('id_programa');
 
@@ -72,6 +78,6 @@ return new class extends Migration
             $table->dropColumn('id_sucursal');
         });
 
-        Schema::dropIfExists('adjunto');
+        Schema::dropIfExists('academic.adjunto');
     }
 };

@@ -51,21 +51,21 @@ class DetalleParametroUpdateDTO extends Data
             'parametro_clase' => [
                 'sometimes',
                 'integer',
-                'exists:parametro,clase',
+                'exists:academic.parametro,clase',
                 'nullable'
             ],
             'nombre' => [
                 'sometimes',
                 'string',
                 'max:100',
-                Rule::unique('parametro', 'nombre'),
+                Rule::unique('academic.parametro', 'nombre'),
                 'nullable'
             ],
             'nombre_url' => [
                 'sometimes',
                 'string',
                 'max:120',
-                Rule::unique('detalle_parametro', 'nombre_url'),
+                Rule::unique('academic.detalle_parametro', 'nombre_url'),
                 'nullable'
             ],
             'descripcion' => [

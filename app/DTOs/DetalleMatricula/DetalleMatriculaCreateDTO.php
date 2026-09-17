@@ -33,12 +33,12 @@ class DetalleMatriculaCreateDTO extends Data
             'id_matricula' => [
                 'required',
                 'integer',
-                'exists:matricula,id'
+                'exists:academic.matricula,id'
             ],
             'id_programa' => [
                 'required',
                 'integer',
-                'exists:programa,id'
+                'exists:academic.programa,id'
             ],
             'valor_matricula' => [
                 'sometimes',

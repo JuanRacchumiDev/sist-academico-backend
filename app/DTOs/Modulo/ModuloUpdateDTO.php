@@ -8,9 +8,11 @@ use Spatie\LaravelData\Data;
 class ModuloUpdateDTO extends Data
 {
     public function __construct(
+        public ?int $id = null,
         public ?string $titulo = null,
         public ?string $titulo_url = null,
         public ?int $orden = null,
+        public ?string $plan = null,
         public ?bool $estado = null,
         public ?int $id_programa = null,
         public ?string $descripcion = null,
@@ -44,14 +46,14 @@ class ModuloUpdateDTO extends Data
                 'sometimes',
                 'string',
                 'max:100',
-                Rule::unique('modulo', 'titulo'),
+                Rule::unique('academic.modulo', 'titulo'),
                 'nullable'
             ],
             'titulo_url' => [
                 'sometimes',
                 'string',
                 'max:120',
-                Rule::unique('modulo', 'titulo_url'),
+                Rule::unique('academic.modulo', 'titulo_url'),
                 'nullable'
             ],
             'descripcion' => [
@@ -74,6 +76,11 @@ class ModuloUpdateDTO extends Data
             'orden' => [
                 'sometimes',
                 'integer',
+                'nullable'
+            ],
+            'plan' => [
+                'sometimes',
+                'string',
                 'nullable'
             ],
             'fecha_crea' => [

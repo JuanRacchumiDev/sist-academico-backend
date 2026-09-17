@@ -36,12 +36,12 @@ class CuestionarioPersonaCreateDTO extends Data
             'id_cuestionario' => [
                 'required',
                 'integer',
-                'exists:cuestionario,id',
+                'exists:academic.cuestionario,id',
             ],
             'id_persona' => [
                 'required',
                 'integer',
-                'exists:persona,id',
+                'exists:academic.persona,id',
             ],
             'numero_intento' => [
                 'sometimes',

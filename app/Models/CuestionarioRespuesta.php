@@ -7,9 +7,9 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class CuestionarioRespuesta extends Pivot
 {
-    protected $table = "cuestionario_respuesta";
+    protected $table = "academic.cuestionario_respuesta";
 
-    public $incrementing = true;
+    // public $incrementing = true;
 
     protected $fillable = [
         "id_cuestionario_persona",
@@ -17,7 +17,12 @@ class CuestionarioRespuesta extends Pivot
         "id_pregunta_opcion",
         "respuesta_texto",
         "puntaje_obtenido",
-        "es_correcta",
+        "is_correcta",
+
+        "fecha_crea",
+        "fecha_actualiza",
+        "fecha_elimina",
+
         "user_crea",
         "user_actualiza",
         "user_elimina",
@@ -33,7 +38,7 @@ class CuestionarioRespuesta extends Pivot
     ];
 
     protected $casts = [
-        'es_correcta' => 'boolean',
+        'is_correcta' => 'boolean',
         'estado' => 'boolean'
     ];
 

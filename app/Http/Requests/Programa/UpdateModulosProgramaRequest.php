@@ -7,32 +7,11 @@ use Override;
 
 class UpdateModulosProgramaRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Si la petición viene como un array JSON indexado directo [{...}, {...}],
-     * lo envolvemos dentro del key 'modulos' antes de validar
-     */
-    protected function prepareForValidation(): void
-    {
-        $data = json_decode($this->getContent(), true);
-
-        if (is_array($data) && array_is_list($data)) {
-            $this->replace(['modulos' => $data]);
-        }
-    }
-
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
@@ -41,6 +20,23 @@ class UpdateModulosProgramaRequest extends FormRequest
             'modulos.*.titulo' => ['required', 'string', 'max:255'],
             'modulos.*.temario' => ['nullable', 'string'],
             'modulos.*.orden' => ['nullable', 'integer'],
+            'modulos.*.plan' => [
+                'nullable',
+                function ($attribute, $value, $fail) {
+                    if ($value instanceof \Illuminate\Http\UploadedFile) {
+                        $allowedMimes = ['pdf', 'doc', 'docx', 'png', 'jpg', 'jpeg'];
+                        $extension = strtolower($value->getClientOriginalExtension());
+                        if (!in_array($extension, $allowedMimes)) {
+                            $fail("El archivo del plan debe estar en formato PDF, Word o Imagen.");
+                        }
+                        if ($value->getSize() > 10240 * 1024) { // 10MB
+                            $fail("El archivo del plan no debe superar los 10MB.");
+                        }
+                    } elseif (!is_string($value) && !is_null($value)) {
+                        $fail("El campo plan debe ser un archivo válido o una ruta de texto.");
+                    }
+                },
+            ],
         ];
     }
 

@@ -32,19 +32,19 @@ class GrupoPersonaUpdateDTO extends Data
             'codigo_grupo' => [
                 'sometimes',
                 'string',
-                'exists:detalle_parametro,codigo',
+                'exists:academic.detalle_parametro,codigo',
                 'nullable'
             ],
             'id_persona' => [
                 'sometimes',
                 'integer',
-                'exists:persona,id',
+                'exists:academic.persona,id',
                 'nullable'
             ],
             'id_sucursal' => [
                 'sometimes',
                 'integer',
-                'exists:detalle_parametro,codigo',
+                'exists:academic.detalle_parametro,codigo',
                 'nullable'
             ],
             'fecha_crea' => [

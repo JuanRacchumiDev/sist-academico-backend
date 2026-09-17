@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('detalle_parametro', function (Blueprint $table) {
+        Schema::create('academic.detalle_parametro', function (Blueprint $table) {
             $table->id('codigo');
             $table->unsignedBigInteger('parametro_clase');
 
@@ -40,7 +40,8 @@ return new class extends Migration
 
             $table->foreign('parametro_clase')
                 ->references('clase')
-                ->on('parametro');
+                ->on('academic.parametro')
+                ->onDelete('cascade');
         });
     }
 
@@ -49,6 +50,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('detalle_parametro');
+        Schema::dropIfExists('academic.detalle_parametro');
     }
 };

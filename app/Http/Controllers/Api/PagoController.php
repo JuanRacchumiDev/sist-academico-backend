@@ -116,8 +116,8 @@ class PagoController extends Controller
     public function getMatricula(Request $request)
     {
         $request->validate([
-            'id_alumno' => 'required|integer|exists:persona,id',
-            'id_matricula' => 'required|integer|exists:matricula,id',
+            'id_alumno' => 'required|integer|exists:academic.persona,id',
+            'id_matricula' => 'required|integer|exists:academic.matricula,id',
         ]);
 
         $idMatricula = $request->input('id_matricula');
@@ -147,8 +147,8 @@ class PagoController extends Controller
     public function getPagoModulo(Request $request)
     {
         $request->validate([
-            'id_alumno' => 'required|integer|exists:persona,id',
-            'id_matricula' => 'required|integer|exists:matricula,id',
+            'id_alumno' => 'required|integer|exists:academic.persona,id',
+            'id_matricula' => 'required|integer|exists:academic.matricula,id',
             'numero_modulo' => 'required|integer'
         ]);
 

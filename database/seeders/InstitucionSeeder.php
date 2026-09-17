@@ -17,9 +17,9 @@ class InstitucionSeeder extends Seeder
         $now = Carbon::now();
         $fechaCrea = $now->format('Y-m-d');
 
-        DB::table('institucion')->truncate();
+        DB::table('academic.institucion')->truncate();
 
-        DB::table('institucion')->insert([
+        DB::table('academic.institucion')->insert([
             [
                 'nombre' => 'INNOVAPERÚ',
                 'sigla' => 'Aprendizaje continúo para ti',

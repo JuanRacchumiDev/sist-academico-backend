@@ -46,31 +46,31 @@ class PagoUpdateDTO extends Data
             'id_matricula' => [
                 'sometimes',
                 'integer',
-                'exists:matricula,id',
+                'exists:academic.matricula,id',
                 'nullable'
             ],
             'codigo_formapago' => [
                 'sometimes',
                 'integer',
-                'exists:detalle_parametro,codigo',
+                'exists:academic.detalle_parametro,codigo',
                 'nullable'
             ],
             'id_sucursal' => [
                 'sometimes',
                 'integer',
-                'exists:detalle_parametro,codigo',
+                'exists:academic.detalle_parametro,codigo',
                 'nullable'
             ],
             'id_modulo' => [
                 'sometimes',
                 'integer',
-                'exists:modulo,id',
+                'exists:academic.modulo,id',
                 'nullable',
             ],
             'codigo_estadopago' => [
                 'sometimes',
                 'integer',
-                'exists:detalle_parametro,codigo',
+                'exists:academic.detalle_parametro,codigo',
                 'nullable',
             ],
             'concepto' => [

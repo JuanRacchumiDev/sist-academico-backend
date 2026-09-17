@@ -13,6 +13,8 @@ class UserCreateDTO extends Data
         public int $codigo_perfil,
         public bool $estado,
         public ?int $id_persona = null,
+        public ?string $email_verified_at = null,
+        public ?string $remember_token = null,
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null,
@@ -46,12 +48,22 @@ class UserCreateDTO extends Data
             'codigo_perfil' => [
                 'required',
                 'int',
-                'exists:detalle_parametro,codigo'
+                'exists:academic.detalle_parametro,codigo'
             ],
             'id_persona' => [
                 'sometimes',
                 'int',
-                'exists:persona,id',
+                'exists:academic.persona,id',
+                'nullable'
+            ],
+            'email_verified_at' => [
+                'sometimes',
+                'string',
+                'nullable'
+            ],
+            'remeber_token' => [
+                'sometimes',
+                'string',
                 'nullable'
             ],
             'user_crea' => [

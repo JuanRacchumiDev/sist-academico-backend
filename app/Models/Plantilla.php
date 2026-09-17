@@ -7,9 +7,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Plantilla extends Model
 {
-    protected $table = 'plantilla';
+    protected $table = 'academic.plantilla';
 
-    protected $guarded = ['id'];
+    // protected $guarded = ['id'];
 
     protected $fillable = [
         'id_institucion',
@@ -21,9 +21,11 @@ class Plantilla extends Model
         'path_pdf_fondo',
         'tipo_disenio',
         'disenio_default',
+
         'fecha_crea',
         'fecha_actualiza',
         'fecha_elimina',
+
         'user_crea',
         'user_actualiza',
         'user_elimina',

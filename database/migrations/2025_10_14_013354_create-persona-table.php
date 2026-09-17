@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('persona', function (Blueprint $table) {
+        Schema::create('academic.persona', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('codigo_tipodocumento');
 
@@ -49,7 +49,8 @@ return new class extends Migration
 
             $table->foreign('codigo_tipodocumento')
                 ->references('codigo')
-                ->on('detalle_parametro');
+                ->on('academic.detalle_parametro')
+                ->onDelete('cascade');
         });
     }
 
@@ -58,11 +59,11 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('persona', function (Blueprint $table) {
+        Schema::table('academic.persona', function (Blueprint $table) {
             $table->dropForeign('codigo_tipodocumento');
             $table->dropColumn('codigo_tipodocumento');
         });
 
-        Schema::dropIfExists('persona');
+        Schema::dropIfExists('academic.persona');
     }
 };

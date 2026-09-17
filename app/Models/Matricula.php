@@ -8,19 +8,21 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Matricula extends Model
 {
-    protected $table = "matricula";
+    protected $table = "academic.matricula";
 
-    protected $guarded = ["id"];
+    // protected $guarded = ["id"];
 
     protected $fillable = [
         "id_persona",
         "codigo_estadomatricula",
         "id_sucursal",
         'numero_modulos',
+
         "fecha_matricula",
         "fecha_retiro",
         "fecha_reserva",
         "fecha_anula",
+
         "user_crea",
         "user_actualiza",
         "user_elimina",

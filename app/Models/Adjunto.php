@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Adjunto extends Model
 {
-    protected $table = 'adjunto';
+    protected $table = 'academic.adjunto';
 
     protected $fillable = [
         'id_programa',
@@ -24,9 +24,11 @@ class Adjunto extends Model
         'size',
         'is_descargable',
         'is_visible',
+
         'fecha_crea',
         'fecha_actualiza',
         'fecha_elimina',
+
         'user_crea',
         'user_actualiza',
         'user_elimina',

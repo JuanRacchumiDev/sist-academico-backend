@@ -24,13 +24,13 @@ class DocenteProgramaUpdateDTO extends Data
             'id_persona' => [
                 'sometimes',
                 'integer',
-                'exists:persona,id',
+                'exists:academic.persona,id',
                 'nullable'
             ],
             'id_programa' => [
                 'sometimes',
                 'integer',
-                'exists:programa,id',
+                'exists:academic.programa,id',
                 'nullable'
             ],
             'fecha_crea' => [

@@ -39,10 +39,10 @@ class PagoRepository implements IPagoRepository
 
         Log::info('idMatricula getMatricula', ['idMatricula' => $idMatricula]);
 
-        $pagoData = DB::table('pago as p')
-            ->join('matricula as m', 'm.id', '=', 'p.id_matricula')
-            ->join('detalle_parametro as dp', 'dp.codigo', '=', 'p.codigo_formapago')
-            ->join('detalle_parametro as dp3', 'dp3.codigo', '=', 'p.codigo_estadopago')
+        $pagoData = DB::table('academic.pago as p')
+            ->join('academic.matricula as m', 'm.id', '=', 'p.id_matricula')
+            ->join('academic.detalle_parametro as dp', 'dp.codigo', '=', 'p.codigo_formapago')
+            ->join('academic.detalle_parametro as dp3', 'dp3.codigo', '=', 'p.codigo_estadopago')
             ->select(
                 'm.fecha_matricula',
                 'dp.nombre as nombre_formapago',
@@ -91,10 +91,10 @@ class PagoRepository implements IPagoRepository
 
         Log::info('idMatricula getPagoModuloData', ['idMatricula' => $idMatricula]);
 
-        $pagoData = DB::table('pago as p')
-            ->join('programa as p2', 'p.id_programa', '=', 'p2.id')
-            ->join('detalle_parametro as dp', 'dp.codigo', '=', 'p.codigo_formapago')
-            ->join('detalle_parametro as dp3', 'dp3.codigo', '=', 'p.codigo_estadopago')
+        $pagoData = DB::table('academic.pago as p')
+            ->join('academic.programa as p2', 'p.id_programa', '=', 'p2.id')
+            ->join('academic.detalle_parametro as dp', 'dp.codigo', '=', 'p.codigo_formapago')
+            ->join('academic.detalle_parametro as dp3', 'dp3.codigo', '=', 'p.codigo_estadopago')
             ->select(
                 'p2.nombre as nombre_programa',
                 'dp.nombre as nombre_formapago',
@@ -144,7 +144,7 @@ class PagoRepository implements IPagoRepository
                 pg.cantidad_efectivo, pg.cantidad_operacion,
                 dp.nombre as nombre_formapago
             FROM
-                pago pg INNER JOIN detalle_parametro dp
+                pago pg INNER JOIN academic.detalle_parametro dp
                 ON dp.codigo = pg.codigo_formapago
             WHERE pg.id_matricula = ? AND pg.numero_modulo IS NOT NULL
             ORDER BY pg.numero_modulo ASC

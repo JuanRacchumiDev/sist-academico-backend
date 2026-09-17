@@ -7,15 +7,19 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class GrupoPersona extends Model
 {
-    protected $table = "grupo_persona";
+    protected $table = "academic.grupo_persona";
+
+    public $timestamps = true;
 
     protected $fillable = [
         'codigo_grupo',
         'id_persona',
         'id_sucursal',
+
         'fecha_crea',
         'fecha_actualiza',
         'fecha_elimina',
+
         'user_crea',
         'user_actualiza',
         'user_elimina'

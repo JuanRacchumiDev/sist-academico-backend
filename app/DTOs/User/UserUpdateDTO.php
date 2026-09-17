@@ -45,7 +45,7 @@ class UserUpdateDTO extends Data
                 'string',
                 'email',
                 'max:60',
-                Rule::unique('users', 'email')->ignore($usuarioId),
+                Rule::unique('academic.users', 'email')->ignore($usuarioId),
                 'nullable'
             ],
             'password' => [
@@ -56,13 +56,13 @@ class UserUpdateDTO extends Data
             'codigo_perfil' => [
                 'sometimes',
                 'int',
-                'exists:detalle_parametro,codigo',
+                'exists:academic.detalle_parametro,codigo',
                 'nullable'
             ],
             'id_persona' => [
                 'sometimes',
                 'int',
-                'exists:persona,id',
+                'exists:academic.persona,id',
                 'nullable'
             ],
             'user_crea' => [

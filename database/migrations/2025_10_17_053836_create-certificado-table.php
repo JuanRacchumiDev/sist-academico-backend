@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('certificado', function (Blueprint $table) {
+        Schema::create('academic.certificado', function (Blueprint $table) {
             $table->id();
 
             $table->unsignedBigInteger('id_persona');
@@ -40,27 +40,33 @@ return new class extends Migration
 
             $table->foreign('id_persona')
                 ->references('id')
-                ->on('persona');
+                ->on('academic.persona')
+                ->onDelete('cascade');
 
             $table->foreign('codigo_tipocertificado')
                 ->references('codigo')
-                ->on('detalle_parametro');
+                ->on('academic.detalle_parametro')
+                ->onDelete('cascade');
 
             $table->foreign('id_sucursal')
                 ->references('codigo')
-                ->on('detalle_parametro');
+                ->on('academic.detalle_parametro')
+                ->onDelete('cascade');
 
             $table->foreign('id_plantilla')
                 ->references('id')
-                ->on('plantilla');
+                ->on('academic.plantilla')
+                ->onDelete('cascade');
 
             $table->foreign('id_programa')
                 ->references('id')
-                ->on('programa');
+                ->on('academic.programa')
+                ->onDelete('cascade');
 
             $table->foreign('id_modulo')
                 ->references('id')
-                ->on('modulo');
+                ->on('academic.modulo')
+                ->onDelete('cascade');
         });
     }
 
@@ -69,7 +75,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('certificado', function (Blueprint $table) {
+        Schema::table('academic.certificado', function (Blueprint $table) {
             $table->dropForeign('id_persona');
             $table->dropColumn('id_persona');
 
@@ -89,6 +95,6 @@ return new class extends Migration
             $table->dropColumn('id_modulo');
         });
 
-        Schema::dropIfExists('certificado');
+        Schema::dropIfExists('academic.certificado');
     }
 };

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Certificado extends Model
 {
-    protected $table = 'certificado';
+    protected $table = 'academic.certificado';
 
     protected $fillable = [
         'id_persona',

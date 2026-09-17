@@ -54,14 +54,14 @@ class PersonaUpdateDTO extends Data
             'codigo_tipodocumento' => [
                 'sometimes',
                 'integer',
-                'exists:detalle_parametro,codigo',
+                'exists:academic.detalle_parametro,codigo',
                 'nullable'
             ],
             'numero_documento' => [
                 'sometimes',
                 'string',
                 'max:13',
-                Rule::unique('persona', 'numero_documento')->ignore($id),
+                Rule::unique('academic.persona', 'numero_documento')->ignore($id),
                 'nullable'
             ],
             'nombres' => [
@@ -123,7 +123,7 @@ class PersonaUpdateDTO extends Data
                 'string',
                 'email',
                 'max:60',
-                Rule::unique('persona', 'email')->ignore($id),
+                Rule::unique('academic.persona', 'email')->ignore($id),
                 'nullable'
             ],
             'telefono' => [

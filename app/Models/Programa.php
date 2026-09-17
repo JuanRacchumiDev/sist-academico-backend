@@ -7,9 +7,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Programa extends Model
 {
-    protected $table = 'programa';
+    protected $table = 'academic.programa';
 
-    protected $guarded = ['id'];
+    // protected $guarded = ['id'];
 
     protected $fillable = [
         'codigo_segmento',
@@ -21,8 +21,9 @@ class Programa extends Model
         'sigla',
         'titulo',
         'titulo_url',
-        'descripcion',
         'temario',
+        'descripcion',
+        'contenido',
         'fecha_inicio',
         'fecha_final',
         'duracion',
@@ -35,10 +36,14 @@ class Programa extends Model
         'capacidad_maxima',
         'cantidad_inscritos',
         'precio_modulo',
+        'banner_url',
         'is_vigente',
+        'show_web',
+
         'fecha_crea',
         'fecha_actualiza',
         'fecha_elimina',
+
         'user_crea',
         'user_actualiza',
         'user_elimina',

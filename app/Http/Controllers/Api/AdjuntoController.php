@@ -120,8 +120,8 @@ class AdjuntoController extends Controller
     {
         try {
             $filters = $request->validate([
-                'id_programa' => 'required|integer|exists:programa,id',
-                'id_modulo'   => 'sometimes|nullable|integer|exists:modulo,id',
+                'id_programa' => 'required|integer|exists:academic.programa,id',
+                'id_modulo'   => 'sometimes|nullable|integer|exists:academic.modulo,id',
                 'titulo'      => 'required|string|max:100'
             ]);
 

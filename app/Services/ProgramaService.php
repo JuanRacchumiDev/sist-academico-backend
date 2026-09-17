@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services;
 
 use App\DTOs\Programa\ProgramaCreateDTO;
@@ -6,13 +7,18 @@ use App\DTOs\Programa\ProgramaUpdateDTO;
 use App\Models\Programa;
 use App\Repositories\Contracts\IProgramaRepository;
 use App\Services\Contracts\IProgramaService;
+use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Override;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
-class ProgramaService implements IProgramaService {
+class ProgramaService implements IProgramaService
+{
     protected IProgramaRepository $programaRepository;
 
     public function __construct(IProgramaRepository $programaRepository)
@@ -35,11 +41,13 @@ class ProgramaService implements IProgramaService {
      * @param array<string, mixed> $filters
      * @param int $perPage
      * @return LengthAwarePaginator
-     */ 
+     */
     public function getAllProgramasWithFilters(array $filters, int $perPage): LengthAwarePaginator
     {
         return $this->programaRepository->getAllFiltered($filters, $perPage);
     }
+
+
 
     /**
      * Obtiene un programa por ID
@@ -48,7 +56,58 @@ class ProgramaService implements IProgramaService {
      */
     public function getProgramaById(int $id): ?Programa
     {
-        return $this->programaRepository->findById($id);
+        $programa = $this->programaRepository->findById($id);
+
+        if (!$programa) {
+            return null;
+        }
+
+        if ($programa->relationLoaded('detalleModulos')) {
+            $programa->detalleModulos->transform(function ($modulo) use ($id) {
+                $hasFile = !empty($modulo->plan) && Storage::disk('local')->exists($modulo->plan);
+
+                $modulo->plan_existe = $hasFile;
+
+                // Generar URL para la descarga si el archivo existe
+                $modulo->plan_url = $hasFile
+                    ? route('programas.modulos.descargar-plan', [
+                        'programaId' => $id,
+                        'moduloId' => $modulo->id
+                    ])
+                    : null;
+
+                return $modulo;
+            });
+        }
+
+        return $programa;
+    }
+
+    public function downloadPlanModulo(int $programaId, int $moduloId): BinaryFileResponse
+    {
+        $programa = $this->programaRepository->findById($programaId);
+
+        if (!$programa) {
+            throw new Exception('El programa solicitado no existe', 404);
+        }
+
+        $modulo = $programa->detalleModulos->firstWhere('id', $moduloId);
+
+        if (!$modulo) {
+            throw new Exception('El módulo solicitado no pertenece a este programa', 404);
+        }
+
+        if (empty($modulo->plan) || !Storage::disk('local')->exists($modulo->plan)) {
+            throw new Exception("El archivo del plan de estudios no existe o fue eliminado", 404);
+        }
+
+        $fullPath = Storage::disk('local')->path($modulo->plan);
+
+        return response()->download(
+            $fullPath,
+            "plan_modulo_{$modulo->id}.pdf",
+            ["Content-Type", "application/pdf"]
+        );
     }
 
     /**
@@ -62,7 +121,7 @@ class ProgramaService implements IProgramaService {
             'dto_data' => $programaCreateDTO->toArray()
         ]);
 
-        return DB::transaction(function() use ($programaCreateDTO) {
+        return DB::transaction(function () use ($programaCreateDTO) {
             if ($programaCreateDTO->plan instanceof UploadedFile) {
 
                 // Validar si el archivo llega correctamente
@@ -71,7 +130,7 @@ class ProgramaService implements IProgramaService {
                     'mimo_type' => $programaCreateDTO->plan->getMimeType(),
                     'tamaño' => $programaCreateDTO->plan->getSize()
                 ]);
-            
+
                 // Obtener el nombre original del archivo
                 $originalName = $programaCreateDTO->plan->getClientOriginalName();
 

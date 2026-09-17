@@ -9,9 +9,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class DetalleParametro extends Model
 {
-    protected $table = "detalle_parametro";
+    protected $table = "academic.detalle_parametro";
     protected $primaryKey = "codigo";
     public $incrementing = true;
+
+    public $timestamps = true;
 
     protected $fillable = [
         'parametro_clase',
@@ -26,9 +28,11 @@ class DetalleParametro extends Model
         'compra',
         'venta',
         'visible',
+
         'fecha_crea',
         'fecha_actualiza',
         'fecha_elimina',
+
         'user_crea',
         'user_actualiza',
         'user_elimina',
@@ -61,7 +65,7 @@ class DetalleParametro extends Model
     {
         return $this->belongsToMany(
             Persona::class,
-            'grupo_persona',
+            'academic.grupo_persona',
             'codigo_grupo',
             'id_persona'
         )->withTimestamps();

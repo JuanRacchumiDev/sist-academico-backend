@@ -46,28 +46,28 @@ class PagoCreateDTO extends Data
             'id_matricula' => [
                 'required',
                 'integer',
-                'exists:matricula,id'
+                'exists:academic.matricula,id'
             ],
             'codigo_formapago' => [
                 'required',
                 'integer',
-                'exists:detalle_parametro,codigo'
+                'exists:academic.detalle_parametro,codigo'
             ],
             'id_sucursal' => [
                 'required',
                 'integer',
-                'exists:detalle_parametro,codigo'
+                'exists:academic.detalle_parametro,codigo'
             ],
             'id_modulo' => [
                 'sometimes',
                 'integer',
-                'exists:modulo,id',
+                'exists:academic.modulo,id',
                 'nullable',
             ],
             'codigo_estadopago' => [
                 'sometimes',
                 'integer',
-                'exists:detalle_parametro,codigo',
+                'exists:academic.detalle_parametro,codigo',
                 'nullable',
             ],
             'concepto' => [

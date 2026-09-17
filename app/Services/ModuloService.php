@@ -125,6 +125,10 @@ class ModuloService implements IModuloService
             $procesados = new Collection();
 
             foreach ($dtos as $dto) {
+                // Convertir DTO a array si es una instancia de Data / DTO
+                $dtoData = $dto instanceof ModuloUpdateDTO ? $dto->toArray() : (array) $dto;
+
+                // Filtrar valores nulos
                 $data = array_filter($dto, fn($value) => !is_null($value));
 
                 $idModulo = $dto['id'] ?? null;

@@ -13,7 +13,8 @@ class UserRepository implements IUserRepository
 {
     public function getAll(array $filters = []): Collection
     {
-        $query = $this->applyFilters(User::query(), $filters);
+        $query = User::with(['perfil', 'persona.grupos']);
+        $query = $this->applyFilters($query, $filters);
         return $query->get();
     }
 
@@ -21,7 +22,7 @@ class UserRepository implements IUserRepository
     {
         $query = User::with([
             'perfil',
-            'persona'
+            'persona.grupos'
         ]);
 
         $query = $this->applyFilters($query, $filters);
@@ -31,24 +32,24 @@ class UserRepository implements IUserRepository
 
     public function findOne(array $filters): ?User
     {
-        return $this->applyFilters(User::query(), $filters)->first();
+        return $this->applyFilters(User::with(['perfil', 'persona.grupos']), $filters)->first();
     }
 
     public function findById(int $id): ?User
     {
         return User::with([
             'perfil',
-            'persona'
+            'persona.grupos'
         ])->findOrFail($id);
     }
 
     public function create(array $data): User
     {
-        // $user = User::create($data);
         $user = User::create([
             'name'      => $data['name'],
             'email'     => $data['email'],
             'codigo_perfil' => $data['codigo_perfil'],
+            'user_crea' => $data['user_crea'],
             'password'  => Hash::make($data['password']),
             'id_persona' => $data['id_persona'] ?? null
         ]);
@@ -61,8 +62,7 @@ class UserRepository implements IUserRepository
         $user = User::find($id);
 
         if ($user) {
-            // Si el password viene en la data, se encripta antes de guardar
-            if (!empty($data['password']) && !empty($data['password'])) {
+            if (!empty($data['password'])) {
                 $data['password'] = Hash::make($data['password']);
             }
 
@@ -98,17 +98,48 @@ class UserRepository implements IUserRepository
             $query->where('id_persona', $filters['id_persona']);
         }
 
-        if (!empty($filters['name']) && !empty($filters['name'])) {
+        if (isset($filters['estado']) && $filters['estado'] !== '') {
+            $query->where('estado', filter_var($filters['estado'], FILTER_VALIDATE_BOOLEAN));
+        }
+
+        if (!empty($filters['name'])) {
             $search = '%' . strtolower($filters['name']) . '%';
-            $query->where(function ($q) use ($search) {
-                $q->whereRaw('LOWER(name) LIKE ?', [$search]);
+            $query->whereRaw('LOWER(name) LIKE ?', [$search]);
+        }
+
+        if (!empty($filters['email'])) {
+            $search = '%' . strtolower($filters['email']) . '%';
+            $query->whereRaw('LOWER(email) LIKE ?', [$search]);
+        }
+
+        if (!empty($filters['perfil_nombre'])) {
+            $search = '%' . strtolower($filters['perfil_nombre']) . '%';
+            $query->whereHas('perfil', function (Builder $q) use ($search) {
+                $q->whereRaw('LOWER(nombre) LIKE ?', [$search]);
             });
         }
 
-        if (!empty($filters['email']) && !empty($filters['email'])) {
-            $search = '%' . strtolower($filters['email']) . '%';
-            $query->where(function ($q) use ($search) {
-                $q->whereRaw('LOWER(email) LIKE ?', [$search]);
+        if (!empty($filters['persona_search'])) {
+            $search = '%' . strtolower($filters['persona_search']) . '%';
+            $query->whereHas('persona', function (Builder $q) use ($search) {
+                $q->where(function (Builder $subQ) use ($search) {
+                    $subQ->whereRaw('LOWER(nombre_completo) LIKE ?', [$search])
+                        ->orWhere('numero_documento', 'LIKE', $search);
+                });
+            });
+        }
+
+        if (!empty($filters['numero_documento'])) {
+            $query->whereHas('persona', function (Builder $q) use ($filters) {
+                $q->where('numero_documento', $filters['numero_documento']);
+            });
+        }
+
+        if (!empty($filters['id_grupo_persona']) || !empty($filters['codigo_grupo'])) {
+            $codigoGrupo = $filters['id_grupo_persona'] ?? $filters['codigo_grupo'];
+
+            $query->whereHas('persona.grupos', function (Builder $q) use ($codigoGrupo) {
+                $q->where('academic.grupo_persona.codigo_grupo', $codigoGrupo);
             });
         }
 

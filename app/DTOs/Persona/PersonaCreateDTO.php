@@ -52,13 +52,13 @@ class PersonaCreateDTO extends Data
             'codigo_tipodocumento' => [
                 'required',
                 'integer',
-                'exists:detalle_parametro,codigo'
+                'exists:academic.detalle_parametro,codigo'
             ],
             'numero_documento' => [
                 'required',
                 'string',
                 'max:13',
-                Rule::unique('persona', 'numero_documento')
+                Rule::unique('academic.persona', 'numero_documento')
             ],
             'nombres' => [
                 'required',
@@ -115,7 +115,7 @@ class PersonaCreateDTO extends Data
                 'string',
                 'email',
                 'max:60',
-                Rule::unique('persona', 'email'),
+                Rule::unique('academic.persona', 'email'),
                 'nullable'
             ],
             'telefono' => [

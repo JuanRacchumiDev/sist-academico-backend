@@ -21,7 +21,7 @@
 /storage/logs/*
 /storage/framework/*
 /storage/app
-/storage/fonts/*
+/storage/fonts
 /boostrap/cache/*
 /vendor
 Homestead.json

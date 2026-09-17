@@ -100,7 +100,7 @@ class ParametroRepository implements IParametroRepository
      */
     public function getNextParClase(): int
     {
-        $maxClase = DB::table('parametro')->max('clase');
+        $maxClase = DB::table('academic.parametro')->max('clase');
         return $maxClase ? $maxClase + 1 : 1003;
     }
 

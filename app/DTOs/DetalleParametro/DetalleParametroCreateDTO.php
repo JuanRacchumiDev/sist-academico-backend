@@ -51,19 +51,19 @@ class DetalleParametroCreateDTO extends Data
             'parametro_clase' => [
                 'required',
                 'integer',
-                'exists:parametro,clase'
+                'exists:academic.parametro,clase'
             ],
             'nombre' => [
                 'required',
                 'string',
                 'max:100',
-                Rule::unique('parametro', 'nombre')
+                Rule::unique('academic.parametro', 'nombre')
             ],
             'nombre_url' => [
                 'required',
                 'string',
                 'max:120',
-                Rule::unique('detalle_parametro', 'nombre_url')
+                Rule::unique('academic.detalle_parametro', 'nombre_url')
             ],
             'descripcion' => [
                 'sometimes',

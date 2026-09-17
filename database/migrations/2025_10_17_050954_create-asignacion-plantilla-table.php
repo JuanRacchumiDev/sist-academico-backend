@@ -11,16 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('asignacion_plantilla', function (Blueprint $table) {
+        Schema::create('academic.asignacion_plantilla', function (Blueprint $table) {
             $table->id();
 
-            // Clave foránea con la tabla 'plantilla'
-            $table->foreignId('id_plantilla')
-                ->constrained('plantilla');
-
-            // Clave foránea con la tabla 'programa'
-            $table->foreignId('id_programa')
-                ->constrained('programa');
+            $table->unsignedBigInteger('id_plantilla');
+            $table->unsignedBigInteger('id_programa');
 
             $table->string('fecha_crea', 10)->nullable();
             $table->string('fecha_actualiza', 10)->nullable();
@@ -30,9 +25,19 @@ return new class extends Migration
             $table->string('user_actualiza', 12)->nullable();
             $table->string('user_elimina', 12)->nullable();
 
+            $table->boolean('estado')->default(true);
+
             $table->timestamps();
 
-            $table->boolean('estado')->default(true);
+            $table->foreign('id_plantilla')
+                ->references('id')
+                ->on('academic.plantilla')
+                ->onDelete('cascade');
+
+            $table->foreign('id_programa')
+                ->references('id')
+                ->on('academic.programa')
+                ->onDelete('cascade');
         });
     }
 
@@ -41,11 +46,11 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('asignacion_plantilla', function (Blueprint $table) {
+        Schema::table('academic.asignacion_plantilla', function (Blueprint $table) {
             $table->dropConstrainedForeignId('id_plantilla');
             $table->dropConstrainedForeignId('id_programa');
         });
 
-        Schema::dropIfExists('asignacion_plantilla');
+        Schema::dropIfExists('academic.asignacion_plantilla');
     }
 };

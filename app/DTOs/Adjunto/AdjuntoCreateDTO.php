@@ -47,19 +47,19 @@ class AdjuntoCreateDTO extends Data
             'id_programa' => [
                 'sometimes',
                 'integer',
-                'exists:programa,id',
+                'exists:academic.programa,id',
                 'nullable'
             ],
             'id_modulo' => [
                 'sometimes',
                 'integer',
-                'exists:modulo,id',
+                'exists:academic.modulo,id',
                 'nullable'
             ],
             'id_sucursal' => [
                 'sometimes',
                 'integer',
-                'exists:detalle_parametro,codigo',
+                'exists:academic.detalle_parametro,codigo',
                 'nullable'
             ],
             'titulo' => [

@@ -62,6 +62,7 @@ class CertificadoController extends Controller
     {
         try {
             $filters = $request->only([
+                'id_persona',
                 'codigo_tipocertificado',
                 'id_sucursal',
                 'id_programa',
@@ -278,12 +279,12 @@ class CertificadoController extends Controller
     public function storeModular(Request $request): JsonResponse
     {
         $validatedData = $request->validate([
-            'id_persona'         => 'required|integer|exists:persona,id',
-            'id_modulo'          => 'required|integer|exists:modulo,id',
-            'id_plantilla'       => 'required|integer|exists:plantilla,id',
-            'id_sucursal'     => 'required|integer|exists:institucion,id',
+            'id_persona'         => 'required|integer|exists:academic.persona,id',
+            'id_modulo'          => 'required|integer|exists:academic.modulo,id',
+            'id_plantilla'       => 'required|integer|exists:academic.plantilla,id',
+            'id_sucursal'     => 'required|integer|exists:academic.institucion,id',
             'codigo_tipocertificado' => 'required|integer',
-            'id_programa'        => 'required|integer|exists:programa,id',
+            'id_programa'        => 'required|integer|exists:academic.programa,id',
         ]);
 
         try {

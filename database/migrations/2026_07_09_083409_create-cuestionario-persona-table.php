@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('cuestionario_persona', function (Blueprint $table) {
+        Schema::create('academic.cuestionario_persona', function (Blueprint $table) {
             $table->id();
 
             $table->unsignedBigInteger('id_cuestionario');
@@ -36,14 +36,13 @@ return new class extends Migration
 
             $table->foreign('id_cuestionario')
                 ->references('id')
-                ->on('cuestionario');
+                ->on('academic.cuestionario')
+                ->onDelete('cascade');
 
             $table->foreign('id_persona')
                 ->references('id')
-                ->on('persona');
-
-            // $table->foreign('id_cuestionario')->references('id')->on('cuestionario')->onDelete('cascade');
-            // $table->foreign('id_persona')->references('id')->on('persona')->onDelete('cascade');
+                ->on('academic.persona')
+                ->onDelete('cascade');
         });
     }
 
@@ -52,7 +51,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('cuestionario_persona', function (Blueprint $table) {
+        Schema::table('academic.cuestionario_persona', function (Blueprint $table) {
             $table->dropForeign('id_cuestionario');
             $table->dropColumn('id_cuestionario');
 
@@ -60,6 +59,6 @@ return new class extends Migration
             $table->dropColumn('id_persona');
         });
 
-        Schema::dropIfExists('cuestionario_persona');
+        Schema::dropIfExists('academic.cuestionario_persona');
     }
 };

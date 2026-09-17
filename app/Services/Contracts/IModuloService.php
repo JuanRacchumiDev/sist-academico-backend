@@ -31,14 +31,14 @@ interface IModuloService
      */
     public function getAllModulosByPrograma(int $idPrograma): Collection;
 
-    public function createModulosBatch(int $idPrograma, array $dtos): Collection;
-
     /**
      * Obtiene un módulo por ID
      * @param int $id
      * @return Modulo|null
      */
     public function getModuloById(int $id): ?Modulo;
+
+    public function createModulosBatch(int $idPrograma, array $dtos): Collection;
 
     /**
      * Crear un nuevo módulo
@@ -48,5 +48,6 @@ interface IModuloService
     public function createModulo(ModuloCreateDTO $moduloCreateDTO): Modulo;
 
     public function updateModulo(int $id, ModuloUpdateDTO $moduloUpdateDTO): ?Modulo;
+
     public function syncModulosPrograma(int $idPrograma, array $dtos): Collection;
 }

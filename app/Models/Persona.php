@@ -9,11 +9,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Persona extends Model
 {
-    protected $primaryKey = 'id';
-    public $incrementing = true;
-    protected $keyType = 'int';
+    // protected $primaryKey = 'id';
+    // public $incrementing = true;
+    // protected $keyType = 'int';
 
-    protected $table = 'persona';
+    protected $table = 'academic.persona';
 
     protected $fillable = [
         'codigo_tipodocumento',
@@ -37,9 +37,11 @@ class Persona extends Model
         'foto',
         'sexo',
         'origen',
+
         'fecha_crea',
         'fecha_actualiza',
         'fecha_elimina',
+
         'user_crea',
         'user_actualiza',
         'user_elimina',
@@ -70,9 +72,9 @@ class Persona extends Model
     {
         return $this->belongsToMany(
             DetalleParametro::class,
-            'grupo_persona',
+            'academic.grupo_persona',
             'id_persona',
-            'codigo_grupo'
+            'codigo_grupo',
         )->withTimestamps();
     }
 
@@ -90,7 +92,7 @@ class Persona extends Model
     {
         return $this->belongsToMany(
             Cuestionario::class,
-            "cuestionario_persona",
+            "academic.cuestionario_persona",
             "id_persona",
             "id_cuestionario"
         )

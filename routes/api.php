@@ -79,7 +79,8 @@ Route::prefix('v1')->group(function () {
         Route::prefix('programas')->group(function () {
             Route::post('/{id}/actualizar-modulos', [ProgramaController::class, 'updateModulos'])->name('programas.actualizar-modulos');
             Route::get('/paginate', [ProgramaController::class, 'getFilteredPaginate'])->name('programas.paginate');
-            Route::get('/{programa}/descargar-plan', [ProgramaController::class, 'downloadPlan'])->name('programas.descargarplan');
+            // Route::get('/{programa}/descargar-plan', [ProgramaController::class, 'downloadPlan'])->name('programas.descargarplan');
+            Route::get('{programaId}/modulos/{moduloId}/descargar-plan', [ProgramaController::class, 'downloadPlanModulo'])->name('programas.modulos.descargar-plan');
             Route::get('/{id}', [ProgramaController::class, 'show'])->name('programas.show');
             Route::get('/', [ProgramaController::class, 'index'])->name('programas');
             Route::post('/', [ProgramaController::class, 'store'])->name('programas.store');
@@ -160,6 +161,7 @@ Route::prefix('v1')->group(function () {
             Route::get('/{id}', [UserController::class, 'show'])->name('users.show');
             Route::get('/validate', [UserController::class, 'validate'])->name('users.validate');
             Route::post('/', [UserController::class, 'store'])->name('users.store');
+            Route::patch('/{id}', [UserController::class, 'update'])->name('users.update');
         });
     });
 });

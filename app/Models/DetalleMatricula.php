@@ -7,9 +7,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class DetalleMatricula extends Model
 {
-    protected $table = "detalle_matricula";
-    protected $primaryKey = "id";
-    public $incrementing = true;
+    protected $table = "academic.detalle_matricula";
+    // protected $primaryKey = "id";
+    // public $incrementing = true;
 
     public $timestamps = true;
 
@@ -18,6 +18,11 @@ class DetalleMatricula extends Model
         'id_programa',
         'valor_matricula',
         'valor_modulo',
+
+        "fecha_crea",
+        "fecha_actualiza",
+        "fecha_elimina",
+
         'user_crea',
         'user_actualiza',
         'user_elimina',

@@ -8,9 +8,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Pregunta extends Model
 {
-    protected $table = "pregunta";
+    protected $table = "academic.pregunta";
 
-    protected $guarded = ["id"];
+    // protected $guarded = ["id"];
 
     protected $fillable = [
         "id_cuestionario",
@@ -18,6 +18,11 @@ class Pregunta extends Model
         "tipo_respuesta",
         "puntos",
         "orden",
+
+        "fecha_crea",
+        "fecha_actualiza",
+        "fecha_elimina",
+
         "user_crea",
         "user_actualiza",
         "user_elimina",

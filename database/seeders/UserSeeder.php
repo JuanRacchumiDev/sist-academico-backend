@@ -18,7 +18,7 @@ class UserSeeder extends Seeder
     {
         $now = Carbon::now();
 
-        DB::table('users')->truncate();
+        DB::table('academic.users')->truncate();
 
         $perfilAdmnin = DetalleParametro::where('parametro_clase', 1001)
             ->where('nombre_url', 'administrador')
@@ -32,9 +32,9 @@ class UserSeeder extends Seeder
 
         $passwordAlumnoHashedIpede = Hash::make("alumno123");
 
-        DB::table('users')->truncate();
+        DB::table('academic.users')->truncate();
 
-        DB::table('users')->insert([
+        DB::table('academic.users')->insert([
             [
                 'name' => 'admin',
                 'email' => 'admin@innovaperu.com',

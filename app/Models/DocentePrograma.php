@@ -7,11 +7,18 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class DocentePrograma extends Model
 {
-    protected $table = "docente_programa";
+    protected $table = "academic.docente_programa";
+
+    public $timestamps = true;
 
     protected $fillable = [
         "id_persona",
         "id_programa",
+
+        "fecha_crea",
+        "fecha_actualiza",
+        "fecha_elimina",
+
         'user_crea',
         'user_actualiza',
         'user_elimina'
@@ -24,7 +31,7 @@ class DocentePrograma extends Model
         'created_at',
         'updated_at'
     ];
-    
+
     public function docente(): BelongsTo
     {
         return $this->belongsTo(Persona::class, 'id_persona', 'id');

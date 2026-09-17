@@ -8,9 +8,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Modulo extends Model
 {
-    protected $table = 'modulo';
+    protected $table = 'academic.modulo';
 
-    protected $guarded = ['id'];
+    // protected $guarded = ['id'];
 
     protected $fillable = [
         'id_programa',
@@ -20,6 +20,12 @@ class Modulo extends Model
         'temario',
         'nota',
         'orden',
+        'plan',
+
+        'fecha_crea',
+        'fecha_actualiza',
+        'fecha_elimina',
+
         'user_crea',
         'user_actualiza',
         'user_elimina',

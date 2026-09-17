@@ -16,9 +16,9 @@ class DetalleParametroSeeder extends Seeder
         $now = Carbon::now();
         $fechaCrea = $now->format("Y-m-d");
 
-        DB::table('detalle_parametro')->truncate();
+        DB::table('academic.detalle_parametro')->truncate();
 
-        DB::table('detalle_parametro')->insert([
+        DB::table('academic.detalle_parametro')->insert([
             [
                 'parametro_clase' => 1000,
                 'nombre' => 'DNI',
@@ -66,7 +66,7 @@ class DetalleParametroSeeder extends Seeder
             ]
         ]);
 
-        DB::table('detalle_parametro')->insert([
+        DB::table('academic.detalle_parametro')->insert([
             [
                 'parametro_clase' => 1001,
                 'nombre' => 'ADMINISTRADOR',
@@ -153,7 +153,7 @@ class DetalleParametroSeeder extends Seeder
             ]
         ]);
 
-        DB::table('detalle_parametro')->insert([
+        DB::table('academic.detalle_parametro')->insert([
             [
                 'parametro_clase' => 1002,
                 'nombre' => 'CERTIFICACIÓN',
@@ -246,7 +246,7 @@ class DetalleParametroSeeder extends Seeder
             ]
         ]);
 
-        DB::table('detalle_parametro')->insert([
+        DB::table('academic.detalle_parametro')->insert([
             [
                 'parametro_clase' => 1003,
                 'nombre' => 'CERTIFICADO DE PARTICIPACIÓN',
@@ -314,7 +314,7 @@ class DetalleParametroSeeder extends Seeder
             ]
         ]);
 
-        DB::table('detalle_parametro')->insert([
+        DB::table('academic.detalle_parametro')->insert([
             [
                 'parametro_clase' => 1004,
                 'nombre' => 'IPEA',
@@ -330,7 +330,7 @@ class DetalleParametroSeeder extends Seeder
             ]
         ]);
 
-        DB::table('detalle_parametro')->insert([
+        DB::table('academic.detalle_parametro')->insert([
             [
                 'parametro_clase' => 1004,
                 'nombre' => 'INNOVAPERU',
@@ -346,7 +346,7 @@ class DetalleParametroSeeder extends Seeder
             ]
         ]);
 
-        DB::table('detalle_parametro')->insert([
+        DB::table('academic.detalle_parametro')->insert([
             [
                 'parametro_clase' => 1004,
                 'nombre' => 'PERUAGRO',
@@ -362,7 +362,7 @@ class DetalleParametroSeeder extends Seeder
             ]
         ]);
 
-        DB::table('detalle_parametro')->insert([
+        DB::table('academic.detalle_parametro')->insert([
             [
                 'parametro_clase' => 1005,
                 'nombre' => 'UNIVERSIDAD NACIONAL DE TRUJILLO',
@@ -379,7 +379,7 @@ class DetalleParametroSeeder extends Seeder
             ]
         ]);
 
-        DB::table('detalle_parametro')->insert([
+        DB::table('academic.detalle_parametro')->insert([
             [
                 'parametro_clase' => 1006,
                 'nombre' => 'EDUCACIÓN',
@@ -494,7 +494,7 @@ class DetalleParametroSeeder extends Seeder
             ]
         ]);
 
-        DB::table('detalle_parametro')->insert([
+        DB::table('academic.detalle_parametro')->insert([
             [
                 'parametro_clase' => 1007,
                 'nombre' => 'GRUPO ALUMNO',
@@ -557,7 +557,7 @@ class DetalleParametroSeeder extends Seeder
             ]
         ]);
 
-        DB::table('detalle_parametro')->insert([
+        DB::table('academic.detalle_parametro')->insert([
             [
                 'parametro_clase' => 1008,
                 'nombre' => 'BN-INNOVAPERU',
@@ -590,7 +590,7 @@ class DetalleParametroSeeder extends Seeder
             ]
         ]);
 
-        DB::table('detalle_parametro')->insert([
+        DB::table('academic.detalle_parametro')->insert([
             [
                 'parametro_clase' => 1010,
                 'nombre' => 'Activo',
@@ -635,7 +635,7 @@ class DetalleParametroSeeder extends Seeder
             ]
         ]);
 
-        DB::table('detalle_parametro')->insert([
+        DB::table('academic.detalle_parametro')->insert([
             [
                 'parametro_clase' => 1011,
                 'nombre' => 'Pendiente',
@@ -750,7 +750,7 @@ class DetalleParametroSeeder extends Seeder
             ]
         ]);
 
-        DB::table('detalle_parametro')->insert([
+        DB::table('academic.detalle_parametro')->insert([
             [
                 'parametro_clase' => 1013,
                 'nombre' => 'San Martín',

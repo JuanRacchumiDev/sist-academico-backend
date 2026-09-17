@@ -9,9 +9,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Cuestionario extends Model
 {
-    protected $table = "cuestionario";
+    protected $table = "academic.cuestionario";
 
-    protected $guarded = ["id"];
+    // protected $guarded = ["id"];
 
     protected $fillable = [
         "id_programa",
@@ -21,6 +21,11 @@ class Cuestionario extends Model
         "duracion_minutos",
         "nota_minima_aprobatoria",
         "intentos_permitidos",
+
+        "fecha_crea",
+        "fecha_actualiza",
+        "fecha_elimina",
+
         "user_crea",
         "user_actualiza",
         "user_elimina",
@@ -58,7 +63,7 @@ class Cuestionario extends Model
     {
         return $this->belongsToMany(
             Persona::class,
-            "cuestionario_persona",
+            "academic.cuestionario_persona",
             "id_cuestionario",
             "id_persona"
         )

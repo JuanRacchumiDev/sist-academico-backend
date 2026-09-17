@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Parametro extends Model
 {
-    protected $table = "parametro";
+    protected $table = "academic.parametro";
     protected $primaryKey = "clase";
     public $incrementing = false;
 
@@ -16,9 +16,11 @@ class Parametro extends Model
         "nombre",
         "nombre_url",
         "descripcion",
+
         "fecha_crea",
         "fecha_actualiza",
         "fecha_elimina",
+
         "user_crea",
         "user_actualiza",
         "user_elimina",

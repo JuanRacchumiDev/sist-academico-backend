@@ -32,7 +32,7 @@ class PreguntaOpcionUpdateDTO extends Data
             'id_pregunta' => [
                 'sometimes',
                 'integer',
-                'exists:pregunta,id',
+                'exists:academic.pregunta,id',
                 'nullable'
             ],
             'texto_opcion' => [

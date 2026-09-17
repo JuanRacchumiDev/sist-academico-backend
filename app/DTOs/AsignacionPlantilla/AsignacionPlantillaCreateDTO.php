@@ -33,12 +33,12 @@ class AsignacionPlantillaCreateDTO extends Data
             'id_plantilla' => [
                 'required',
                 'integer',
-                'exists:plantilla,id'
+                'exists:academic.plantilla,id'
             ],
             'id_programa' => [
                 'required',
                 'integer',
-                'exists:programa,id'
+                'exists:academic.programa,id'
             ],
             'fecha_crea' => [
                 'sometimes',

@@ -18,11 +18,10 @@ class DatabaseSeeder extends Seeder
 
         // Deshabilita verificación de claves foráneas
         Schema::disableForeignKeyConstraints();
-        
+
         $this->call([
             ParametroSeeder::class,
             DetalleParametroSeeder::class,
-            EmpresaSeeder::class,
             UserSeeder::class,
             InstitucionSeeder::class
         ]);

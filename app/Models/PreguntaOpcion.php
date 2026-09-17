@@ -8,15 +8,20 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PreguntaOpcion extends Model
 {
-    protected $table = "pregunta_opcion";
+    protected $table = "academic.pregunta_opcion";
 
-    protected $guarded = ["id"];
+    // protected $guarded = ["id"];
 
     protected $fillable = [
         "id_pregunta",
         "texto_opcion",
-        "es_correcta",
+        "is_correcta",
         "orden",
+
+        "fecha_crea",
+        "fecha_actualiza",
+        "fecha_elimina",
+
         "user_crea",
         "user_actualiza",
         "user_elimina",
@@ -32,7 +37,7 @@ class PreguntaOpcion extends Model
     ];
 
     protected $casts = [
-        'es_correcta' => 'boolean',
+        'is_correcta' => 'boolean',
         'estado' => 'boolean'
     ];
 

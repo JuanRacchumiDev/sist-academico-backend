@@ -53,19 +53,19 @@ class MatriculaUpdateDTO extends Data
             'id_persona' => [
                 'sometimes',
                 'integer',
-                'exists:persona,id',
+                'exists:academic.persona,id',
                 'nullable'
             ],
             'codigo_estadomatricula' => [
                 'sometimes',
                 'integer',
-                'exists:detalle_parametro,codigo',
+                'exists:academic.detalle_parametro,codigo',
                 'nullable'
             ],
             'id_sucursal' => [
                 'sometimes',
                 'integer',
-                'exists:detalle_parametro,codigo',
+                'exists:academic.detalle_parametro,codigo',
                 'nullable'
             ],
             'numero_modulos' => [
@@ -83,7 +83,7 @@ class MatriculaUpdateDTO extends Data
             'programas.*' => [
                 'sometimes',
                 'integer',
-                'exists:programa,id',
+                'exists:academic.programa,id',
                 'nullable'
             ],
             'fecha_matricula' => [
@@ -102,7 +102,7 @@ class MatriculaUpdateDTO extends Data
             'codigo_formapago_matricula' => [
                 'sometimes',
                 'integer',
-                'exists:detalle_parametro,codigo',
+                'exists:academic.detalle_parametro,codigo',
                 'nullable'
             ],
             'concepto_matricula' => [
@@ -139,7 +139,7 @@ class MatriculaUpdateDTO extends Data
                 'required_if:pagarPrimerModulo,true',
                 'nullable',
                 'integer',
-                'exists:detalle_parametro,codigo'
+                'exists:academic.detalle_parametro,codigo'
             ],
             'concepto_modulo' => [
                 'nullable',

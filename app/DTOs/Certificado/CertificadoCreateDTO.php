@@ -45,49 +45,49 @@ class CertificadoCreateDTO extends Data
             'id_persona' => [
                 'required',
                 'integer',
-                'exists:persona,id'
+                'exists:academic.persona,id'
             ],
             'codigo_tipocertificado' => [
                 'required',
                 'integer',
-                'exists:detalle_parametro,codigo'
+                'exists:academic.detalle_parametro,codigo'
             ],
             'id_sucursal' => [
                 'sometimes',
                 'integer',
-                'exists:institucion,id',
+                'exists:academic.institucion,id',
                 'nullable'
             ],
             'id_plantilla' => [
                 'sometimes',
                 'integer',
-                'exists:plantilla,id',
+                'exists:academic.plantilla,id',
                 'nullable'
             ],
             'id_programa' => [
                 'sometimes',
                 'integer',
-                'exists:programa,id',
+                'exists:academic.programa,id',
                 'nullable'
             ],
             'id_modulo' => [
                 'sometimes',
                 'integer',
-                'exists:modulo,id',
+                'exists:academic.modulo,id',
                 'nullable'
             ],
             'codigo_verificacion' => [
                 'sometimes',
                 'string',
                 'max:12',
-                Rule::unique('certificado', 'codigo_verificacion'),
+                Rule::unique('academic.certificado', 'codigo_verificacion'),
                 'nullable'
             ],
             'codigo_qr_path' => [
                 'sometimes',
                 'string',
                 'max:350',
-                Rule::unique('certificado', 'codigo_qr_path'),
+                Rule::unique('academic.certificado', 'codigo_qr_path'),
                 'nullable'
             ],
             'path_file' => [

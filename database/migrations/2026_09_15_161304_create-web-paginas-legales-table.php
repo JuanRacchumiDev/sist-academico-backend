@@ -11,30 +11,34 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('academic.pregunta_opcion', function (Blueprint $table) {
+        Schema::create('web.pagina_legal', function (Blueprint $table) {
             $table->id();
 
-            $table->unsignedBigInteger('id_pregunta');
+            // Clave única del documento legal
+            $table->string('titulo', 80)->unique();
+            $table->string('titulo_url', 100);
 
-            $table->text('texto_opcion');
-            $table->boolean('is_correcta')->default(false);
-            $table->integer('orden')->default(1);
+            $table->longText('contenido_html');
+
+            $table->string('version', 10)->default('1.0');
+
+            // SEO básico para estas páginas
+            $table->string('meta_title', 150)->nullable();
+            $table->text('meta_description')->nullable();
+
+            $table->boolean('is_publicado')->default(true);
 
             $table->string('fecha_crea', 10)->nullable();
             $table->string('fecha_actualiza', 10)->nullable();
             $table->string('fecha_elimina', 10)->nullable();
+            $table->string('fecha_publicacion', 10)->nullable();
 
             $table->string('user_crea', 12)->nullable();
             $table->string('user_actualiza', 12)->nullable();
             $table->string('user_elimina', 12)->nullable();
+
             $table->boolean('estado')->default(true);
-
             $table->timestamps();
-
-            $table->foreign('id_pregunta')
-                ->references('id')
-                ->on('academic.pregunta')
-                ->onDelete('cascade');
         });
     }
 
@@ -43,11 +47,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('academic.pregunta_opcion', function (Blueprint $table) {
-            $table->dropForeign('id_pregunta');
-            $table->dropColumn('id_pregunta');
-        });
-
-        Schema::dropIfExists('academic.pregunta_opcion');
+        Schema::dropIfExists('web.paginas_legales');
     }
 };

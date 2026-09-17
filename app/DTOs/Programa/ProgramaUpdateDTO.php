@@ -54,39 +54,39 @@ class ProgramaUpdateDTO extends Data
             'codigo_segmento' => [
                 'sometimes',
                 'integer',
-                'exists:detalle_parametro,codigo',
+                'exists:academic.detalle_parametro,codigo',
                 'nullable'
             ],
             'codigo_tipoprograma' => [
                 'sometimes',
                 'integer',
-                'exists:detalle_parametro,codigo',
+                'exists:academic.detalle_parametro,codigo',
                 'nullable'
             ],
             'codigo_categoriaprograma' => [
                 'sometimes',
                 'integer',
-                'exists:detalle_parametro,codigo',
+                'exists:academic.detalle_parametro,codigo',
                 'nullable'
             ],
             'id_sucursal' => [
                 'sometimes',
                 'integer',
-                'exists:institucion,id',
+                'exists:academic.institucion,id',
                 'nullable'
             ],
             'codigo_old' => [
                 'sometimes',
                 'string',
                 'max:10',
-                Rule::unique('programa', 'codigo_old'),
+                Rule::unique('academic.programa', 'codigo_old'),
                 'nullable'
             ],
             'sigla' => [
                 'sometimes',
                 'string',
                 'max:10',
-                Rule::unique('programa', 'sigla'),
+                Rule::unique('academic.programa', 'sigla'),
                 'nullable'
             ],
             'titulo' => [

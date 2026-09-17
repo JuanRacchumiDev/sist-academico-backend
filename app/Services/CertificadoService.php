@@ -161,7 +161,7 @@ class CertificadoService implements ICertificadoService
         $nombreTipoPrograma = $tipoPrograma->nombre_url;
         $disenio = $plantilla->tipo_disenio;
         $nombreImpresion = $certificado->nombre_impresion;
-        $tituloPrograma = $programa->titulo;
+        $tituloPrograma = Str::upper($programa->titulo);
 
         $nombreDirector = ($plantilla->institucion && $plantilla->institucion->nombre_director)
             ? $plantilla->institucion->nombre_director
@@ -182,11 +182,11 @@ class CertificadoService implements ICertificadoService
         $fontSizeFechas = $estilos['fechas']['fontSize'] ?? '17';
         $fontSizeDirector = $estilos['director']['fontSize'] ?? '12';
 
-        $anchosDisponibles = "params.styles_pdfs.{$nombreTipoPrograma}";
-        $anchoMaximoAlumno   = config("{$anchosDisponibles}.anchoMaximoAlumno", 673.51);
-        $anchoMaximoPrograma = config("{$anchosDisponibles}.anchoMaximoPrograma", 673.51);
-        $anchoMaximoFechas   = config("{$anchosDisponibles}.anchoMaximoFechas", 673.51);
-        $anchoMaximoDirector = config("{$anchosDisponibles}.anchoMaximoDirector", 200.00);
+        $estilosTipoPrograma = "params.styles_pdfs.{$nombreTipoPrograma}";
+        $anchoMaximoAlumno   = config("{$estilosTipoPrograma}.anchoMaximoAlumno", 673.60);
+        $anchoMaximoPrograma = config("{$estilosTipoPrograma}.anchoMaximoPrograma", 673.60);
+        $anchoMaximoFechas   = config("{$estilosTipoPrograma}.anchoMaximoFechas", 673.60);
+        $anchoMaximoDirector = config("{$estilosTipoPrograma}.anchoMaximoDirector", 200.00);
 
         Log::info('Evaluando anchos disponibles', [
             'anchoMaximoAlumno' => $anchoMaximoAlumno,
@@ -210,28 +210,16 @@ class CertificadoService implements ICertificadoService
         };
 
         $fonts = [
-            'alumno'   => $buildFontConfig($estilos['alumno'] ?? [], 'GreatVibes-Regular.ttf'),
-            'programa' => $buildFontConfig($estilos['programa'] ?? [], 'Anton.ttf'),
-            'fechas'   => $buildFontConfig($estilos['fechas'] ?? [], 'Archivo-Regular.ttf'),
+            'alumno'   => $buildFontConfig($estilos['alumno'] ?? [], 'GreatVibes-Regular.ttf')['path'],
+            'programa' => $buildFontConfig($estilos['programa'] ?? [], 'Anton.ttf')['path'],
+            'fechas'   => $buildFontConfig($estilos['fechas'] ?? [], 'Archivo-Regular.ttf')['path'],
             'director' => isset($estilos['director'])
-                ? $buildFontConfig($estilos['director'], 'Archivo-Medium.ttf')
+                ? $buildFontConfig($estilos['director'], 'Archivo-Medium.ttf')['path']
                 : null,
         ];
 
         Log::info('fonts', ['fonts' => $fonts]);
         Log::info('estilos', ['estilos' => $estilos]);
-
-        $estilosAlumno   = CertificadoHelper::calcularEstilosTexto($nombreImpresion, $fontSizeAlumno, $anchoMaximoAlumno);
-        $estilosPrograma = CertificadoHelper::calcularEstilosTexto($tituloPrograma ?? '', $fontSizePrograma, $anchoMaximoPrograma);
-        $estilosFechas   = CertificadoHelper::calcularEstilosTexto($descFechasPrograma, $fontSizeFechas, $anchoMaximoFechas);
-        $estilosDirector = CertificadoHelper::calcularEstilosTexto($nombreDirector, $fontSizeDirector, $anchoMaximoDirector);
-
-        Log::info('Evaluando estilos', [
-            'estilosAlumno' => $estilosAlumno,
-            'estilosPrograma' => $estilosPrograma,
-            'estilosFechas' => $estilosFechas,
-            'estilosDirector' => $estilosDirector
-        ]);
 
         $horasAcademicasDefault = config('params.horas_academicas_default');
         $horasAcademicas = $programa->horas_academicas ?? $horasAcademicasDefault;
@@ -239,6 +227,76 @@ class CertificadoService implements ICertificadoService
         $textoFechasConHoras = ($descFechasPrograma !== '')
             ? "{$descFechasPrograma} con una duración de {$horasAcademicas} horas"
             : "";
+
+        $paramLineHeightAlumno = "params.styles_pdfs.{$nombreTipoPrograma}.{$disenio}.alumno.line_height";
+        $paramLineHeightPrograma = "params.styles_pdfs.{$nombreTipoPrograma}.{$disenio}.programa.line_height";
+        $paramLineHeightFechas = "params.styles_pdfs.{$nombreTipoPrograma}.{$disenio}.fechas.line_height";
+        $paramLineHeightDirector = "params.styles_pdfs.{$nombreTipoPrograma}.{$disenio}.director.line_height";
+
+        $paramFactorConversionAlumno = "params.styles_pdfs.{$nombreTipoPrograma}.{$disenio}.alumno.factor_conversion";
+        $paramFactorConversionPrograma = "params.styles_pdfs.{$nombreTipoPrograma}.{$disenio}.programa.factor_conversion";
+        $paramFactorConversionFechas = "params.styles_pdfs.{$nombreTipoPrograma}.{$disenio}.fechas.factor_conversion";
+        $paramFactorConversionDirector = "params.styles_pdfs.{$nombreTipoPrograma}.{$disenio}.director.factor_conversion";
+
+        $lineHeightAlumno = config($paramLineHeightAlumno, 1.0);
+        $lineHeightPrograma = config($paramLineHeightPrograma, 1.0);
+        $lineHeightFechas = config($paramLineHeightFechas, 1.0);
+        $lineHeightDirector = config($paramLineHeightDirector, 1.0);
+
+        $factorConversionAlumno = config($paramFactorConversionAlumno, 0.35);
+        $factorConversionPrograma = config($paramFactorConversionPrograma, 0.35);
+        $factorConversionFechas = config($paramFactorConversionFechas, 0.35);
+        $factorConversionDirector = config($paramFactorConversionDirector, 0.35);
+
+        Log::info(
+            'Evaluando valores lineHeight',
+            [
+                'lineHeightAlumno' => $lineHeightAlumno,
+                'lineHeightPrograma' => $lineHeightPrograma,
+                'lineHeightFechas' => $lineHeightFechas,
+                'lineHeightDirector' => $lineHeightDirector
+            ]
+        );
+
+        Log::info(
+            'Evaluando valores factorConversion',
+            [
+                'factorConversionAlumno' => $factorConversionAlumno,
+                'factorConversionPrograma' => $factorConversionPrograma,
+                'factorConversionFechas' => $factorConversionFechas,
+                'factorConversionDirector' => $factorConversionDirector
+            ]
+        );
+
+        $estilosAlumno   = CertificadoHelper::calcularEstilosTexto($nombreImpresion, $fontSizeAlumno, $anchoMaximoAlumno, $lineHeightAlumno, $factorConversionAlumno);
+        $estilosPrograma = CertificadoHelper::calcularEstilosTexto($tituloPrograma ?? '', $fontSizePrograma, $anchoMaximoPrograma, $lineHeightPrograma, $factorConversionPrograma);
+        $estilosFechas   = CertificadoHelper::calcularEstilosTexto($textoFechasConHoras, $fontSizeFechas, $anchoMaximoFechas, $lineHeightFechas, $factorConversionFechas);
+        $estilosDirector = CertificadoHelper::calcularEstilosTexto($nombreDirector, $fontSizeDirector, $anchoMaximoDirector, $lineHeightDirector, $factorConversionDirector);
+
+        $estilosRender = [
+            'alumno' => [
+                'color' => $estilos['alumno']['color'] ?? '#000000',
+                'fontSize' => $estilosAlumno['font_size'],
+                'lineHeight' => $estilosAlumno['line_height']
+            ],
+            'programa' => [
+                'color' => $estilos['programa']['color'] ?? '#000000',
+                'fontSize' => $estilosPrograma['font_size'],
+                'lineHeight' => $estilosPrograma['line_height']
+            ],
+            'fechas' => [
+                'color' => $estilos['fechas']['color'] ?? '#000000',
+                'fontSize' => $estilosFechas['font_size'],
+                'lineHeight' => $estilosFechas['line_height']
+            ],
+            'director' => [
+                'color' => $estilos['director']['color'] ?? '#000000',
+                'fontSize' => $estilosDirector['font_size'],
+                'lineHeight' => $estilosDirector['line_height']
+            ]
+        ];
+
+        Log::info('estilosRender', ['estilosRender' => $estilosRender]);
 
         $logoRelative = $sucursal?->logo_path ?? ($plantilla?->institucion?->logo_path ?? null);
         Log::info('Evaluando logoRelative', ['logoRelative' => $logoRelative]);
@@ -267,18 +325,18 @@ class CertificadoService implements ICertificadoService
 
         $info = (object)[
             'nombre_alumno'         => $nombreImpresion,
-            'estilos_alumno'        => $estilosAlumno,
+            // 'estilos_alumno'        => $estilosAlumno,
 
             'titulo_programa'       => $tituloPrograma ?? 'Programa Académico',
-            'estilos_programa'      => $estilosPrograma,
+            // 'estilos_programa'      => $estilosPrograma,
 
             'nombre_tipoprograma'   => $nombreTipoPrograma ?? 'Tipo Programa Académico',
 
             'fechas_programa'       => $textoFechasConHoras,
-            'estilos_fechas'        => $estilosFechas,
+            // 'estilos_fechas'        => $estilosFechas,
 
             'nombre_director'       => $nombreDirector,
-            'estilos_director'      => $estilosDirector,
+            // 'estilos_director'      => $estilosDirector,
 
             'horas_academicas'      => $horasAcademicas,
             'fecha_emision'         => CertificadoHelper::fechaEnLetras($certificado->fecha_crea),
@@ -297,7 +355,7 @@ class CertificadoService implements ICertificadoService
         $pdf = Pdf::loadView($viewNameDefault, [
             'info'    => $info,
             'fonts'   => $fonts,
-            'estilos' => $estilos
+            'estilos' => $estilosRender
         ])->setPaper('a4', 'landscape')
             ->setOption('isFontSubsettingEnabled', false);
 

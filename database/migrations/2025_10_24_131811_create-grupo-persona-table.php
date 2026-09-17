@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('grupo_persona', function (Blueprint $table) {
+        Schema::create('academic.grupo_persona', function (Blueprint $table) {
             $table->unsignedBigInteger('codigo_grupo');
             $table->unsignedBigInteger('id_persona');
             $table->unsignedBigInteger('id_sucursal')->nullable();
@@ -28,21 +28,20 @@ return new class extends Migration
 
             $table->timestamps();
 
-            // Definición explícita de la clave foránea para 'detalle_parametro'
             $table->foreign('codigo_grupo')
-                ->references('codigo') // La clave primaria de detalle_parametro se llama 'codigo'
-                ->on('detalle_parametro');
-            //   ->onDelete('cascade');
+                ->references('codigo')
+                ->on('academic.detalle_parametro')
+                ->onDelete('cascade');
 
-            // Definición explícita de la clave foránea para 'persona'
             $table->foreign('id_persona')
-                ->references('id') // La clave primaria de persona se llama 'id'
-                ->on('persona');
-            //   ->onDelete('cascade');
+                ->references('id')
+                ->on('academic.persona')
+                ->onDelete('cascade');
 
             $table->foreign('id_sucursal')
                 ->references('codigo')
-                ->on('detalle_parametro');
+                ->on('academic.detalle_parametro')
+                ->onDelete('cascade');
         });
     }
 
@@ -51,7 +50,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('grupo_persona', function (Blueprint $table) {
+        Schema::table('academic.grupo_persona', function (Blueprint $table) {
             $table->dropForeign('codigo_grupo');
             $table->dropColumn('codigo_grupo');
 
@@ -63,6 +62,6 @@ return new class extends Migration
         });
 
 
-        Schema::dropIfExists('grupo_persona');
+        Schema::dropIfExists('academic.grupo_persona');
     }
 };

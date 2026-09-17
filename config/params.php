@@ -446,6 +446,10 @@ return [
             ],
         ],
         'especializacion' => [
+            'anchoMaximoAlumno' => 673.60,
+            'anchoMaximoPrograma' => 673.60,
+            'anchoMaximoFechas' => 673.60,
+            'anchoMaximoDirector' => 673.60,
             'especializacion_col_abogados' => [
                 'alumno' => [
                     'color' => '#000000',
@@ -457,7 +461,9 @@ return [
                     'color' => '#0092FF',
                     'custom_font' => true,
                     'font' => 'Anton.ttf',
-                    'fontSize' => '47'
+                    'fontSize' => '47',
+                    'line_height' => 1.0,
+                    'factor_conversion' => 0.55
                 ],
                 'fechas' => [
                     'color' => '#D5A701',
@@ -483,7 +489,8 @@ return [
                     'color' => '#000000',
                     'custom_font' => true,
                     'font' => 'Anton.ttf',
-                    'fontSize' => '47'
+                    'fontSize' => '47',
+                    'line_height' => 0.8
                 ],
                 'fechas' => [
                     'color' => '#007A3E',
@@ -509,7 +516,8 @@ return [
                     'color' => '#000000',
                     'custom_font' => true,
                     'font' => 'Anton.ttf',
-                    'fontSize' => '47'
+                    'fontSize' => '47',
+                    'line_height' => 0.8
                 ],
                 'fechas' => [
                     'color' => '#C6A54F',
@@ -535,7 +543,8 @@ return [
                     'color' => '#0D377F',
                     'custom_font' => true,
                     'font' => 'Anton.ttf',
-                    'fontSize' => '47'
+                    'fontSize' => '47',
+                    'line_height' => 0.8
                 ],
                 'fechas' => [
                     'color' => '#B89439',
@@ -561,7 +570,8 @@ return [
                     'color' => '#191C43',
                     'custom_font' => true,
                     'font' => 'Anton.ttf',
-                    'fontSize' => '47'
+                    'fontSize' => '47',
+                    'line_height' => 0.8
                 ],
                 'fechas' => [
                     'color' => '#02BFBE',
@@ -587,7 +597,8 @@ return [
                     'color' => '#6C0E10',
                     'custom_font' => true,
                     'font' => 'Anton.ttf',
-                    'fontSize' => '47'
+                    'fontSize' => '47',
+                    'line_height' => 0.8
                 ],
                 'fechas' => [
                     'color' => '#A87D26',
@@ -613,7 +624,8 @@ return [
                     'color' => '#0C2468',
                     'custom_font' => true,
                     'font' => 'Anton.ttf',
-                    'fontSize' => '47'
+                    'fontSize' => '47',
+                    'line_height' => 0.8
                 ],
                 'fechas' => [
                     'color' => '#A87D26',
@@ -639,7 +651,8 @@ return [
                     'color' => '#1E3D8A',
                     'custom_font' => true,
                     'font' => 'Anton.ttf',
-                    'fontSize' => '47'
+                    'fontSize' => '47',
+                    'line_height' => 0.8
                 ],
                 'fechas' => [
                     'color' => '#E5231E',

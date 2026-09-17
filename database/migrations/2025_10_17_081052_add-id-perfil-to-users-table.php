@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
+        Schema::table('academic.users', function (Blueprint $table) {
             $table->foreignId('codigo_perfil')
                 ->after('id')
-                ->constrained('detalle_parametro', 'codigo');
+                ->constrained('academic.detalle_parametro', 'codigo');
         });
     }
 
@@ -23,7 +23,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
+        Schema::table('academic.users', function (Blueprint $table) {
             $table->dropConstrainedForeignId('codigo_perfil');
         });
     }

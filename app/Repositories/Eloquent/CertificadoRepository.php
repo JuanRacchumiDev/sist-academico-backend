@@ -43,7 +43,7 @@ class CertificadoRepository implements ICertificadoRepository
             'persona',
             'tipoCertificado',
             'sucursal',
-            'plantilla',
+            'plantilla.institucion',
             'programa.tipoPrograma',
             'modulo'
         ])->find($id);
@@ -55,7 +55,7 @@ class CertificadoRepository implements ICertificadoRepository
             'persona',
             'tipoCertificado',
             'sucursal',
-            'plantilla',
+            'plantilla.institucion',
             'programa.tipoPrograma',
             'modulo'
         ])
@@ -114,7 +114,7 @@ class CertificadoRepository implements ICertificadoRepository
                 'persona',
                 'tipoCertificado',
                 'sucursal',
-                'plantilla',
+                'plantilla.institucion',
                 'programa.tipoPrograma',
                 'modulo'
             ]);
@@ -131,6 +131,11 @@ class CertificadoRepository implements ICertificadoRepository
                 $q->whereRaw('LOWER(codigo_verificacion) LIKE ?', [$searchTerm])
                     ->orWhereRaw('LOWER(nombre_impresion) LIKE ?', [$searchTerm]);
             });
+        }
+
+        // Filtro por persona
+        if (!empty($filters['id_persona'])) {
+            $query->where('id_persona', $filters['id_persona']);
         }
 
         // Filtro por Tipo de Certificado

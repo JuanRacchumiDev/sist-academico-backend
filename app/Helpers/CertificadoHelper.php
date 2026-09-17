@@ -120,6 +120,7 @@ class CertificadoHelper
      * @param string $texto Texto a evaluar
      * @param float $fontSizeBase Tamaño de fuente base deseado
      * @param float $anchoMaximoDisponible Ancho disponible de la capa/caja en el PDF (por defecto 673.51 pt = 80% de A4 landscape)
+     * @param float $lineHeight Separador de líneas
      * @param float $factorFuente Factor de aspecto promedio de la fuente (GreatVibes/Calibri es aprox 0.38)
      * @return array ['font_size' => int|float, 'line_height' => float]
      */
@@ -127,6 +128,8 @@ class CertificadoHelper
         string $texto,
         float $fontSizeBase,
         float $anchoMaximoDisponible = 673.60,
+        float $lineHeight = 1.0,
+        float $factorConversion = 0.35,
         float $factorFuente = 0.38
     ): array {
         $textoLimpio = trim($texto);
@@ -134,7 +137,7 @@ class CertificadoHelper
         if ($textoLimpio === '') {
             return [
                 'font_size' => (int) round($fontSizeBase),
-                'line_height' => 1.0
+                'line_height' => $lineHeight
             ];
         }
 
@@ -166,7 +169,8 @@ class CertificadoHelper
             'anchoCaracteres'       => $anchoCaracteres,
             'fontSizeBase'          => $fontSizeBase,
             'anchoProyectado'       => $anchoProyectado,
-            'anchoMaximoDisponible' => $anchoMaximoDisponible
+            'anchoMaximoDisponible' => $anchoMaximoDisponible,
+            'lineHeight'            => $lineHeight
         ]);
 
         // CASO 1: El texto entra en 1 sola línea cómodamente sin reducir la fuente base
@@ -176,7 +180,7 @@ class CertificadoHelper
 
             return [
                 'font_size'   => $newFontSize,
-                'line_height' => 1.0
+                'line_height' => $lineHeight
             ];
         }
 
@@ -187,7 +191,7 @@ class CertificadoHelper
         $fontSizeCalculado = $fontSizeBase * $ratio;
 
         // Definimos un tamaño mínimo de seguridad (35% del base)
-        $minFontSize = $fontSizeBase * 0.35;
+        $minFontSize = $fontSizeBase * $factorConversion;
         $newFontSize = (int) round(max($fontSizeCalculado, $minFontSize));
 
         Log::info("Resultado: Ajuste dinámico proporcional a 1 línea", [
@@ -198,28 +202,7 @@ class CertificadoHelper
 
         return [
             'font_size'   => $newFontSize,
-            'line_height' => 1.0
+            'line_height' => $lineHeight
         ];
-
-        // CASO 2: Requiere escalar la fuente o dividirse en 2 líneas (hasta 2x el ancho)
-        // if ($anchoProyectado <= ($anchoMaximoDisponible * 2)) {
-        //     // Se calcula una reducción proporcional o se aplica un 75% del tamaño base
-        //     $newFontSize = (int) round($fontSizeBase * 0.60);
-        //     Log::info("Resultado: Requiere 2 líneas o escala moderada (Caso 2)", ['fontSize' => $newFontSize]);
-
-        //     return [
-        //         'font_size'   => $newFontSize,
-        //         'line_height' => 0.95
-        //     ];
-        // }
-
-        // // CASO 3: Texto muy largo (requiere 3 líneas o escala mayor)
-        // $newFontSize = (int) round($fontSizeBase * 0.55);
-        // Log::info("Resultado: Requiere 3 líneas o escala fuerte (Caso 3)", ['fontSize' => $newFontSize]);
-
-        // return [
-        //     'font_size'   => $newFontSize,
-        //     'line_height' => 0.85
-        // ];
     }
 }

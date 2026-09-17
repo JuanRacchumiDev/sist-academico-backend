@@ -7,9 +7,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Pago extends Model
 {
-    protected $table = 'pago';
+    protected $table = 'academic.pago';
 
-    protected $guarded = ['id'];
+    // protected $guarded = ['id'];
 
     protected $fillable = [
         'id_matricula',
@@ -24,9 +24,11 @@ class Pago extends Model
         'fecha_vencimiento',
         'cantidad_efectivo',
         'cantidad_operacion',
+
         'fecha_crea',
         'fecha_actualiza',
         'fecha_elimina',
+
         'user_crea',
         'user_actualiza',
         'user_elimina',

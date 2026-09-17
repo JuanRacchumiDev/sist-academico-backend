@@ -44,51 +44,51 @@ class CertificadoUpdateDTO extends Data
             'id_persona' => [
                 'sometimes',
                 'integer',
-                'exists:persona,id',
+                'exists:academic.persona,id',
                 'nullable'
             ],
             'codigo_tipocertificado' => [
                 'sometimes',
                 'integer',
-                'exists:detalle_parametro,codigo',
+                'exists:academic.detalle_parametro,codigo',
                 'nullable'
             ],
             'id_sucursal' => [
                 'sometimes',
                 'integer',
-                'exists:institucion,id',
+                'exists:academic.institucion,id',
                 'nullable'
             ],
             'id_plantilla' => [
                 'sometimes',
                 'integer',
-                'exists:plantilla,id',
+                'exists:academic.plantilla,id',
                 'nullable'
             ],
             'id_programa' => [
                 'sometimes',
                 'integer',
-                'exists:programa,id',
+                'exists:academic.programa,id',
                 'nullable'
             ],
             'id_modulo' => [
                 'sometimes',
                 'integer',
-                'exists:modulo,id',
+                'exists:academic.modulo,id',
                 'nullable'
             ],
             'codigo_verificacion' => [
                 'sometimes',
                 'string',
                 'max:12',
-                Rule::unique('certificado', 'codigo_verificacion'),
+                Rule::unique('academic.certificado', 'codigo_verificacion'),
                 'nullable'
             ],
             'codigo_qr_path' => [
                 'sometimes',
                 'string',
                 'max:350',
-                Rule::unique('certificado', 'codigo_qr_path'),
+                Rule::unique('academic.certificado', 'codigo_qr_path'),
                 'nullable'
             ],
             'path_file' => [

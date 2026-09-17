@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('parametro', function (Blueprint $table) {
+        Schema::create('academic.parametro', function (Blueprint $table) {
             $table->integer('clase')->primary()->unique();
 
             $table->string('nombre', 100)->unique();
@@ -36,6 +36,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('parametro');
+        Schema::dropIfExists('academic.parametro');
     }
 };

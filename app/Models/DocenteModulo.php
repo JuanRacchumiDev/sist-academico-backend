@@ -7,11 +7,18 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class DocenteModulo extends Model
 {
-    protected $table = "docente_modulo";
+    protected $table = "academic.docente_modulo";
+
+    public $timestamps = true;
 
     protected $fillable = [
         "id_persona",
         "id_modulo",
+
+        "fecha_crea",
+        "fecha_actualiza",
+        "fecha_elimina",
+
         'user_crea',
         'user_actualiza',
         'user_elimina'

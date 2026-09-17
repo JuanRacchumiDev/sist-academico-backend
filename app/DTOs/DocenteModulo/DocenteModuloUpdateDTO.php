@@ -31,13 +31,13 @@ class DocenteModuloUpdateDTO extends Data
             'id_persona' => [
                 'sometimes',
                 'integer',
-                'exists:persona,id',
+                'exists:academic.persona,id',
                 'nullable'
             ],
             'id_modulo' => [
                 'sometimes',
                 'integer',
-                'exists:modulo,id',
+                'exists:academic.modulo,id',
                 'nullable'
             ],
             'fecha_crea' => [

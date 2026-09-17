@@ -36,13 +36,13 @@ class CuestionarioPersonaUpdateDTO extends Data
             'id_cuestionario' => [
                 'sometimes',
                 'integer',
-                'exists:cuestionario,id',
+                'exists:academic.cuestionario,id',
                 'nullable'
             ],
             'id_persona' => [
                 'sometimes',
                 'integer',
-                'exists:persona,id',
+                'exists:academic.persona,id',
                 'nullable'
             ],
             'numero_intento' => [

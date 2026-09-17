@@ -8,11 +8,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Institucion extends Model
 {
-    protected $primaryKey = 'id';
-    public $incrementing = true;
-    protected $keyType = 'int';
+    // protected $primaryKey = 'id';
+    // public $incrementing = true;
+    // protected $keyType = 'int';
 
-    protected $table = 'institucion';
+    protected $table = 'academic.institucion';
 
     protected $fillable = [
         'codigo_sede',
@@ -29,9 +29,11 @@ class Institucion extends Model
         'firma_director_path',
         'firma_representante_path',
         'is_cliente',
+
         'fecha_crea',
         'fecha_actualiza',
         'fecha_elimina',
+
         'user_crea',
         'user_actualiza',
         'user_elimina',

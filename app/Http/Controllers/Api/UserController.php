@@ -180,6 +180,10 @@ class UserController extends Controller
         try {
             $data = $request->all();
 
+            $usuarioAutenticado = Auth::user();
+            $username = $usuarioAutenticado ? ($usuarioAutenticado->name) : 'systemapi';
+            $data['user_actualiza'] = $username;
+
             $userUpdateDTO = UserUpdateDTO::from([
                 ...$data,
                 'id' => $id

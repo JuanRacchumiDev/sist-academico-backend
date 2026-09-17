@@ -16,6 +16,7 @@ class ModuloCreateDTO extends Data
         public ?string $descripcion = null,
         public ?string $temario = null,
         public ?float $nota = null,
+        public ?string $plan = null,
         public ?string $fecha_crea = null,
         public ?string $fecha_actualiza = null,
         public ?string $fecha_elimina = null,
@@ -37,19 +38,19 @@ class ModuloCreateDTO extends Data
             'id_programa' => [
                 'required',
                 'integer',
-                'exists:programa,id'
+                'exists:academic.programa,id'
             ],
             'titulo' => [
                 'required',
                 'string',
                 'max:100',
-                Rule::unique('modulo', 'titulo')
+                Rule::unique('academic.modulo', 'titulo')
             ],
             'titulo_url' => [
                 'required',
                 'string',
                 'max:120',
-                Rule::unique('modulo', 'titulo_url')
+                Rule::unique('academic.modulo', 'titulo_url')
             ],
             'descripcion' => [
                 'sometimes',
@@ -71,6 +72,11 @@ class ModuloCreateDTO extends Data
             'orden' => [
                 'required',
                 'integer',
+            ],
+            'plan' => [
+                'sometimes',
+                'string',
+                'nullable'
             ],
             'fecha_crea' => [
                 'sometimes',

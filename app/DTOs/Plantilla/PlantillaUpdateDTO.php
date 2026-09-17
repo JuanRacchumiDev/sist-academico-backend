@@ -44,13 +44,13 @@ class PlantillaUpdateDTO extends Data
             'id_institucion' => [
                 'sometimes',
                 'integer',
-                'exists:institucion,id',
+                'exists:academic.institucion,id',
                 'nullable'
             ],
             'codigo_tipoprograma' => [
                 'sometimes',
                 'integer',
-                'exists:detalle_parametro,id',
+                'exists:academic.detalle_parametro,id',
                 'nullable'
             ],
             'nombre' => [

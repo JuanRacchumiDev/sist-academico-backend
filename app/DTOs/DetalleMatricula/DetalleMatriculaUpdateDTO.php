@@ -33,13 +33,13 @@ class DetalleMatriculaUpdateDTO extends Data
             'id_matricula' => [
                 'sometimes',
                 'integer',
-                'exists:matricula,id',
+                'exists:academic.matricula,id',
                 'nullable'
             ],
             'id_programa' => [
                 'sometimes',
                 'integer',
-                'exists:programa,id',
+                'exists:academic.programa,id',
                 'nullable'
             ],
             'valor_matricula' => [

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('programa', function (Blueprint $table) {
+        Schema::create('academic.programa', function (Blueprint $table) {
             $table->id();
 
             $table->unsignedBigInteger('codigo_segmento')->nullable();
@@ -23,21 +23,25 @@ return new class extends Migration
             $table->string('sigla', 10)->nullable();
             $table->string('titulo', 100);
             $table->string('titulo_url', 120);
-            $table->string('descripcion', 150)->nullable();
             $table->text('temario')->nullable();
+            $table->string('descripcion', 150)->nullable();
+            $table->string('contenido', 150)->nullable();
             $table->string('fecha_inicio', 10)->nullable();
             $table->string('fecha_final', 10)->nullable();
             $table->string('duracion', 20)->nullable();
             $table->integer('horas_academicas')->nullable();
             $table->integer('numero_modulos')->nullable();
             $table->integer('creditos')->nullable();
-            $table->string('plan', 100)->nullable();
+            $table->string('plan', 150)->nullable();
             $table->enum('modalidad', ['VIRTUAL', 'PRESENCIAL', 'MIXTO'])->default('VIRTUAL');
             $table->integer('capacidad_minima')->nullable();
             $table->integer('capacidad_maxima')->nullable();
             $table->integer('cantidad_inscritos')->nullable();
             $table->decimal('precio_modulo', 10, 2)->nullable();
+            $table->string('banner_url')->nullable();
+
             $table->boolean('is_vigente')->default(true);
+            $table->boolean('show_web')->default(true);
 
             $table->string('fecha_crea', 10)->nullable();
             $table->string('fecha_actualiza', 10)->nullable();
@@ -52,19 +56,23 @@ return new class extends Migration
 
             $table->foreign('codigo_segmento')
                 ->references('codigo')
-                ->on('detalle_parametro');
+                ->on('academic.detalle_parametro')
+                ->onDelete('cascade');
 
             $table->foreign('codigo_tipoprograma')
                 ->references('codigo')
-                ->on('detalle_parametro');
+                ->on('academic.detalle_parametro')
+                ->onDelete('cascade');
 
             $table->foreign('codigo_categoriaprograma')
                 ->references('codigo')
-                ->on('detalle_parametro');
+                ->on('academic.detalle_parametro')
+                ->onDelete('cascade');
 
             $table->foreign('id_sucursal')
                 ->references('codigo')
-                ->on('detalle_parametro');
+                ->on('academic.detalle_parametro')
+                ->onDelete('cascade');
         });
     }
 
@@ -73,7 +81,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('programa', function (Blueprint $table) {
+        Schema::table('academic.programa', function (Blueprint $table) {
             $table->dropForeign('codigo_segmento');
             $table->dropColumn('codigo_segmento');
 
@@ -87,6 +95,6 @@ return new class extends Migration
             $table->dropColumn('id_sucursal');
         });
 
-        Schema::dropIfExists('programa');
+        Schema::dropIfExists('academic.programa');
     }
 };

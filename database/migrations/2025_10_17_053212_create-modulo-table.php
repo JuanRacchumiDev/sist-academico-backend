@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('modulo', function (Blueprint $table) {
+        Schema::create('academic.modulo', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('id_programa')->nullable();
 
@@ -21,6 +21,7 @@ return new class extends Migration
             $table->text('temario')->nullable();
             $table->decimal('nota', 10, 2)->nullable();
             $table->integer('orden');
+            $table->string('plan', 150)->nullable();
 
             $table->string('fecha_crea', 10)->nullable();
             $table->string('fecha_actualiza', 10)->nullable();
@@ -35,7 +36,8 @@ return new class extends Migration
 
             $table->foreign('id_programa')
                 ->references('id')
-                ->on('programa');
+                ->on('academic.programa')
+                ->onDelete('cascade');
         });
     }
 
@@ -44,11 +46,11 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('modulo', function (Blueprint $table) {
+        Schema::table('academic.modulo', function (Blueprint $table) {
             $table->dropForeign('id_programa');
             $table->dropColumn('id_programa');
         });
 
-        Schema::dropIfExists('modulo');
+        Schema::dropIfExists('academic.modulo');
     }
 };

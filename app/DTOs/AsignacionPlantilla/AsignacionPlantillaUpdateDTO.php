@@ -33,13 +33,13 @@ class AsignacionPlantillaUpdateDTO extends Data
             'id_plantilla' => [
                 'sometimes',
                 'integer',
-                'exists:plantilla,id',
+                'exists:academic.plantilla,id',
                 'nullable'
             ],
             'id_programa' => [
                 'sometimes',
                 'integer',
-                'exists:programa,id',
+                'exists:academic.programa,id',
                 'nullable'
             ],
             'fecha_crea' => [

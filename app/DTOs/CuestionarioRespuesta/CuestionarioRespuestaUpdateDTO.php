@@ -33,19 +33,19 @@ class CuestionarioRespuestaUpdateDTO extends Data
             'id_cuestionario_persona' => [
                 'sometimes',
                 'integer',
-                'exists:cuestionario_persona,id',
+                'exists:academic.cuestionario_persona,id',
                 'nullable'
             ],
             'id_pregunta' => [
                 'sometimes',
                 'integer',
-                'exists:pregunta,id',
+                'exists:academic.pregunta,id',
                 'nullable'
             ],
             'id_pregunta_opcion' => [
                 'sometimes',
                 'integer',
-                'exists:pregunta_opcion,id',
+                'exists:academic.pregunta_opcion,id',
                 'nullable',
             ],
             'respuesta_texto' => [

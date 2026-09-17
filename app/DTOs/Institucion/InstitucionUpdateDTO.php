@@ -44,7 +44,7 @@ class InstitucionUpdateDTO extends Data
             'codigo_sede' => [
                 'sometimes',
                 'integer',
-                'exists:detalle_parametro,codigo',
+                'exists:academic.detalle_parametro,codigo',
                 'nullable'
             ],
             'nombre' => [

@@ -32,17 +32,17 @@ class GrupoPersonaCreateDTO extends Data
             'codigo_grupo' => [
                 'required',
                 'string',
-                'exists:detalle_parametro,codigo'
+                'exists:academic.detalle_parametro,codigo'
             ],
             'id_persona' => [
                 'required',
                 'integer',
-                'exists:persona,id'
+                'exists:academic.persona,id'
             ],
             'id_sucursal' => [
                 'sometimes',
                 'integer',
-                'exists:detalle_parametro,codigo',
+                'exists:academic.detalle_parametro,codigo',
                 'nullable'
             ],
             'fecha_crea' => [

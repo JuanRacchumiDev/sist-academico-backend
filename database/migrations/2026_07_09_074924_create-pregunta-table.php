@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pregunta', function (Blueprint $table) {
+        Schema::create('academic.pregunta', function (Blueprint $table) {
             $table->id();
 
             $table->unsignedBigInteger('id_cuestionario');
@@ -30,9 +30,8 @@ return new class extends Migration
 
             $table->foreign('id_cuestionario')
                 ->references('id')
-                ->on('cuestionario');
-
-            // $table->foreign('id_cuestionario')->references('id')->on('cuestionario')->onDelete('cascade');
+                ->on('academic.cuestionario')
+                ->onDelete('cascade');
         });
     }
 
@@ -41,11 +40,11 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('pregunta', function (Blueprint $table) {
+        Schema::table('academic.pregunta', function (Blueprint $table) {
             $table->dropForeign('id_cuestionario');
             $table->dropColumn('id_cuestionario');
         });
 
-        Schema::dropIfExists('pregunta');
+        Schema::dropIfExists('academic.pregunta');
     }
 };

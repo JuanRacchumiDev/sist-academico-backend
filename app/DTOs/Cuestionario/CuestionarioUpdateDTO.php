@@ -39,13 +39,13 @@ class CuestionarioUpdateDTO extends Data
             'id_programa' => [
                 'sometimes',
                 'integer',
-                'exists:programa,id',
+                'exists:academic.programa,id',
                 'nullable'
             ],
             'id_modulo' => [
                 'sometimes',
                 'integer',
-                'exists:modulo,id',
+                'exists:academic.modulo,id',
                 'nullable'
             ],
             'titulo' => [
@@ -107,7 +107,7 @@ class CuestionarioUpdateDTO extends Data
             'preguntas.*.id' => [
                 'sometimes',
                 'integer',
-                'exists:pregunta,id',
+                'exists:academic.pregunta,id',
                 'nullable'
             ],
             'preguntas.*.enunciado' => [

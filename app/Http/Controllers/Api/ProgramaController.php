@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Programa\UpdateModulosProgramaRequest;
 use App\Services\Contracts\IModuloService;
 use App\Services\Contracts\IProgramaService;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -108,6 +109,53 @@ class ProgramaController extends Controller
         }
     }
 
+    public function downloadPlanModulo(int $programaId, int $moduloId)
+    {
+        try {
+            return $this->programaService->downloadPlanModulo($programaId, $moduloId);
+        } catch (Exception $e) {
+            $code = $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500;
+
+            Log::error("Error al descargar plan de módulo (Programa: {$programaId}, Módulo: {$moduloId}): " . $e->getMessage());
+
+            return response()->json([
+                'result' => false,
+                'message' => $e->getMessage()
+            ], $code);
+        }
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id): JsonResponse
+    {
+        try {
+            $programa = $this->programaService->getProgramaById($id);
+
+            if (!$programa) {
+                return response()->json([
+                    'result' => false,
+                    'message' => 'Programa no encontrado',
+                    'data' => []
+                ], 404);
+            }
+
+            return response()->json([
+                'result' => true,
+                'data' => $programa,
+                'message' => 'Programa encontrado correctamente'
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error("Error fetching programa (id: {$id}): " . $e->getMessage());
+
+            return response()->json([
+                'result' => false,
+                'message' => 'Error al obtener el programa: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
     /**
      * Store a newly created resource in storage.
      */
@@ -165,37 +213,6 @@ class ProgramaController extends Controller
             return response()->json([
                 'result' => false,
                 'message' => 'Error al crear programa: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id): JsonResponse
-    {
-        try {
-            $programa = $this->programaService->getProgramaById($id);
-
-            if (!$programa) {
-                return response()->json([
-                    'result' => false,
-                    'message' => 'Programa no encontrado',
-                    'data' => []
-                ], 404);
-            }
-
-            return response()->json([
-                'result' => true,
-                'data' => $programa,
-                'message' => 'Programa encontrado correctamente'
-            ], 200);
-        } catch (\Exception $e) {
-            Log::error("Error fetching programa (id: {$id}): " . $e->getMessage());
-
-            return response()->json([
-                'result' => false,
-                'message' => 'Error al obtener el programa: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -267,8 +284,37 @@ class ProgramaController extends Controller
         $usuarioAutenticado = Auth::user();
         $username = $usuarioAutenticado ? ($usuarioAutenticado->name) : 'systemapi';
 
+        Log::info('Test UpdateModulosProgramaRequest request', [
+            'request' => $request
+        ]);
+
         // Mapear los ítems enviados en el array a DTOs
-        $dtos = collect($request->validated()['modulos'])->map(function (array $item) use ($id, $username) {
+        $dtos = collect($request->validated()['modulos'])->map(function (array $item, int $index) use ($id, $username, $request) {
+
+            // Mantener el valor original del plan si venía como cadena
+            $planPath = is_string($item['plan'] ?? null) ? $item['plan'] : null;
+            $idModulo = $item['id'] ?? null;
+
+            // Verificar si existe un archivo subido en este índice
+            if ($request->hasFile("modulos.{$index}.plan")) {
+                $file = $request->file("modulos.{$index}.plan");
+
+                // Generar nombre seguro o usar el nombre original del archivo
+                $fileName = time() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+
+                // Identificar carpeta del módulo (ID existente o identificador temporal)
+                $moduloFolder = $idModulo ? $idModulo : 'nuevo_' . ($index + 1);
+
+                // Definir la ruta relativa: programa/[idPrograma]/modulo/[idModulo]
+                $folderPath = "programa/{$id}/modulo/{$moduloFolder}";
+
+                // Guardar el archivo en el disco 'local' (que apunta a /storage/app/private o /storage/app)
+                $storedPath = $file->storeAs($folderPath, $fileName, 'local');
+
+                // Asignar la ruta relativa guardada para almacenar en la BD
+                $planPath = $storedPath;
+            }
+
             return ModuloUpdateDTO::from([
                 'id' => $item['id'] ?? null,
                 'id_programa' => $id,
@@ -276,7 +322,8 @@ class ProgramaController extends Controller
                 'titulo_url' => Str::slug($item['titulo']),
                 'temario' => $item['temario'] ?? null,
                 'orden' => $item['orden'] ?? null,
-                'user_actualiza' => $username
+                'plan' => $planPath,
+                'user_actualiza' => $username,
             ]);
         })->toArray();
 

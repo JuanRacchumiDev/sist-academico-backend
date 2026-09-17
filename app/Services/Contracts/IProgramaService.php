@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services\Contracts;
 
 use App\DTOs\Programa\ProgramaCreateDTO;
@@ -6,8 +7,10 @@ use App\DTOs\Programa\ProgramaUpdateDTO;
 use App\Models\Programa;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
-interface IProgramaService {
+interface IProgramaService
+{
     /**
      * Obtener todos los programas
      * @param array<string, mixed>|null $searchParams
@@ -28,6 +31,8 @@ interface IProgramaService {
      * @return Programa|null
      */
     public function getProgramaById(int $id): ?Programa;
+
+    public function downloadPlanModulo(int $programaId, int $moduloId): BinaryFileResponse;
 
     /**
      * Crear un nuevo programa
