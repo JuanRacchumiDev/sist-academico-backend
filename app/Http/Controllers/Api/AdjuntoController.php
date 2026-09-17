@@ -172,6 +172,7 @@ class AdjuntoController extends Controller
             if ($adjuntoExistente) {
                 return response()->json([
                     'result' => true,
+                    'exists' => true,
                     'data' => $adjuntoExistente,
                     'message' => 'El adjunto ya ha sido ingresado previamente',
                     'code' => 'PREVIOUSLY_REGISTERED'
@@ -183,7 +184,10 @@ class AdjuntoController extends Controller
 
             $data = $dto->toArray();
             $data['user_crea'] = $username;
-            $data['id_modulo'] = $idModulo;
+
+            if (!isset($idModulo)) {
+                $data['id_modulo'] = $idModulo;
+            }
 
             if (!isset($data['estado'])) {
                 $data['estado'] = true;
@@ -197,7 +201,22 @@ class AdjuntoController extends Controller
                 $data['is_visible'] = true;
             }
 
-            $adjunto = $this->adjuntoService->createAdjunto($data, $request->file('file'));
+            // Validación condicional del archivo según el tipo de adjunto
+            $tipo = $data['tipo'] ?? 'FILE';
+
+            if ($tipo === 'FILE') {
+                if (!$request->hasFile('file') || !$request->file('file')->isValid()) {
+                    return response()->json([
+                        'result' => false,
+                        'message' => 'El archivo adjunto es obligatorio y debe ser válido.',
+                        'code' => 'FILE_REQUIRED'
+                    ], 422);
+                }
+            }
+
+            $file = $request->hasFile('file') ? $request->file('file') : null;
+
+            $adjunto = $this->adjuntoService->createAdjunto($data, $file);
 
             return response()->json([
                 'result' => true,

@@ -101,14 +101,14 @@ class MatriculaService implements IMatriculaService
 
     public function generateFichaPDF(int $id)
     {
+        $logoBase64 = null;
+
         $matricula = $this->matriculaRepository->findById($id);
         $institucion = $matricula->institucion;
 
         $numeroFormateado = str_pad($matricula->id, 4, '0', STR_PAD_LEFT);
 
-        // Definir la ruta: año/institucion/documento/ficha.php
         $anio = Carbon::parse($matricula->fecha_matricula)->year;
-        // $nombreIns = strtolower($dataInstitucion->nombre) ?? 'genérico';
         $nombreIns = str($institucion->nombre)->slug();
         $documento = $matricula->persona->numero_documento;
 
@@ -130,8 +130,6 @@ class MatriculaService implements IMatriculaService
         $logoPath = $institucion->logo_path
             ? storage_path("app/public/" . $institucion->logo_path)
             : public_path("images/logo_default.png");
-
-        $logoBase64 = null;
 
         if (file_exists($logoPath)) {
             $type = pathinfo($logoPath, PATHINFO_EXTENSION);
@@ -234,6 +232,8 @@ class MatriculaService implements IMatriculaService
 
     public function generarCronogramaPagos(int $idMatricula)
     {
+        $logoBase64 = null;
+
         $matricula = $this->matriculaRepository->findById($idMatricula);
 
         Log::info('Validando variable $matricula', ['matricula' => $matricula]);
@@ -248,50 +248,39 @@ class MatriculaService implements IMatriculaService
         }
 
         // Definición de datos por defecto de la Institución si vienen vacíos o nulos
-        $institucion = $matricula->institucion;
+        $sucursal = $matricula->institucion;
 
-        // Ruta del logo por defecto
-        $logoPath = public_path('images' . DIRECTORY_SEPARATOR . 'LOGO_INNOVAPERU.jpeg');
+        $logoRelative = $sucursal->logo_path ?? null;
+        Log::info('Evaluando logoRelative', ['logoRelative' => $logoRelative]);
 
-        Log::info('Evaluando ruta de logo original public', ['logoPath' => $logoPath]);
+        if ($logoRelative) {
+            $cleanPath = ltrim($logoRelative, '/');
 
-        // Si existe un logo propio de la institución, intentamos usarlo
-        if ($institucion && $institucion->logo_path) {
-            $path = 'app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'instituciones' . DIRECTORY_SEPARATOR . 'logos' . DIRECTORY_SEPARATOR . $institucion->logo_path;
+            if (str_starts_with($cleanPath, 'logos/')) {
+                $cleanPath = substr($cleanPath, 6);
+            } elseif (str_starts_with($cleanPath, 'logo/')) {
+                $cleanPath = substr($cleanPath, 5);
+            }
 
-            Log::info('Evaluando path', ['path' => $path]);
+            $logoPath = public_path('images' . DIRECTORY_SEPARATOR . 'logos' . DIRECTORY_SEPARATOR . $cleanPath);
 
-            $customLogoPath = storage_path($path);
+            Log::info('Evaluando logoPath', ['logoPath' => $logoPath]);
 
-            Log::info('Evaluando ruta de customLogoPath', ['customLogoPath' => $customLogoPath]);
+            if (file_exists($logoPath) && is_file($logoPath)) {
+                Log::info('Test existe logoPath', ['validacion' => 'si']);
 
-            if (file_exists($customLogoPath)) {
-                Log::info('Evaluando si existe customLogoPath', ['validacion' => 'si']);
-                $logoPath = $customLogoPath;
-            } else {
-                Log::info('Evaluando si existe customLogoPath', ['validacion' => 'no']);
+                $logoData = file_get_contents($logoPath);
+                $logoMime = mime_content_type($logoPath) ?: 'image/jpeg';
+                $logoBase64 = "data:{$logoMime};base64," . base64_encode($logoData);
             }
         }
 
-        Log::info('Ruta final del logo a procesar', ['logoPath' => $logoPath]);
-
-        // Convertir la imagen a Base64 para garantizar compatibilidad con Dompdf
-        $logoBase64 = null;
-        if (file_exists($logoPath)) {
-            Log::info('Evaluando si existe logo institución', ['existe' => 'si']);
-            $type = pathinfo($logoPath, PATHINFO_EXTENSION);
-            $data = file_get_contents($logoPath);
-            $logoBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
-        } else {
-            Log::warning('No se encontró el archivo del logo en el disco', ['logoPath' => $logoPath]);
-        }
-
         $institucionData = [
-            'nombre' => $institucion->nombre ?? 'INSTITUCIÓN ACADÉMICA',
-            'sigla' => $institucion->sigla ?? 'Innovación y aprendizaje continuo para ti',
-            'telefono' => $institucion->telefono_contacto ?? '999-999-999',
-            'email' => $institucion->email ?? 'contacto@institucion.edu.pe',
-            'logo' => $logoBase64
+            'nombre'   => $sucursal->nombre ?? 'INSTITUCIÓN ACADÉMICA',
+            'sigla'    => $sucursal->sigla ?? 'Innovación y aprendizaje continuo para ti',
+            'telefono' => $sucursal->telefono_contacto ?? '999-999-999',
+            'email'    => $sucursal->email ?? 'contacto@institucion.edu.pe',
+            'logo'     => $logoBase64
         ];
 
         $pagosReales = $this->pagoRepository->getPagosByMatricula($idMatricula);
@@ -299,14 +288,11 @@ class MatriculaService implements IMatriculaService
         Log::info('Obteniendo pagos reales', ['pagosReales' => $pagosReales]);
 
         $cronograma = [];
-
         $totalModulos = $matricula->numero_modulos;
-
         $montoTotal = 0;
 
         for ($i = 1; $i <= $totalModulos; $i++) {
             $pagoEfectuado = $pagosReales->firstWhere('numero_modulo', $i);
-
             $fechaVencimiento = ItemPagoHelper::calcularFechaVencimiento($matricula->fecha_matricula, $i);
 
             if ($pagoEfectuado) {

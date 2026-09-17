@@ -166,6 +166,8 @@ class PagoService implements IPagoService
 
     public function generarConstancia(int $idPago)
     {
+        $logoBase64 = null;
+
         $pago = $this->pagoRepository->findById($idPago);
 
         if (!$pago) {
@@ -173,46 +175,45 @@ class PagoService implements IPagoService
         }
 
         $matricula = $pago->matricula;
-        $institucion = $pago->institucion ?? $matricula->institucion ?? null;
+        $sucursal = $pago->institucion ?? null;
 
-        // --- Procesamiento del Logo para DomPDF (Base64) ---
-        $logoPath = "";
-        $logoBase64 = null;
+        if ($sucursal && !empty($sucursal->logo_path)) {
+            $logoRelative = $sucursal->logo_path;
+            Log::info('Evaluando logoRelative', ['logoRelative' => $logoRelative]);
 
-        if ($institucion && $institucion->logo_path) {
-            $path = 'app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'instituciones' . DIRECTORY_SEPARATOR . 'logos' . DIRECTORY_SEPARATOR . $institucion->logo_path;
+            $cleanPath = ltrim($logoRelative, '/');
 
-            Log::info('Evaluando path', ['path' => $path]);
+            // Limpieza de prefijos en caso de venir repetidos desde BD
+            if (str_starts_with($cleanPath, 'logos/')) {
+                $cleanPath = substr($cleanPath, 6);
+            } elseif (str_starts_with($cleanPath, 'logo/')) {
+                $cleanPath = substr($cleanPath, 5);
+            }
 
-            $customLogoPath = storage_path($path);
+            $logoPath = public_path('images' . DIRECTORY_SEPARATOR . 'logos' . DIRECTORY_SEPARATOR . $cleanPath);
 
-            Log::info('Evaluando de customLogoPath', ['customLogoPath' => $customLogoPath]);
+            Log::info('Evaluando logoPath', ['logoPath' => $logoPath]);
 
-            if (file_exists($customLogoPath)) {
-                $logoPath = $customLogoPath;
+            if (file_exists($logoPath) && is_file($logoPath)) {
+                Log::info('Test existe logoPath', ['validacion' => 'si']);
+
+                $logoData   = file_get_contents($logoPath);
+                $logoMime   = mime_content_type($logoPath) ?: 'image/jpeg';
+                $logoBase64 = "data:{$logoMime};base64," . base64_encode($logoData);
+            } else {
+                Log::info('Test existe logoPath', ['validacion' => 'no']);
             }
         }
 
-        Log::info('Ruta final del logo a procesar', ['logoPath' => $logoPath]);
-
-        // Convertir la imagen a Base64 para garantizar compatibilidad con DomPdf
-        if (file_exists($logoPath)) {
-            $type = pathinfo($logoPath, PATHINFO_EXTENSION);
-            $data = file_get_contents($logoPath);
-            $logoBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
-        }
-
-        // --- Cálculo de Montos para Formas de Pago ---
         $efectivo = (float) ($pago->cantidad_efectivo ?? 0);
         $operacion = (float) ($pago->cantidad_operacion ?? 0);
 
-        // Si no es pago mixto pero los valores vienen en 0, asignamos el total según el tipo
         $totalGeneral = $efectivo + $operacion;
 
         $dataPdf = [
             'pago'          => $pago,
             'matricula'     => $matricula,
-            'institucion'   => $institucion,
+            'sucursal'      => $sucursal,
             'logoBase64'    => $logoBase64,
             'efectivo'      => $efectivo,
             'operacion'     => $operacion,

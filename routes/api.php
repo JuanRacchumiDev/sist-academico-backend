@@ -77,12 +77,11 @@ Route::prefix('v1')->group(function () {
         });
 
         Route::prefix('programas')->group(function () {
+            Route::get('/', [ProgramaController::class, 'index'])->name('programas');
             Route::post('/{id}/actualizar-modulos', [ProgramaController::class, 'updateModulos'])->name('programas.actualizar-modulos');
             Route::get('/paginate', [ProgramaController::class, 'getFilteredPaginate'])->name('programas.paginate');
-            // Route::get('/{programa}/descargar-plan', [ProgramaController::class, 'downloadPlan'])->name('programas.descargarplan');
             Route::get('{programaId}/modulos/{moduloId}/descargar-plan', [ProgramaController::class, 'downloadPlanModulo'])->name('programas.modulos.descargar-plan');
             Route::get('/{id}', [ProgramaController::class, 'show'])->name('programas.show');
-            Route::get('/', [ProgramaController::class, 'index'])->name('programas');
             Route::post('/', [ProgramaController::class, 'store'])->name('programas.store');
             Route::patch('/{id}', [ProgramaController::class, 'update'])->name('programas.update');
         });

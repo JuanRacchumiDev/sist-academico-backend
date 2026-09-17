@@ -107,7 +107,7 @@ class ProgramaCreateDTO extends Data
             ],
             'temario' => [
                 'sometimes',
-                'text',
+                'string',
                 'nullable'
             ],
             'fecha_inicio' => [
@@ -170,7 +170,7 @@ class ProgramaCreateDTO extends Data
             ],
             'precio_modulo' => [
                 'sometimes',
-                'float',
+                'numeric',
                 'nullable',
             ],
             'is_vigente' => [

@@ -35,7 +35,7 @@
             object-fit: contain;
         }
         .logo-placeholder {
-            width: 100px;
+            width: 110px;
             height: 45px;
             background-color: #0f172a;
             color: #ffffff;
@@ -43,7 +43,8 @@
             text-align: center;
             line-height: 45px;
             font-weight: bold;
-            font-size: 14px;
+            font-size: 12px;
+            text-transform: uppercase;
         }
         .inst-info {
             padding-left: 10px;
@@ -129,13 +130,12 @@
             vertical-align: top;
         }
         
-        /* MEJORA EN LA CLASE LABEL: Ancho controlado y espacio uniforme */
         .label { 
             font-weight: 600; 
             color: #64748b;
-            width: 80px; /* Ancho fijo para alineación vertical perfecta */
+            width: 80px;
             white-space: nowrap;
-            padding-right: 10px; /* Separación garantizada con la siguiente celda */
+            padding-right: 10px;
         }
         
         /* Table Content */
@@ -216,10 +216,10 @@
         <tr>
             <td class="logo-container">
                 @if(!empty($institucion['logo']))
-                    <img class="logo-img" src="{{ $institucion['logo'] }}" alt="Logo Institución">
+                    <img class="logo-img" src="{{ $institucion['logo'] }}" alt="{{ $institucion['nombre'] }}">
                 @else
                     <div class="logo-placeholder">
-                        INNOVA
+                        {{ substr($institucion['nombre'], 0, 8) }}
                     </div>
                 @endif
             </td>

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Parametro extends Model
 {
     protected $table = "academic.parametro";
+
     protected $primaryKey = "clase";
     public $incrementing = false;
 

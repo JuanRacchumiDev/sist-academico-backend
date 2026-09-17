@@ -38,6 +38,7 @@ class Programa extends Model
         'precio_modulo',
         'banner_url',
         'is_vigente',
+        'is_visible',
         'show_web',
 
         'fecha_crea',

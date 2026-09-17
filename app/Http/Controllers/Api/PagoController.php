@@ -136,8 +136,10 @@ class PagoController extends Controller
             return response($result['message'], 404);
         }
 
+        $idMatriculaPadding = str_pad($idMatricula, 4, '0', STR_PAD_LEFT);
+
         // Devolver el archivo PDF como respuesta binaria
-        $filename = "pago_matricula_{$idMatricula}.pdf";
+        $filename = "pago_matricula_{$idMatriculaPadding}.pdf";
 
         return response($result['pdfContent'], 200)
             ->header('Content-Type', 'application/pdf')
@@ -171,8 +173,11 @@ class PagoController extends Controller
             return response($result['message'], 404);
         }
 
+        $idMatriculaPadding = str_pad($idMatricula, 4, '0', STR_PAD_LEFT);
+        $numeroModuloPadding = str_pad($numeroModulo, 4, '0', STR_PAD_LEFT);
+
         // Devolver el archivo PDF como respuesta binaria
-        $filename = "pago_modulo_{$idMatricula}_{$numeroModulo}.pdf";
+        $filename = "pago_modulo_{$idMatriculaPadding}_{$numeroModuloPadding}.pdf";
 
         Log::error("Filename getPagoModulo PagoController: " . $filename);
 
@@ -189,10 +194,11 @@ class PagoController extends Controller
             ]);
 
             $idPago = (int)$request->query('id_pago');
+            $idPagoPadding = str_pad($idPago, 4, '0', STR_PAD_LEFT);
 
             $pdfContent = $this->pagoService->generarConstancia($idPago);
 
-            $filename = "constancia_pago_{$idPago}.pdf";
+            $filename = "constancia_pago_{$idPagoPadding}.pdf";
 
             return new Response($pdfContent, 200, [
                 'Content-Type' => 'application/pdf',

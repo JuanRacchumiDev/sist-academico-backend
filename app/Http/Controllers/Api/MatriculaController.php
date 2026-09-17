@@ -180,13 +180,10 @@ class MatriculaController extends Controller
         try {
             $path = $this->matriculaService->generateFichaPDF($id);
 
-            // Retornar el archivo para visualizar en el navegador
             return response()->file($path, [
                 'Content-Type' => 'application/pdf',
                 'Content-Disposition' => 'inline, filename="ficha_matricula.pdf"'
             ]);
-
-            // return $pdf->stream("ficha_matricula_${id}.pdf");
         } catch (\Exception $e) {
             Log::error("Error al obtener PDF: " . $e->getMessage());
             return response()->json(['message' => 'Error al procesar el archivo'], 500);
@@ -204,9 +201,12 @@ class MatriculaController extends Controller
             $idMatricula = (int) $request->query('id_matricula');
             $idPrograma  = (int) $request->query('id_programa');
 
+            $idMatriculaPadding = str_pad($idMatricula, 4, '0', STR_PAD_LEFT);
+            $idProgramaPadding = str_pad($idPrograma, 4, '0', STR_PAD_LEFT);
+
             $pdfContent = $this->matriculaService->generateCertificadoPDF($idMatricula, $idPrograma);
 
-            $filename = "certificado_mat_{$idMatricula}_prog_{$idPrograma}.pdf";
+            $filename = "certificado_mat_{$idMatriculaPadding}_prog_{$idProgramaPadding}.pdf";
 
             return new Response($pdfContent, 200, [
                 'Content-Type' => 'application/pdf',
@@ -230,9 +230,11 @@ class MatriculaController extends Controller
 
             $idMatricula = (int)$request->query('id_matricula');
 
+            $idMatriculaPadding = str_pad($idMatricula, 4, '0', STR_PAD_LEFT);
+
             $pdfContent = $this->matriculaService->generarCronogramaPagos($idMatricula);
 
-            $filename = "cronograma_pagos_matricula_{$idMatricula}.pdf";
+            $filename = "cronograma_pagos_matricula_{$idMatriculaPadding}.pdf";
 
             return new Response($pdfContent, 200, [
                 'Content-Type' => 'application/pdf',

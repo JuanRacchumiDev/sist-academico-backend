@@ -386,7 +386,7 @@ class CertificadoService implements ICertificadoService
             throw new Exception("El archivo del certificado no se encuentra disponible físicamente.", 404);
         }
 
-        $filename = $certificado->filename ?? "Certificado_{$certificado->codigo_verificacion}.pdf";
+        $filename = $certificado->filename ?? "certificado_{$certificado->codigo_verificacion}.pdf";
 
         return [
             'full_path' => $fullPath,
@@ -520,7 +520,10 @@ class CertificadoService implements ICertificadoService
             'L'
         );
 
-        $pdfFilename = "certificado_modulo_{$modulo->id}_{$persona->id}_" . time() . ".pdf";
+        $idModuloPadding = str_pad($modulo->id, 4, '0', STR_PAD_LEFT);
+        $idPersonaPadding = str_pad($persona->id, 4, '0', STR_PAD_LEFT);
+
+        $pdfFilename = "certificado_modulo_{$idModuloPadding}_{$idPersonaPadding}_" . time() . ".pdf";
         $pdfRelativePath = $yearMonthDocDir . DIRECTORY_SEPARATOR . $pdfFilename;
         $pdfAbsolutePath = Storage::disk('local')->path($pdfRelativePath);
 

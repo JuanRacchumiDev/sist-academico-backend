@@ -14,9 +14,11 @@ class Adjunto extends Model
         'id_modulo',
         'id_sucursal',
 
+        'tipo',
         'titulo',
         'titulo_url',
         'descripcion',
+        'url',
         'filename',
         'originalname',
         'filepath',
@@ -56,7 +58,7 @@ class Adjunto extends Model
 
     public function modulo(): BelongsTo
     {
-        return $this->belongsTo(modulo::class, 'id_modulo', 'id');
+        return $this->belongsTo(Modulo::class, 'id_modulo', 'id');
     }
 
     public function institucion(): BelongsTo

@@ -103,9 +103,11 @@ class ProgramaService implements IProgramaService
 
         $fullPath = Storage::disk('local')->path($modulo->plan);
 
+        $idModuloPadding = str_pad($modulo->id, 4, '0', STR_PAD_LEFT);
+
         return response()->download(
             $fullPath,
-            "plan_modulo_{$modulo->id}.pdf",
+            "plan_modulo_{$idModuloPadding}.pdf",
             ["Content-Type", "application/pdf"]
         );
     }

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class DetalleMatricula extends Model
 {
     protected $table = "academic.detalle_matricula";
+
     // protected $primaryKey = "id";
     // public $incrementing = true;
 

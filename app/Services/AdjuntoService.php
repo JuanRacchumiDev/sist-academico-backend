@@ -80,53 +80,58 @@ class AdjuntoService implements IAdjuntoService
         ];
     }
 
-    public function createAdjunto(array $data, UploadedFile $file): Adjunto
+    public function createAdjunto(array $data, ?UploadedFile $file): Adjunto
     {
         return DB::transaction(function () use ($data, $file) {
 
             Log::info('Obteniendo data para nuevo adjunto', ['data' => $data]);
 
-            $directory = 'adjuntos';
+            $filename = null;
+            $filePath = null;
 
-            if (!empty($data['id_programa'])) {
-                $directory .= '/programa/' . $data['id_programa'];
-                if (!empty($data['id_modulo'])) {
-                    $directory .= '/modulo/' . $data['id_modulo'];
+            // Almacenar el archivo físico SOLO si se proporcionó un objeto UploadedFile
+            if ($file && ($data['tipo'] ?? 'FILE') === 'FILE') {
+                $directory = 'adjuntos';
+
+                if (!empty($data['id_programa'])) {
+                    $directory .= '/programa/' . $data['id_programa'];
+                    if (!empty($data['id_modulo'])) {
+                        $directory .= '/modulo/' . $data['id_modulo'];
+                    }
+                }
+
+                $filename = time() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+                $filePath = "{$directory}/{$filename}";
+
+                // Subir archivo mediante StorageService
+                $stored = $this->storageService->put($filePath, file_get_contents($file->getRealPath()));
+
+                if (!$stored) {
+                    throw new Exception("Error al guardar el archivo físico en el almacenamiento.", 500);
                 }
             }
 
-            $filename = time() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
-            $filePath = "{$directory}/{$filename}";
-
-            // Subir archivo mediante StorageService
-            $stored = $this->storageService->put($filePath, file_get_contents($file->getRealPath()));
-
-            if (!$stored) {
-                throw new Exception("Error al guardar el archivo físico en el almacenamiento.", 500);
-            }
-
             try {
-                return DB::transaction(function () use ($data, $file, $filename, $filePath) {
-                    $fullData = array_merge($data, [
-                        'titulo_url'     => Str::slug($data['titulo']),
-                        'filename'       => $filename,
-                        'originalname'   => $file->getClientOriginalName(),
-                        'filepath'       => $filePath,
-                        'mimetype'       => $file->getClientMimeType(),
-                        'size'           => $file->getSize(),
-                        'is_descargable' => filter_var($data['is_descargable'] ?? true, FILTER_VALIDATE_BOOLEAN),
-                        'is_visible'     => filter_var($data['is_visible'] ?? true, FILTER_VALIDATE_BOOLEAN),
-                        'id_modulo'      => !empty($data['id_modulo']) ? (int)$data['id_modulo'] : null,
-                        'id_sucursal'    => !empty($data['id_sucursal']) ? (int)$data['id_sucursal'] : null,
-                        'estado'         => true
-                    ]);
+                $fullData = array_merge($data, [
+                    'titulo_url'     => Str::slug($data['titulo']),
+                    'filename'       => $filename,
+                    'originalname'   => $file ? $file->getClientOriginalName() : null,
+                    'filepath'       => $filePath,
+                    'mimetype'       => $file ? $file->getClientMimeType() : null,
+                    'size'           => $file ? $file->getSize() : null,
+                    'is_descargable' => filter_var($data['is_descargable'] ?? true, FILTER_VALIDATE_BOOLEAN),
+                    'is_visible'     => filter_var($data['is_visible'] ?? true, FILTER_VALIDATE_BOOLEAN),
+                    'id_modulo'      => !empty($data['id_modulo']) ? (int)$data['id_modulo'] : null,
+                    'id_sucursal'    => !empty($data['id_sucursal']) ? (int)$data['id_sucursal'] : null,
+                    'estado'         => true
+                ]);
 
-                    $adjuntoCreateDTO = AdjuntoCreateDTO::from($fullData);
-                    return $this->adjuntoRepository->create($adjuntoCreateDTO->toArray());
-                });
+                $adjuntoCreateDTO = AdjuntoCreateDTO::from($fullData);
+                return $this->adjuntoRepository->create($adjuntoCreateDTO->toArray());
             } catch (Exception $e) {
-                // Rollback manual del archivo físico si la transacción de BD falla
-                $this->storageService->delete($filePath);
+                if ($filePath) {
+                    $this->storageService->delete($filePath);
+                }
                 throw $e;
             }
         });

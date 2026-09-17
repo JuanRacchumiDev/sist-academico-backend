@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class DetalleParametro extends Model
 {
     protected $table = "academic.detalle_parametro";
+
     protected $primaryKey = "codigo";
     public $incrementing = true;
 

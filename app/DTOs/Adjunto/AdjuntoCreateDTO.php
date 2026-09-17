@@ -3,17 +3,20 @@
 namespace App\DTOs\Adjunto;
 
 use Spatie\LaravelData\Data;
+use Illuminate\Validation\Rule;
 
 class AdjuntoCreateDTO extends Data
 {
     public function __construct(
         public string $titulo,
+        public string $tipo,
 
         public ?int $id_programa = null,
         public ?int $id_modulo = null,
         public ?int $id_sucursal = null,
         public ?string $titulo_url = null,
         public ?string $descripcion = null,
+        public ?string $url = null,
         public ?string $filename = null,
         public ?string $originalname = null,
         public ?string $filepath = null,
@@ -27,6 +30,7 @@ class AdjuntoCreateDTO extends Data
         public ?string $user_crea = null,
         public ?string $user_actualiza = null,
         public ?string $user_elimina = null,
+
         public ?bool $is_descargable = null,
         public ?bool $is_visible = null,
         public ?bool $estado = null,
@@ -47,20 +51,24 @@ class AdjuntoCreateDTO extends Data
             'id_programa' => [
                 'sometimes',
                 'integer',
-                'exists:academic.programa,id',
+                Rule::exists('programa', 'id'),
                 'nullable'
             ],
             'id_modulo' => [
                 'sometimes',
                 'integer',
-                'exists:academic.modulo,id',
+                Rule::exists('modulo', 'id'),
                 'nullable'
             ],
             'id_sucursal' => [
                 'sometimes',
                 'integer',
-                'exists:academic.detalle_parametro,codigo',
+                Rule::exists('detalle_parametro', 'id'),
                 'nullable'
+            ],
+            'tipo' => [
+                'required',
+                'in:FILE,YOUTUBE,DRIVE,URL'
             ],
             'titulo' => [
                 'required',
@@ -79,8 +87,14 @@ class AdjuntoCreateDTO extends Data
                 'max:150',
                 'nullable'
             ],
+            'url' => [
+                'required_if:tipo,YOUTUBE,DRIVE,URL',
+                'url',
+                'nullable'
+            ],
             'file' => [
-                'required',
+                'required_if:tipo,FILE',
+                'nullable',
                 'file',
                 'max:10240'
             ],
