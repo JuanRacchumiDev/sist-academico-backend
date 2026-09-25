@@ -44,13 +44,13 @@ class PlantillaCreateDTO extends Data
             'id_institucion' => [
                 'sometimes',
                 'integer',
-                'exists:academic.institucion,id',
+                'exists:institucion,id',
                 'nullable'
             ],
             'codigo_tipoprograma' => [
                 'sometimes',
                 'integer',
-                'exists:academic.detalle_parametro,codigo',
+                'exists:detalle_parametro,codigo',
                 'nullable'
             ],
             'nombre' => [

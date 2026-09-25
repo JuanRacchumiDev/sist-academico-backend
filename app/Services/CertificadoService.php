@@ -408,7 +408,6 @@ class CertificadoService implements ICertificadoService
         return $this->downloadCertificado($certificado->id);
     }
 
-
     public function generateCertificadoModular(?array $searchParams): string
     {
         $persona = $this->personaRepository->findById($searchParams['id_persona']);
