@@ -163,6 +163,12 @@ class CertificadoService implements ICertificadoService
         $nombreImpresion = $certificado->nombre_impresion;
         $tituloPrograma = Str::upper($programa->titulo);
 
+        // Definir si el tipo de programa es especialización
+        $esEspecializacion = $nombreTipoPrograma === 'especializacion';
+
+        // Definir los módulos
+        $modulos = $programa->detalleModulos ?? collect();
+
         $nombreDirector = ($plantilla->institucion && $plantilla->institucion->nombre_director)
             ? $plantilla->institucion->nombre_director
             : "----";
@@ -344,7 +350,9 @@ class CertificadoService implements ICertificadoService
             'qrCode'                => $qrBase64,
             'fondo'                 => $templateBase64,
             'logo'                  => $logoBase64,
-            'temario'               => $programa->temario ?? ''
+            'temario'               => $programa->temario ?? '',
+            'es_especializacion'    => $esEspecializacion,
+            'modulos'               => $modulos
         ];
 
         // Determinar la plantilla/diseño correspondiente

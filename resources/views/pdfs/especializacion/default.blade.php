@@ -341,9 +341,24 @@
                             {{ $info->titulo_programa }}
                         </div>
 
-                        @if(!empty($info->temario))
+                        {{-- CASO 1: Programa de tipo Especialización -> Listar Módulos --}}
+                        @if($info->es_especializacion && count($info->modulos) > 0)
                             <div class="temario-box">
-                                Temario
+                                MÓDULOS DEL PROGRAMA
+                            </div>
+
+                            <ul class="temario-list">
+                                @foreach($info->modulos as $index => $modulo)
+                                    <li>
+                                        <strong>Módulo {{ $index + 1 }}:</strong> {{ $modulo->nombre ?? $modulo->titulo }}
+                                    </li>
+                                @endforeach
+                            </ul>
+
+                        {{-- CASO 2: Otro tipo de Programa -> Mostrar Temario --}}
+                        @elseif(!empty($info->temario))
+                            <div class="temario-box">
+                                TEMARIO
                             </div>
 
                             <ul class="temario-list">

@@ -45,6 +45,7 @@ class CertificadoRepository implements ICertificadoRepository
             'sucursal',
             'plantilla.institucion',
             'programa.tipoPrograma',
+            'programa.detalleModulos',
             'modulo'
         ])->find($id);
     }
@@ -57,6 +58,7 @@ class CertificadoRepository implements ICertificadoRepository
             'sucursal',
             'plantilla.institucion',
             'programa.tipoPrograma',
+            'programa.detalleModulos',
             'modulo'
         ])
             ->where('codigo_verificacion', $codigo)
@@ -116,6 +118,7 @@ class CertificadoRepository implements ICertificadoRepository
                 'sucursal',
                 'plantilla.institucion',
                 'programa.tipoPrograma',
+                'programa.detalleModulos',
                 'modulo'
             ]);
 
