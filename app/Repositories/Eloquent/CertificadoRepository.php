@@ -40,7 +40,7 @@ class CertificadoRepository implements ICertificadoRepository
     public function findById(int $id): ?Certificado
     {
         return Certificado::with([
-            'persona',
+            'persona.grupos',
             'tipoCertificado',
             'sucursal',
             'plantilla.institucion',
@@ -53,7 +53,7 @@ class CertificadoRepository implements ICertificadoRepository
     public function findByCodigo(string $codigo): ?Certificado
     {
         return Certificado::with([
-            'persona',
+            'persona.grupos',
             'tipoCertificado',
             'sucursal',
             'plantilla.institucion',
@@ -113,7 +113,7 @@ class CertificadoRepository implements ICertificadoRepository
     {
         $query = Certificado::query()
             ->with([
-                'persona',
+                'persona.grupos',
                 'tipoCertificado',
                 'sucursal',
                 'plantilla.institucion',
