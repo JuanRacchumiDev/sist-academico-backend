@@ -23,6 +23,10 @@ class Certificado extends Model
         'filename',
         'nombre_impresion',
 
+        'disk',
+        'bucket',
+        'region',
+
         'fecha_crea',
         'fecha_actualiza',
         'fecha_elimina',

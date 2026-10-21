@@ -89,6 +89,13 @@ class AdjuntoService implements IAdjuntoService
             $filename = null;
             $filePath = null;
 
+            // Determinar el disco dinámico
+            $disk = $data['disk'] ?? config('filesystems.default', 'public');
+
+            // Si el disco es S3, podemos extraer dinámicamente el bucket y región de la configuración o request
+            $bucket = $data['bucket'] ?? ($disk === 's3' ? config("filesystems.disks.s3.bucket"): null);
+            $region = $data['region'] ?? ($disk === 's3' ? config("filesystems.disks.s3.region") : null);
+
             // Almacenar el archivo físico SOLO si se proporcionó un objeto UploadedFile
             if ($file && ($data['tipo'] ?? 'FILE') === 'FILE') {
                 $directory = 'adjuntos';
@@ -104,7 +111,8 @@ class AdjuntoService implements IAdjuntoService
                 $filePath = "{$directory}/{$filename}";
 
                 // Subir archivo mediante StorageService
-                $stored = $this->storageService->put($filePath, file_get_contents($file->getRealPath()));
+                // $stored = $this->storageService->put($filePath, file_get_contents($file->getRealPath()));
+                $stored = $this->storageService->putFile($filePath, $file, $disk);
 
                 if (!$stored) {
                     throw new Exception("Error al guardar el archivo físico en el almacenamiento.", 500);
@@ -149,7 +157,12 @@ class AdjuntoService implements IAdjuntoService
         }
 
         $oldFilePath = $adjunto->filepath;
+        $oldDisk = $adjunto->disk;
         $newFilePath = null;
+
+        $disk = $data['disk'] ?? $adjunto->disk ?? config('filesystems.default', 'public');
+        $bucket = $data['bucket'] ?? ($disk === 's3' ? config("filesystems.disks.s3.bucket") : $adjunto->bucket);
+        $region = $data['region'] ?? ($disk === 's3' ? config("filesystems.disks.s3.region") : $adjunto->region);
 
         $updateData = [
             'titulo'      => $data['titulo'] ?? $adjunto->titulo,
@@ -157,6 +170,9 @@ class AdjuntoService implements IAdjuntoService
             'id_programa' => !empty($data['id_programa']) ? (int)$data['id_programa'] : $adjunto->id_programa,
             'id_modulo'   => isset($data['id_modulo']) ? (!empty($data['id_modulo']) ? (int)$data['id_modulo'] : null) : $adjunto->id_modulo,
             'id_sucursal' => isset($data['id_sucursal']) ? (!empty($data['id_sucursal']) ? (int)$data['id_sucursal'] : null) : $adjunto->id_sucursal,
+            'disk'        => $disk,
+            'bucket'      => $bucket,
+            'region'      => $region,
         ];
 
         if ($file) {
@@ -174,7 +190,8 @@ class AdjuntoService implements IAdjuntoService
             $filename = time() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
             $newFilePath = "{$directory}/{$filename}";
 
-            $stored = $this->storageService->put($newFilePath, file_get_contents($file->getRealPath()));
+            // $stored = $this->storageService->put($newFilePath, file_get_contents($file->getRealPath()));
+            $stored = $this->storageService->putFile($newFilePath, $file, $disk);
 
             if (!$stored) {
                 throw new Exception("Error al subir el nuevo archivo al almacenamiento.", 500);
@@ -193,8 +210,11 @@ class AdjuntoService implements IAdjuntoService
             });
 
             // Eliminar archivo antiguo si el nuevo se subió con éxito
-            if ($file && $newFilePath && $oldFilePath && $oldFilePath !== $newFilePath) {
-                $this->storageService->delete($oldFilePath);
+            // if ($file && $newFilePath && $oldFilePath && $oldFilePath !== $newFilePath) {
+            //     $this->storageService->delete($oldFilePath);
+            // }
+            if ($file && $newFilePath && $oldFilePath) {
+                $this->storageService->deleteFile($oldFilePath, $oldDisk);
             }
 
             return $adjuntoActualizado;

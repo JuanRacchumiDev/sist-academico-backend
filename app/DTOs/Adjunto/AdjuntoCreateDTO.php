@@ -23,6 +23,10 @@ class AdjuntoCreateDTO extends Data
         public ?string $mimetype = null,
         public ?int $size = null,
 
+        public ?string $disk = null,
+        public ?string $bucket = null,
+        public ?string $region = null,
+
         public ?string $fecha_crea = null,
         public ?string $fecha_actualiza = null,
         public ?string $fecha_elimina = null,
@@ -41,7 +45,8 @@ class AdjuntoCreateDTO extends Data
         return [
             'is_descargable' => true,
             'is_visible' => true,
-            'estado' => true
+            'estado' => true,
+            'disk' => config('filesystems.default', 'local')
         ];
     }
 
@@ -97,6 +102,24 @@ class AdjuntoCreateDTO extends Data
                 'nullable',
                 'file',
                 'max:10240'
+            ],
+            'disk' => [
+                'sometimes',
+                'string',
+                'max:50',
+                'nullable'
+            ],
+            'bucket' => [
+                'sometimes',
+                'string',
+                'max:100',
+                'nullable'
+            ],
+            'region' => [
+                'sometimes',
+                'string',
+                'max:50',
+                'nullable'
             ],
             'filename' => [
                 'sometimes',

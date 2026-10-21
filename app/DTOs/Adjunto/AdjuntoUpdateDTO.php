@@ -23,6 +23,10 @@ class AdjuntoUpdateDTO extends Data
         public ?string $mimetype = null,
         public ?int $size = null,
 
+        public ?string $disk = null,
+        public ?string $bucket = null,
+        public ?string $region = null,
+
         public ?string $fecha_crea = null,
         public ?string $fecha_actualiza = null,
         public ?string $fecha_elimina = null,

@@ -19,6 +19,9 @@ class CertificadoUpdateDTO extends Data
         public ?string $path_file = null,
         public ?string $filename = null,
         public ?string $nombre_impresion = null,
+        public ?string $disk = null,
+        public ?string $bucket = null,
+        public ?string $region = null,
         public ?string $codigo_qr_path = null,
         public ?string $fecha_crea = null,
         public ?string $fecha_actualiza = null,
@@ -107,6 +110,24 @@ class CertificadoUpdateDTO extends Data
                 'sometimes',
                 'string',
                 'max:150',
+                'nullable'
+            ],
+            'disk' => [
+                'sometimes',
+                'string',
+                'max:50',
+                'nullable'
+            ],
+            'bucket' => [
+                'sometimes',
+                'string',
+                'max:100',
+                'nullable'
+            ],
+            'region' => [
+                'sometimes',
+                'string',
+                'max:50',
                 'nullable'
             ],
             'fecha_crea' => [

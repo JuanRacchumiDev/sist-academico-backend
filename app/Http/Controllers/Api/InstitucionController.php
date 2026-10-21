@@ -107,8 +107,8 @@ class InstitucionController extends Controller
                 'codigo_sede'
             ]);
 
-            if ($request->has('search')) {
-                $filters['search'] = $request->input('search');
+            if ($request->has('nombre')) {
+                $filters['nombre'] = $request->input('nombre');
             }
 
             $perPage = (int)$request->input('limit', 10);

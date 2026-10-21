@@ -77,6 +77,10 @@ class PlantillaRepository implements IPlantillaRepository
             $query->where('codigo_tipoprograma', $filters['codigo_tipoprograma']);
         }
 
+        if (!empty($filters['id_sucursal'])) {
+            $query->where('id_sucursal', $filters['id_sucursal']);
+        }
+
         if (!empty($filters['search'])) {
             $search = '%' . strtolower($filters['search']) . '%';
             $query->where(function ($q) use ($search) {

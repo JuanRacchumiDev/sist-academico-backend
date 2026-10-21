@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Services\Contracts\IStorageService;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\UploadedFile;
 use Exception;
 use Override;
 
@@ -79,5 +80,33 @@ class StorageService implements IStorageService
         file_put_contents($tempPath, $this->get($path, $targetDisk));
 
         return $tempPath;
+    }
+
+    /**
+     * Almacena un archivo en el disco especificado (o el por defecto)
+     */
+    public function putFile(string $path, UploadedFile $file, ?string $disk = null): bool
+    {
+        $selectedDisk = $disk ?? config('filesystems.default', 'local');
+
+        return Storage::disk($selectedDisk)->putFileAs(
+            dirname($path),
+            $file,
+            basename($path)
+        ) !== false;
+    }
+
+    /**
+     * Elimina un archivo del disco indicado
+     */
+    public function deleteFile(string $path, ?string $disk = null): bool
+    {
+        $selectedDisk = $disk ?? config('filesystems.default', 'local');
+
+        if (Storage::disk($selectedDisk)->exists($path)) {
+            return Storage::disk($selectedDisk)->delete($path);
+        }
+
+        return true;
     }
 }

@@ -368,9 +368,9 @@ class CertificadoService implements ICertificadoService
             ->setOption('isFontSubsettingEnabled', false);
 
         // Guarda el PDF generado directamente a través de IStorageService
-        $this->storageService->put($pdfRelativePath, $pdf->output());
+        $this->storageService->put($pdfRelativePath, $pdf->output(), 'private', $certificado->disk);
 
-        return $this->storageService->getLocalPath($pdfRelativePath);
+        return $this->storageService->getLocalPath($pdfRelativePath, $certificado->disk);
     }
 
     public function downloadCertificado(int $id): array
@@ -581,7 +581,6 @@ class CertificadoService implements ICertificadoService
         $slugSucursal = Str::slug($sucursal->nombre ?? "sucursal");
         $dniAlumno    = $persona->numero_documento;
 
-        // Estructura: /{slugTipoPrograma}/{anio}/{nombreSucursal}/{dniAlumno}
         $folderPath = "{$slugTipoPrograma}/{$anio}/{$slugSucursal}/{$dniAlumno}";
         $fileName = "CERT-{$data['codigo_verificacion']}.pdf";
         $qrFileName = "QR_{$data['codigo_verificacion']}.png";
@@ -590,6 +589,19 @@ class CertificadoService implements ICertificadoService
         $data['path_file'] = $folderPath;
         $data['filename'] = $fileName;
         $data['codigo_qr_path'] = "{$folderPath}/{$qrFileName}";
+
+        // Determinar el disco de almacenamiento: si no se envía o está vacío, usa 'public' o 'local'
+        $diskDestino = !empty($data['disk']) ? $data['disk'] : config('filesystems.default', 'public');
+        $data['disk'] = $diskDestino;
+
+        // Si es S3, completamos opcionalmente bucket y región si vienen vacíos
+        if ($diskDestino === 's3') {
+            $data['bucket'] = $data['bucket'] ?? config('filesystems.disks.s3.bucket', null);
+            $data['region'] = $data['region'] ?? config('filesystems.disks.s3.region', null);
+        } else {
+            $data['bucket'] = null;
+            $data['region'] = null;
+        }
 
         // Guardar el registro en base de datos
         $certificado = $this->certificadoRepository->create($data);

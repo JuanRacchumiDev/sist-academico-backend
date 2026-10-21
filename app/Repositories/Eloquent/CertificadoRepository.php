@@ -27,9 +27,7 @@ class CertificadoRepository implements ICertificadoRepository
     {
         $query = $this->applyFilters($searchParams ?? []);
 
-        $certificados = $query->get();
-
-        return $certificados;
+        return $query->get();
     }
 
     public function getAllFiltered(array $filters, int $perPage = 10): LengthAwarePaginator

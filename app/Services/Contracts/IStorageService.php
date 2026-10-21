@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Services\Contracts;
+use Illuminate\Http\UploadedFile;
 
 interface IStorageService
 {
@@ -33,4 +34,8 @@ interface IStorageService
      * Retorna la ruta absoluta local (si aplica) o descarga a un path temporal
      */
     public function getLocalPath(string $path, ?string $disk = null): string;
+
+    public function putFile(string $path, UploadedFile $file, ?string $disk = null): bool;
+
+    public function deleteFile(string $path, ?string $disk = null): bool;
 }

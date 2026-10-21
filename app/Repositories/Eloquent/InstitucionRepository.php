@@ -77,8 +77,8 @@ class InstitucionRepository implements IInstitucionRepository
         }
 
         if (!empty($filters['nombre'])) {
-            $search = "%" . strtolower($filters['nombre']) . "%";
-            $query->whereRaw('LOWER(nombre) LIKE ?', [$search]);
+            $nombre = "%" . strtolower($filters['nombre']) . "%";
+            $query->whereRaw('LOWER(nombre) LIKE ?', [$nombre]);
         }
 
         if (array_key_exists('is_cliente', $filters) && $filters['is_cliente'] !== null && $filters['is_cliente'] !== '') {

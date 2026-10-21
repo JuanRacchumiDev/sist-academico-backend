@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 
 class Adjunto extends Model
 {
@@ -27,6 +28,10 @@ class Adjunto extends Model
         'is_descargable',
         'is_visible',
 
+        'disk',
+        'bucket',
+        'region',
+
         'fecha_crea',
         'fecha_actualiza',
         'fecha_elimina',
@@ -46,7 +51,9 @@ class Adjunto extends Model
     ];
 
     protected $casts = [
-        'estado' => 'boolean'
+        'estado' => 'boolean',
+        'is_descargable' => 'boolean',
+        'is_visible' => 'boolean'
     ];
 
     protected $appends = ['nombre_archivo', 'ruta_enlace'];
@@ -75,16 +82,35 @@ class Adjunto extends Model
     }
 
     /**
-     * Accessor para estructurar la URL absoluta de descarga
+     * Accessor dinámico para generar el enlace según el disco (Local, S3, Azure, etc.)
      */
-    public function getRutaEnlaceAttribute(): string
+    public function getRutaEnlaceAttribute(): ?string
     {
-        // Si almacenas URLs completas (S3, etc.), retorna directamente el filepath
+        if ($this->tipo !== 'FILE' || empty($this->filepath)) {
+            return $this->url;
+        }
+
+        // Si el archivo ya es una URL externa
         if (filter_var($this->filepath, FILTER_VALIDATE_URL)) {
             return $this->filepath;
         }
 
-        // Si usas el storage local de Laravel, generas la URL pública correspondiente
-        return asset('storage/' . $this->filepath);
+        // Selecciona el disco configurado (por defecto 'public' o 'local')
+        $diskName = $this->disk ?? config('filesystems.default', 'local');
+
+        try {
+            $disk = Storage::disk($diskName);
+            return $disk->url($this->filepath);
+        } catch(\Exception $e) {
+            return null;
+        }
+
+        // Si almacenas URLs completas (S3, etc.), retorna directamente el filepath
+        // if (filter_var($this->filepath, FILTER_VALIDATE_URL)) {
+        //     return $this->filepath;
+        // }
+
+        // // Si usas el storage local de Laravel, generas la URL pública correspondiente
+        // return asset('storage/' . $this->filepath);
     }
 }
