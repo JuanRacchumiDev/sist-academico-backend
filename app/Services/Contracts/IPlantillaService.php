@@ -16,9 +16,5 @@ interface IPlantillaService
 
     public function getPlantillaById(int $id): ?Plantilla;
 
-    public function createPlantilla(PlantillaCreateDTO $plantillaCreateDTO): Plantilla;
-
-    public function updatePlantilla(int $id, PlantillaUpdateDTO $plantillaUpdateDTO): ?Plantilla;
-
-    public function deletePlantilla(int $id): bool;
+    public function obtenerPlantillaByParams(int $idInstitucion, int $idSucursal, int $codigoTipoPrograma, string $tipoDisenio, string $disenioDefault): ?Plantilla;
 }

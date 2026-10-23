@@ -111,7 +111,6 @@ class AdjuntoService implements IAdjuntoService
                 $filePath = "{$directory}/{$filename}";
 
                 // Subir archivo mediante StorageService
-                // $stored = $this->storageService->put($filePath, file_get_contents($file->getRealPath()));
                 $stored = $this->storageService->putFile($filePath, $file, $disk);
 
                 if (!$stored) {

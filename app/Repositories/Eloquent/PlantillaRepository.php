@@ -41,31 +41,17 @@ class PlantillaRepository implements IPlantillaRepository
         ])->findOrFail($id);
     }
 
-    public function create(array $data): Plantilla
+    public function findDuplicate(int $idInstitucion, int $idSucursal, int $codigoTipoPrograma, string $tipoDisenio, string $disenioDefault): ?Plantilla
     {
-        $plantilla = Plantilla::create($data);
-        return $plantilla;
+        $query = Plantilla::where('id_institucion', $idInstitucion)
+            ->where('id_sucursal', $idSucursal)
+            ->where('codigo_tipoprograma', $codigoTipoPrograma)
+            ->where('tipoDisenio', $tipoDisenio)
+            ->where('disenio_default', $disenioDefault);
+
+        return $query->first();
     }
 
-    public function update(int $id, array $data): ?Plantilla
-    {
-        $plantilla = $this->findById($id);
-
-        if (!$plantilla) {
-            return null;
-        }
-
-        $plantilla->update($data);
-
-        return $plantilla;
-    }
-
-    public function delete(int $id): bool
-    {
-        $plantilla = $this->findById($id);
-
-        return $plantilla ? (bool)$plantilla->delete() : false;
-    }
 
     private function applyFilters(Builder $query, array $filters): Builder
     {

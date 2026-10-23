@@ -68,12 +68,10 @@ Route::prefix('v1')->group(function () {
             Route::delete('/{id}', [PersonaController::class, 'destroy'])->name('personas.destroy');
         });
 
-        Route::prefix('plantillas')->name('plantillas.')->group(function () {
-            Route::get('/', [PlantillaController::class, 'index'])->name('index');
-            Route::post('/', [PlantillaController::class, 'store'])->name('store');
-            Route::get('/{id}', [PlantillaController::class, 'show'])->name('show');
-            Route::put('/{id}', [PlantillaController::class, 'update'])->name('update');
-            Route::delete('/{id}', [PlantillaController::class, 'destroy'])->name('destroy');
+        Route::prefix('plantillas')->group(function () {
+            Route::get('/paginate', [PlantillaController::class, 'getFilteredPaginate'])->name('plantillas.paginate');
+            Route::get('/{id}', [PlantillaController::class, 'show'])->name('plantillas.show');
+            Route::get('/', [PlantillaController::class, 'index'])->name('plantillas');
         });
 
         Route::prefix('programas')->group(function () {
